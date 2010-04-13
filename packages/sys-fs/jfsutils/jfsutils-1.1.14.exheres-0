@@ -1,0 +1,37 @@
+# Copyright 2009 Hong Hao
+# Distributed under the terms of the GNU General Public License v2
+# Based in part upon 'jfsutils-1.1.8.ebuild' from Gentoo, which is:
+#     Copyright 1999-2009 Gentoo Foundation
+# Updated by Barry Schwartz for jfsutils 1.1.14
+
+SUMMARY="IBM JFS utility programs"
+DESCRIPTION="
+Utilities for managing IBM's Journaled File System (JFS) under Linux.  The
+following utilities are available: jfs_fsck - initiate replay of the JFS
+transaction log, and check and repair a JFS formatted device. jfs_fscklog -
+extract a log from the JFS fsck workspace into a file and/or display it.
+jfs_logdump - dump a JFS formatted device's journal log. jfs_mkfs - create
+a JFS formatted partition. jfs_tune - adjust tunable parameters of the JFS
+file system. jfs_debugfs - shell-type JFS file system editor.
+"
+HOMEPAGE="http://jfs.sourceforge.net"
+DOWNLOADS="http://jfs.sourceforge.net/project/pub/${PNV}.tar.gz"
+
+LICENCES="GPL-2"
+SLOT="0"
+PLATFORMS="~x86 ~amd64"
+MYOPTIONS=""
+
+DEPENDENCIES="
+    build+run:
+        sys-libs/glibc"
+
+REMOTE_IDS="sourceforge:jfs"
+BUGS_TO="http://sourceforge.net/tracker/?group_id=128802&atid=712756"
+
+UPSTREAM_CHANGELOG="
+http://jfs.cvs.sourceforge.net/*checkout*/jfs/jfsutils/NEWS?revision=1.41"
+UPSTREAM_DOCUMENTATION="
+http://jfs.sourceforge.net/project/pub/faq.txt"
+
+DEFAULT_SRC_CONFIGURE_PARAMS=( '--sbindir=/sbin' )
