@@ -1,0 +1,22 @@
+# Copyright 2010 Barry Schwartz
+# Distributed under the terms of the GNU General Public License v2
+
+require sourceforge [ suffix=tar.gz ]
+
+SUMMARY="MenuMaker, a menu generation utility"
+DESCRIPTION="
+MenuMaker generates a menu for your window manager.
+It is written in pure Python."
+HOMEPAGE="http://menumaker.sourceforge.net/"
+
+LICENCES="BSD-2"
+SLOT="0"
+PLATFORMS="~amd64"
+MYOPTIONS=""
+
+DEPENDENCIES="
+    build+run:
+        dev-lang/python:=[>=2.3]
+"
+
+DEFAULT_SRC_CONFIGURE_PARAMS=( --hates=docdir )
