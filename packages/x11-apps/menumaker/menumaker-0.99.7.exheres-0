@@ -7,7 +7,6 @@ SUMMARY="MenuMaker, a menu generation utility"
 DESCRIPTION="
 MenuMaker generates a menu for your window manager.
 It is written in pure Python."
-HOMEPAGE="http://menumaker.sourceforge.net/"
 
 LICENCES="BSD-2"
 SLOT="0"
