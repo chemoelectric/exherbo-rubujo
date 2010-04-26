@@ -1,0 +1,50 @@
+# Copyright 2010 Barry Schwartz
+# Distributed under the terms of the GNU General Public License v2
+
+SUMMARY="gClip, a clipboard manager for X11"
+HOMEPAGE="http://gclip.uhvo.org/"
+DOWNLOADS="
+    http://gclip.uhvo.org/sec/gclip.txt -> "${PNV}"
+    http://gclip.uhvo.org/sec/gclip.desktop -> "${PNV}.desktop"
+    http://www.openclipart.org/image/64px/svg_to_png/edit-paste.png -> "${PNV}".png
+"
+
+LICENCES="
+    CCPL-Attribution-Noncommercial-ShareAlike-3.0
+    gClip-appendices
+    public-domain
+"
+SLOT="0"
+PLATFORMS="~amd64"
+MYOPTIONS=""
+WORK="${WORKBASE}"
+
+DEPENDENCIES="
+    run:
+        dev-lang/perl:*
+        dev-perl/Gtk2-TrayIcon
+"
+
+src_unpack()
+    {
+        cp "${FETCHEDDIR}/${PNV}" "${PN}"
+        cp "${FETCHEDDIR}/${PNV}.desktop" "${PN}.desktop"
+        cp "${FETCHEDDIR}/${PNV}.png" "${PN}.png"
+    }
+
+src_prepare()
+    {
+        sed -i -e "s/^Exec=.*/Exec=${PN}/;
+                   s/^Icon=.*/Icon=firefox-icon/" "${PN}.desktop"
+    }
+
+src_install()
+    {
+        dobin "${PN}"
+
+        insinto /usr/share/applications        
+        doins "${PN}.desktop"
+
+        insinto /usr/share/pixmaps
+        doins "${PN}.png"
+    }
