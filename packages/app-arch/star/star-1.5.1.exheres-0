@@ -9,22 +9,12 @@ DOWNLOADS="ftp://ftp.berlios.de/pub/star/${PNV}.tar.bz2"
 LICENCES="LGPL-2.1"
 SLOT="0"
 PLATFORMS="~amd64"
-MYOPTIONS="acl doc
-    static [[ description = [ Create static binaries of star, smt, and rmt,
-                              and put them in /bin and /sbin instead of under /usr ] ]]
-    xattr"
+MYOPTIONS="acl doc xattr"
 
 DEPENDENCIES="
-    static? (
-        build:
-            acl? ( sys-apps/acl )
-            xattr? ( sys-apps/attr )
-    )
-    !static? (
-        build+run:
-            acl? ( sys-apps/acl )
-            xattr? ( sys-apps/attr )
-    )
+    build+run:
+        acl? ( sys-apps/acl )
+        xattr? ( sys-apps/attr )
     build:
         sys-devel/smake
 "
@@ -56,13 +46,7 @@ src_configure()
 
 src_compile()
 {
-    local coptx="${CFLAGS} -DTRY_EXT2_FS"
-    local loptx="${LDFLAGS}"
-
-    if option static ; then
-        loptx="-static ${loptx}"
-    fi
-    edo smake COPTX="${coptx}" LDOPTX="${loptx}"
+    edo smake COPTX="${CFLAGS} -DTRY_EXT2_FS" LDOPTX="${LDFLAGS}"
 }
 
 src_install()
@@ -81,7 +65,4 @@ src_install()
 
     edo mv "${IMAGE}/usr/share/doc/${PN}" "${IMAGE}/usr/share/doc/${PNVR}"
     edo mv "${IMAGE}/usr/man" "${IMAGE}/usr/share/man"
-
-    edo mv "${IMAGE}/usr/bin" "${IMAGE}/bin"
-    edo mv "${IMAGE}/usr/sbin" "${IMAGE}/sbin"
 }
