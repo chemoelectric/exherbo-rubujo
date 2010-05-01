@@ -1,0 +1,50 @@
+# Copyright (c) 2010 Barry Schwartz
+# Distributed under the terms of the GNU General Public License v2
+
+SUMMARY="smake -- maintain, update, and regenerate programs"
+HOMEPAGE="http://developer.berlios.de/projects/smake/"
+DOWNLOADS="ftp://ftp.berlios.de/pub/smake/${PNV}.tar.bz2"
+
+LICENCES="CDDL-Schily GPL-2"
+SLOT="0"
+PLATFORMS="~amd64"
+MYOPTIONS=""
+
+DEPENDENCIES=""
+
+src_prepare()
+{
+    local culprits='autoconf/aclocal.m4
+autoconf/configure
+autoconf/configure.in
+autoconf/xconfig.h.in
+autoconf/aclocal.m4
+autoconf/configure
+autoconf/configure.in
+autoconf/xconfig.h.in
+DEFAULTS/Defaults.gnu
+DEFAULTS/Defaults.linux
+DEFAULTS_ENG/Defaults.gnu
+DEFAULTS_ENG/Defaults.linux'
+
+    for i in ${culprits}; do
+        edo sed -i -e 's|/usr/src/linux/include|/usr/include/linux|g' $i
+    done
+}
+
+src_configure()
+{
+    :
+}
+
+src_compile()
+{
+    emake COPTX="${CFLAGS} -DTRY_EXT2_FS" LDOPTX="${LDFLAGS}"
+}
+
+src_install()
+{
+    emake INS_BASE=/usr DESTDIR="${IMAGE}" install
+    edo mkdir -p "${IMAGE}/usr/share"
+    edo mv "${IMAGE}/usr/man" "${IMAGE}/usr/share/man"
+}
