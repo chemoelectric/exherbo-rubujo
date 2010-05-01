@@ -1,0 +1,87 @@
+# Copyright (c) 2010 Barry Schwartz
+# Distributed under the terms of the GNU General Public License v2
+
+SUMMARY="star -- unique standard tape archiver"
+DESCRIPTION="FIXME"
+HOMEPAGE="http://developer.berlios.de/projects/star/"
+DOWNLOADS="ftp://ftp.berlios.de/pub/star/${PNV}.tar.bz2"
+
+LICENCES="LGPL-2.1"
+SLOT="0"
+PLATFORMS="~amd64"
+MYOPTIONS="acl doc
+    static [[ description = [ Create static binaries of star, smt, and rmt,
+                              and put them in /bin and /sbin instead of under /usr ] ]]
+    xattr"
+
+DEPENDENCIES="
+    static? (
+        build:
+            acl? ( sys-apps/acl )
+            xattr? ( sys-apps/attr )
+    )
+    !static? (
+        build+run:
+            acl? ( sys-apps/acl )
+            xattr? ( sys-apps/attr )
+    )
+    build:
+        sys-devel/smake
+"
+
+src_prepare()
+{
+    local culprits='autoconf/aclocal.m4
+autoconf/configure
+autoconf/configure.in
+autoconf/xconfig.h.in
+autoconf/aclocal.m4
+autoconf/configure
+autoconf/configure.in
+autoconf/xconfig.h.in
+DEFAULTS/Defaults.gnu
+DEFAULTS/Defaults.linux
+DEFAULTS_ENG/Defaults.gnu
+DEFAULTS_ENG/Defaults.linux'
+
+    for i in ${culprits}; do
+        edo sed -i -e 's|/usr/src/linux/include|/usr/include/linux|g' $i
+    done
+}
+
+src_configure()
+{
+    :
+}
+
+src_compile()
+{
+    local coptx="${CFLAGS} -DTRY_EXT2_FS"
+    local loptx="${LDFLAGS}"
+
+    if option static ; then
+        loptx="-static ${loptx}"
+    fi
+    edo smake COPTX="${coptx}" LDOPTX="${loptx}"
+}
+
+src_install()
+{
+    edo smake INS_BASE=/usr DESTDIR="${IMAGE}" install
+
+    # Get rid of "tar" and "mt", so they don't become confused with
+    # the GNU tools.
+    for i in tar mt; do
+        edo rm "${IMAGE}/usr/bin/${i}"
+    done
+
+    if ! option doc ; then
+        edo rm -r "${IMAGE}/usr/share/doc/${PN}/testscripts"
+    fi
+
+    edo mv "${IMAGE}/usr/share/doc/${PN}" "${IMAGE}/usr/share/doc/${PNVR}"
+    edo mv "${IMAGE}/usr/man" "${IMAGE}/usr/share/man"
+
+    edo mv "${IMAGE}/usr/bin" "${IMAGE}/bin"
+    edo mv "${IMAGE}/usr/sbin" "${IMAGE}/sbin"
+}
