@@ -1,0 +1,22 @@
+# Copyright 2010 Barry Schwartz
+# Distributed under the terms of the GNU General Public License v2
+
+SCM_REPOSITORY="http://bitbucket.org/durin42/${PN}/"
+
+require scm-hg distutils
+
+SUMMARY="hg-git, a plugin for Mercurial to let it push to and pull from a Git server"
+HOMEPAGE="http://hg-git.github.com/"
+
+LICENCES="GPL-2"
+SLOT="0"
+PLATFORMS="~amd64"
+MYOPTIONS=""
+
+DEPENDENCIES="
+    build+run:
+        dev-lang/python
+    run:
+        dev-python/dulwich[>=0.3.2]
+        dev-scm/mercurial[>=1.3]
+"
