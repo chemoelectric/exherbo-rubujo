@@ -20,3 +20,16 @@ DEPENDENCIES="
         dev-python/dulwich[>=0.3.2]
         dev-scm/mercurial[>=1.3]
 "
+
+pkg_postinst()
+{
+    ewarn ""
+    ewarn "Be sure to put entries like these in"
+    ewarn "the 'extensions' section of your ~/.hgrc file:"
+    ewarn ""
+    ewarn "[extensions]"
+    ewarn "hgext.bookmarks ="
+    ewarn "hggit ="
+    ewarn ""
+}
+
