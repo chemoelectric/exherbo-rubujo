@@ -35,7 +35,14 @@ src_prepare()
 
      # Encourage the user to set a station identifier.
      edo sed -i -e 's/^station =/#station =/' "${PN}.conf"
- }
+}
+
+src_install()
+{
+    default
+    edo cd ..
+    dodoc README CHANGES
+}
 
 pkg_postinst()
 {
