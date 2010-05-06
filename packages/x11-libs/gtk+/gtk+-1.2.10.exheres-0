@@ -1,0 +1,48 @@
+# Copyright 2010 Barry Schwartz
+# Distributed under the terms of the GNU General Public License v2
+# Based in part upon 'gtk+-1.2.10-r12.ebuild' from Gentoo, which is:
+#     Copyright 1999-2008 Gentoo Foundation.
+
+GENTOO_PATCH=${PNV}-r8-gentoo.diff
+
+require flag-o-matic autotools [ supported_autoconf=[ 2.5 ] supported_automake=[ 1.11 ] ]
+
+SUMMARY="The GIMP Toolkit"
+HOMEPAGE="http://www.gtk.org/"
+DOWNLOADS="
+    mirror://gnome/sources/${PN}/$(ever range 1-2)/${PNV}.tar.gz
+    mirror://gentoo/${GENTOO_PATCH}.bz2
+"
+
+LICENCES="LGPL-2.1"
+SLOT="1"
+PLATFORMS="~amd64"
+LINGUAS=" az ca cs da de el es et eu fi fr ga gl hr hu it ja ko lt nl nn no pl pt_BR pt ro ru sk sl sr sv tr uk vi"
+MYOPTIONS="linguas: ${LINGUAS}"
+
+DEPENDENCIES="
+    build+run:
+        dev-libs/glib[=1.2*]
+        x11-libs/libXi
+        x11-libs/libXt
+    build:
+        x11-proto/inputproto
+        x11-proto/xextproto
+        sys-devel/gettext
+        dev-util/intltool
+"
+
+DEFAULT_SRC_CONFIGURE_PARAMS=( --hates=docdir )
+
+src_prepare()
+{
+    append-flags -fgnu89-inline
+    expatch -p1 "${FILES}/${PNV}-m4.patch"
+    expatch -p0 "${FILES}/${PNV}-automake.patch"
+    expatch -p0 "${FILES}/${PNV}-cleanup.patch"
+    expatch -p1 "../${GENTOO_PATCH}"
+    expatch -p0 "${FILES}/${PN}-1.2-locale_fix.patch"
+    expatch -p1 "${FILES}/${PNV}-as-needed.patch"
+    edo sed -i -e "/libtool.m4/,/AM_PROG_NM/d" acinclude.m4
+    eautoreconf
+}
