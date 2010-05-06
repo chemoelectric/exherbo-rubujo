@@ -1,0 +1,52 @@
+# Copyright (c) 2010 Barry Schwartz
+# Distributed under the terms of the GNU General Public License v2
+# Based in part upon 'grip-3.3.1-r2.ebuild' from Gentoo, which is:
+#     Copyright 1999-2008 Gentoo Foundation.
+
+
+require sourceforge [ suffix=tar.gz ] autotools [ supported_autoconf=[ 2.5 ] supported_automake=[ 1.11 1.10 ] ] flag-o-matic
+
+SUMMARY="Grip, a cd-player and cd-ripper for Gnome"
+
+LICENCES="GPL-2"
+SLOT="0"
+
+# An x86 fix was taken from Gentoo, but that platform has not yet been tested on Exherbo.
+PLATFORMS="~amd64"
+
+LANGS="be bg ca de en en_CA en_GB en_US es fi fr hu it ja nl pl_PL pt_BR ru zh_CN zh_HK zh_TW"
+MYOPTIONS="vorbis linguas: ${LANGS} platform: x86"
+
+DEPENDENCIES="
+    build+run:
+        x11-libs/gtk+:2
+        dev-libs/vte
+        media-sound/lame
+        media/cdparanoia
+        media-libs/id3lib
+        gnome-platform/libgnomeui
+        gnome-platform/ORBit2
+        net-misc/curl
+        vorbis? ( media-sound/vorbis-tools )
+    build:
+        dev-util/pkg-config
+        sys-devel/gettext
+"
+
+DEFAULT_SRC_PREPARE_PATCHES=(
+    "${FILES}/${PNV}-implicit-declaration.patch"
+    "${FILES}/${PNV}-configure.patch"
+)
+
+DEFAULT_SRC_CONFIGURE_PARAMS=(
+    --hates=docdir
+    --enable-nls
+)
+
+src_configure()
+{
+    if option platform:x86 ; then
+        append-flags -mno-sse
+    fi
+    default
+}

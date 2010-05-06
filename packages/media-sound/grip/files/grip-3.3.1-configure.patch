@@ -1,0 +1,33 @@
+--- grip-3.3.1.ORIG/configure.in	2005-06-25 18:39:23.000000000 +0000
++++ grip-3.3.1/configure.in	2010-05-06 00:25:38.571322117 +0000
+@@ -54,7 +54,12 @@
+ if test "$enable_cdpar" = "yes"; then
+   LIBS="$LIBS -lm"
+ 
+-  AC_CHECK_HEADERS(cdda_interface.h cdda_paranoia.h)
++  AC_CHECK_HEADERS([cdda_interface.h cdda_paranoia.h], [], [],
++    [[#ifdef HAVE_CDDA_INTERFACE_H
++    #include <cdda_interface.h>
++    #endif
++    ]])
++
+   AC_CHECK_HEADERS(cdda/cdda_interface.h cdda/cdda_paranoia.h)
+ 
+   AC_CHECK_LIB(cdda_interface,main,
+@@ -93,6 +98,7 @@
+ dnl ID3LIB_MAJOR, ID3LIB_MINOR, ID3LIB_PATCH
+ if test $id3lib = yes; then
+     AC_MSG_CHECKING(for id3lib version)
++      my_cwd=`pwd`
+       AC_TRY_RUN([
+ #include <id3.h>
+ #include <stdio.h>
+@@ -106,7 +112,7 @@
+     fclose(output);
+     exit(0);
+ }
+-], . conftest.id3
++], . "${my_cwd}/conftest.id3"
+    echo "${ID3LIB_MAJOR}.${ID3LIB_MINOR}.${ID3LIB_PATCH}", 
+    AC_MSG_WARN(could not determine id3lib version),[echo $ac_n "cross compiling; assuming ${ID3LIB_MAJOR}.${ID3LIB_MINOR}.${ID3LIB_PATCH} $ac_c"])
+    AC_DEFINE_UNQUOTED(ID3LIB_MAJOR, $ID3LIB_MAJOR, [Description])
