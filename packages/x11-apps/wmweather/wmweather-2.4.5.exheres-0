@@ -1,0 +1,45 @@
+# Copyright 2010 Barry Schwartz
+# Distributed under the terms of the GNU General Public License v2
+
+SUMMARY="wmweather, a weather-display dockapp"
+DOWNLOADS="http://ftp.debian.org/debian/pool/main/w/${PN}/${PN}_${PV}.orig.tar.gz"
+
+LICENCES="GPL-2"
+SLOT="0"
+PLATFORMS="~amd64"
+MYOPTIONS=""
+
+WORK="${WORKBASE}/${PNV}/src"
+
+DEPENDENCIES="
+    build+run:
+        net-misc/curl
+        x11-libs/libXpm
+        x11-libs/libXext
+        x11-libs/libX11
+        x11-libs/libXau
+        x11-libs/libXdmcp
+    run:
+        x11-apps/xmessage
+"
+
+DEFAULT_SRC_CONFIGURE_PARAMS=( --with-xmessage )
+
+src_prepare()
+{
+     default
+
+     # The default system-wide config file probably shouldn't override
+     # program defaults.
+     edo sed -i -e 's/^metric$/#metric/' "${PN}.conf"
+
+     # Encourage the user to set a station identifier.
+     edo sed -i -e 's/^station =/#station =/' "${PN}.conf"
+ }
+
+pkg_postinst()
+{
+    ewarn "A weather station identifier has to be set in /etc/wmweather.conf, at the"
+    ewarn "command line, or in the user's config."
+    ewarn "You can find station identifiers at http://www.nws.noaa.gov/tg/siteloc.shtml"
+}
