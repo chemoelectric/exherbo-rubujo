@@ -24,7 +24,17 @@ DEPENDENCIES="
         dev-util/pkg-config
 "
 
-DEFAULT_SRC_CONFIGURE_PARAMS=( --hates=docdir )
+DEFAULT_SRC_CONFIGURE_PARAMS=(
+    --hates=docdir
+    --hates=disable-silent-rules
+)
+
+src_prepare() {
+    default
+
+    # Do not build the examples.
+    edo sed "s:\(SUBDIRS.*\)examples:\1:" -i Makefile.am Makefile.in
+}
 
 src_install()
 {
