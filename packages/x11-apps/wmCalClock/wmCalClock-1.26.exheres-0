@@ -1,0 +1,32 @@
+# Copyright 2010 Barry Schwartz
+# Distributed under the terms of the GNU General Public License v2
+
+SUMMARY="wmCalClock, a calendar-clock dockapp"
+HOMEPAGE="http://wmcalclock.darwinports.com/"
+DOWNLOADS="http://jmpacquet.free.fr/wmcalclock/${PNV}.tar.gz"
+
+LICENCES="GPL-2"
+SLOT="0"
+PLATFORMS="~amd64"
+MYOPTIONS=""
+
+DEPENDENCIES="
+    build+run:
+        x11-libs/libXpm
+        x11-libs/libXext
+        x11-libs/libX11
+        x11-libs/libXau
+        x11-libs/libXdmcp
+"
+
+src_compile()
+{
+    emake -C Src
+}
+
+src_install()
+{
+    dobin Src/wmCalClock
+    doman Src/wmCalClock.1
+    dodoc TODO README CHANGES BUGS
+}
