@@ -19,8 +19,6 @@ SLOT="1"
 PLATFORMS="~amd64"
 MYOPTIONS=""
 
-# The Gentoo build listed no dependencies, and this library is
-# obsolete, anyway.
 DEPENDENCIES=""
 
 DEFAULT_SRC_CONFIGURE_PARAMS=(
