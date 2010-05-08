@@ -1,0 +1,43 @@
+# Copyright 2009 A Frederick Christensen <fauxmight@nosocomia.com>
+# Distributed under the terms of the GNU General Public License v2
+
+require multilib
+
+SUMMARY="Camlp5 is a preprocessor-pretty-printer of OCaml"
+
+HOMEPAGE="http://pauillac.inria.fr/~ddr/camlp5/"
+DOWNLOADS="http://pauillac.inria.fr/~ddr/camlp5/distrib/src/${PNV}.tgz"
+
+LICENCES="BSD-3"
+SLOT="0"
+PLATFORMS="~amd64 ~x86"
+MYOPTIONS="
+    strict [[ description = [ new sytax tree - breaks compatibility with older syntax tree ] ]]
+"
+
+DEPENDENCIES="
+    build+run:
+        dev-lang/ocaml[>=3.08.0&<=3.12.0]
+"
+
+BUGS_TO="fauxmight@nosocomia.com"
+
+# This OCaml specific configure file behaves very unlike
+# 'normal' (read autotools) configure files. Options are in the
+# form "--option value" rather than "--option=value" 
+# (' ' instead of '=')
+src_configure() {
+    option strict && CAMLP5_MODE="--strict" || CAMLP5_MODE="--transitional"
+    ./configure \
+        --prefix /usr \
+        --bindir /usr/bin \
+        --mandir /usr/share/man \
+        --libdir /usr/$(get_libdir) \
+        "$CAMLP5_MODE" || die "Configure failed!"
+}
+
+# This OCaml specific makefile doesn't understand 'normal' 
+# (read autotools) make options like -j#
+src_compile() {
+    make world.opt || die "Make failed!"
+}

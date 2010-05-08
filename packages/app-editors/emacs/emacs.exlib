@@ -1,0 +1,134 @@
+# Copyright 2008, 2009 Ingmar Vanhassel <ingmar@exherbo.org>
+# Distributed under the terms of the GNU General Public License v2
+# Based in part upon 'emacs-22.2-r2.ebuild' from Gentoo, which is:
+#     Copyright 1999-2008 Gentoo Foundation.
+
+require game elisp-module
+
+if [[ -z $(ever range 3) ]]; then
+    require gnu [ suffix=bz2 ]
+else
+    require gnu [ alpha=true subdir=pretest suffix=gz ]
+fi
+
+export_exlib_phases src_prepare src_install pkg_postinst pkg_postrm
+
+SUMMARY="The extensible, customizable, self-documenting, real-time display editor"
+
+LICENCES="GPL-3"
+SLOT="0"
+MYOPTIONS="
+    X alsa dbus freetype gif gpm gtk jpeg otf png svg tiff tiff xpm
+    ( freetype gif gtk jpeg otf png svg tiff tiff xim xpm ) [[ requires = X ]]
+    otf [[
+        description = [ Support for OpenType fonts ]
+        requires = freetype
+    ]]
+    xim [[
+        description = [ Enable X11 XiM input method ]
+    ]]
+"
+
+# Make sure slotted versions of emacs are removed before installation
+# Added March 13th, to be removed after a month
+DEPENDENCIES="
+    build:
+        X? ( dev-util/pkg-config )
+        alsa? ( dev-util/pkg-config )
+        dbus? ( dev-util/pkg-config )
+        gtk? ( dev-util/pkg-config )
+        svg? ( dev-util/pkg-config )
+    build+run:
+        !app-editors/emacs:23.1
+        !app-editors/emacs:23.1.92
+        !app-editors/emacs:23.2
+        net-libs/liblockfile
+        sys-libs/ncurses
+        alsa? ( sys-sound/alsa-lib[>=1.0.0] )
+        X? (
+            x11-libs/libXmu
+            x11-libs/libXt
+            x11-data/xbitmaps
+            gif? ( media-libs/giflib )
+            gtk? (
+              dev-libs/glib:2[>=2.6]
+              x11-libs/gtk+:2[>=2.6]
+              x11-libs/libXft[>=0.13.0]
+            )
+            jpeg? ( media-libs/jpeg )
+            otf? ( dev-libs/libotf )
+            png? ( media-libs/libpng )
+            svg? ( gnome-desktop/librsvg:2[>=2.11.0] )
+            tiff? ( media-libs/tiff )
+            xpm? ( x11-libs/libXpm )
+        )
+        dbus? ( sys-apps/dbus[>=1.0.0] )
+        freetype? (
+            media-libs/fontconfig[>=2.2.0]
+            media-libs/freetype:2
+            x11-libs/libXft[>=0.13.0]
+        )
+        gpm? ( sys-libs/gpm )
+   suggestion:
+        app-spell/aspell [[ description = [ For ispell and flyspell mode ] ]]
+"
+
+DEFAULT_SRC_CONFIGURE_PARAMS=(
+    --infodir=/usr/share/info/emacs
+    --without-kerberos
+    --without-kerberos5
+    --without-hesiod
+    --without-m17n-flt
+)
+
+DEFAULT_SRC_CONFIGURE_OPTION_WITHS=(
+    'X x'
+    'alsa sound'
+    'freetype xft'
+    'gtk x-toolkit gtk' 'gtk toolkit-scroll-bars'
+    'otf libotf'
+    'svg rsvg'
+    'dbus' 'gif' 'gpm' 'jpeg' 'png' 'tiff' 'xim' 'xpm'
+)
+
+emacs_src_prepare() {
+    # Compressing *.el files saves 25MB diskspace, which is not worth it on modern systems
+    edo sed -i -e 's/@GZIP_PROG@//' {.,leim}/Makefile.in
+    default
+}
+
+emacs_src_install() {
+    default
+
+    insinto ${ELISP_SITE_LISP}
+    hereins site-start.el <<EOF
+(require 'site-exherbo)
+EOF
+
+    keepdir /var/lib/games/emacs
+    dovarlibgames -R
+    # they lose group write permission anyway after being updated
+    edo chmod g-w "${IMAGE}"/var/lib/games/emacs/*
+    preserve_scores "${IMAGE}"/var/lib/games/emacs/*
+    edo chown wizard:games "${IMAGE}"/usr/libexec/emacs/${PV}/${CHOST}/update-game-score
+    edo chmod ug+s "${IMAGE}"/usr/libexec/emacs/${PV}/${CHOST}/update-game-score
+
+    local i
+    for i in "${IMAGE}"/usr/share/info/${PN}/*; do
+        edo mv "${i}" "${i}.info"
+    done
+
+    hereenvd 70${PN} <<EOF
+INFOPATH="/usr/share/info/${PN}"
+EOF
+}
+
+emacs_pkg_postinst() {
+    game_pkg_postinst
+    elisp-generate-global-site-file
+}
+
+emacs_pkg_postrm() {
+    :
+}
+

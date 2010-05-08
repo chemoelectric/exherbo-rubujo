@@ -1,0 +1,39 @@
+# Copyright 2009 A Frederick Christensen <fauxmight@nosocomia.com>
+# Copyright 2010 Barry Schwartz <github@crudfactory.com>
+# Distributed under the terms of the GNU General Public License v2
+
+SUMMARY="Ledit is a line editor, allowing to use shell commands with control 
+characters like in emacs"
+DESCRIPTION="'ledit ocaml' is a standard way to run the OCaml
+toplevel, but ledit can be used with many other programs."
+HOMEPAGE="http://pauillac.inria.fr/~ddr/ledit/"
+DOWNLOADS="http://pauillac.inria.fr/~ddr/ledit/distrib/src/${PNV}.tgz"
+
+LICENCES="BSD-3"
+SLOT="0"
+PLATFORMS="~amd64"
+MYOPTIONS=""
+
+DEPENDENCIES="
+    build:
+        dev-lang/ocaml
+        dev-ocaml/camlp5
+"
+
+src_compile()
+{
+    # The Makefile is pretty messy, but the following produces the
+    # optimized binary.
+    emake -j1
+    emake -j1 "${PN}.opt"
+
+    # And this produces the manpage.
+    emake -j1 "${PN}.1"
+}
+
+src_install()
+{
+    newbin "${PN}.opt" "${PN}"
+    doman "${PN}.1"
+    dodoc README CHANGES
+}
