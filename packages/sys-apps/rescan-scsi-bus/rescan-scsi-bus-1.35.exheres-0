@@ -1,0 +1,31 @@
+# Copyright 2010 Barry Schwartz
+# Distributed under the terms of the GNU General Public License v2
+
+SUMMARY="rescan-scsi-bus"
+DESCRIPTION="
+The Revision Control System (RCS) manages multiple revisions of files. RCS
+automates the storing, retrieval, logging, identification, and merging of
+revisions. RCS is useful for text that is revised frequently, e. g. programs,
+documentation, graphics, papers, and form letters.
+You don't want to use this unless it's a dependency for something you really need.
+"
+HOMEPAGE="http://www.garloff.de/kurt/linux/"
+DOWNLOADS="http://www.garloff.de/kurt/linux/${PN}.sh-${PV}"
+
+SLOT="0"
+LICENCES="GPL-2"
+PLATFORMS="~amd64"
+MYOPTIONS=""
+
+DEPENDENCIES="
+    run:
+        app-shells/bash
+"
+
+WORK="${WORKBASE}"
+
+src_install()
+{
+    newsbin "${FETCHEDDIR}/${PN}.sh-${PV}" "${PN}"
+}
+
