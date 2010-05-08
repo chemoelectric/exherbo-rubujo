@@ -1,0 +1,28 @@
+# Copyright 2009 Saleem Abdulrasool <compnerd@compnerd.org>
+# Distributed under the terms of the GNU General Public License v2
+
+MY_PV="${PV%_p*}"
+MY_PNV="${PN}-${MY_PV}"
+
+SUMMARY="A lean, small and clean implementation of an ATA S.M.A.R.T"
+HOMEPAGE="http://0pointer.de/blog/projects/being-smart.html"
+DOWNLOADS="
+   http://archive.ubuntu.com/ubuntu/pool/main/liba/libatasmart/libatasmart_0.17+git20100219.orig.tar.gz
+   http://archive.ubuntu.com/ubuntu/pool/main/liba/libatasmart/libatasmart_0.17+git20100219-1git2.diff.gz
+"
+
+LICENCES="LGPL-2.1"
+SLOT="0"
+PLATFORMS="~amd64 ~x86"
+MYOPTIONS=""
+
+DEPENDENCIES="
+    build:
+        dev-util/pkg-config[>=0.20]
+    build+run:
+        sys-fs/udev[>=140]
+"
+
+WORK="${WORKBASE}/${MY_PNV}"
+
+DEFAULT_SRC_PREPARE_PATCHES=( "${WORKBASE}/libatasmart_0.17+git20100219-1git2.diff" )
