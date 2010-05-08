@@ -1,5 +1,5 @@
 # Copyright 2009 A Frederick Christensen <fauxmight@nosocomia.com>
-# Copyright 2010 Barry Schwartz <github@crudfactory.com>
+# Copyright 2010 Barry Schwartz
 # Distributed under the terms of the GNU General Public License v2
 
 SUMMARY="Ledit is a line editor, allowing to use shell commands with control 
