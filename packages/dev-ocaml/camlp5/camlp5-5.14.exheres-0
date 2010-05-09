@@ -20,7 +20,7 @@ DEPENDENCIES="
         dev-lang/ocaml[>=3.08.0&<=3.12.0]
 "
 
-BUGS_TO="fauxmight@nosocomia.com"
+#BUGS_TO="fauxmight@nosocomia.com"
 
 # This OCaml specific configure file behaves very unlike
 # 'normal' (read autotools) configure files. Options are in the
@@ -32,7 +32,7 @@ src_configure() {
         --prefix /usr \
         --bindir /usr/bin \
         --mandir /usr/share/man \
-        --libdir /usr/$(get_libdir) \
+        --libdir /usr/$(get_libdir)/ocaml \
         "$CAMLP5_MODE" || die "Configure failed!"
 }
 
@@ -40,4 +40,10 @@ src_configure() {
 # (read autotools) make options like -j#
 src_compile() {
     make world.opt || die "Make failed!"
+}
+
+src_install() {
+    default
+    insinto /usr/$(get_libdir)/ocaml/${PN}
+    doins etc/META
 }
