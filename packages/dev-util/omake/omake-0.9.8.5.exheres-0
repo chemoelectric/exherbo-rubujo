@@ -1,0 +1,77 @@
+# Copyright 2010 Barry Schwartz
+# Distributed under the terms of the GNU General Public License v2
+# Based in part upon 'omake-0.9.8.5.ebuild' from Gentoo, which is:
+#     Copyright 1999-2009 Gentoo Foundation.
+
+EXTRA_PV="-3"
+
+SUMMARY="OMake, a build system, particularly for Objective Caml"
+HOMEPAGE="http://omake.metaprl.org/"
+DOWNLOADS="http://omake.metaprl.org/downloads/${PNV}${EXTRA_PV}.tar.gz"
+LICENCES="GPL-2"
+
+SLOT="0"
+PLATFORMS="~amd64"
+MYOPTIONS="doc ncurses readline"
+DEPENDENCIES="
+    build+run:
+        readline? ( sys-libs/readline )
+        ncurses? ( sys-libs/ncurses )
+    build:
+        dev-lang/ocaml
+"
+
+option_boolean()
+{
+    if option $1; then
+        echo "true"
+    else
+        echo "false"
+    fi
+}
+
+src_prepare()
+{
+    expatch -p0 "${FILES}/${PNV}-caml_sync.patch"
+    expatch -p1 "${FILES}/${PNV}-lm_printf.patch"
+}
+
+src_configure()
+{
+    echo "PREFIX = \$(dir \$\"/usr\")" > .config
+    echo "BINDIR = \$(dir \$\"\$(PREFIX)/bin\")" >> .config
+    echo "LIBDIR = \$(dir \$\"\$(PREFIX)/$(get_libdir)\")" >> .config
+    echo "MANDIR = \$(dir \$\"\$(PREFIX)/man\")" >> .config
+
+    echo "CC = ${CC-cc}" >> .config
+    echo "CFLAGS = ${CFLAGS}" >> .config
+
+    echo "NATIVE_ENABLED = false" >> .config
+    echo "BYTE_ENABLED = true" >> .config
+
+    echo "NATIVE_PROFILE = false" >> .config
+
+    echo "READLINE_ENABLED = $(option_boolean readline)" >> .config
+    echo "FAM_ENABLED = false" >> .config
+    echo "NCURSES_ENABLED = $(option_boolean ncurses)" >> .config
+
+    echo "DEFAULT_SAVE_INTERVAL = 60" >> .config
+
+    echo "OCAMLDEP_MODULES_ENABLED = false" >> .config
+}
+
+src_compile()
+{
+    emake bootstrap
+    emake all
+}
+
+src_install()
+{
+    emake INSTALL_ROOT="${IMAGE}" install
+    dodoc CHANGELOG.txt
+    if option doc; then
+        dodoc doc/ps/omake-doc.{pdf,ps} doc/txt/omake-doc.txt
+        dohtml -r doc/html/*
+    fi
+}
