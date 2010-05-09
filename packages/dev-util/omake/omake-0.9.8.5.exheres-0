@@ -46,8 +46,8 @@ src_configure()
     echo "CC = ${CC-cc}" >> .config
     echo "CFLAGS = ${CFLAGS}" >> .config
 
-    echo "NATIVE_ENABLED = false" >> .config
-    echo "BYTE_ENABLED = true" >> .config
+    echo "NATIVE_ENABLED = true" >> .config
+    echo "BYTE_ENABLED = false" >> .config
 
     echo "NATIVE_PROFILE = false" >> .config
 
