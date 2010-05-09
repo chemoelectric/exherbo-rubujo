@@ -1,10 +1,12 @@
 # Copyright 2009 A Frederick Christensen <fauxmight@nosocomia.com>
+# Copyright 2010 Barry Schwartz
 # Distributed under the terms of the GNU General Public License v2
 # Based in part on 'ocaml-3.10.2.exheres-0', which is
 #     Copyright 2008 Saleem Abdulrasool <compnerd@compnerd.org>
+# Based in part upon 'ocaml-3.11.2.ebuild' from Gentoo, which is:
+#     Copyright 1999-2010 Gentoo Foundation.
 
 require flag-o-matic multilib
-
 
 SUMMARY="Caml is a general-purpose programming language, designed with program safety and reliability in mind."
 DESCRIPTION="
@@ -16,7 +18,6 @@ portability; and an interactive loop, for experimentation and rapid development.
 HOMEPAGE="http://caml.inria.fr/"
 DOWNLOADS="http://caml.inria.fr/pub/distrib/"${PN}"-"$(ever range 1-2)"/"${PNV}".tar.bz2"
 
-BUGS_TO="fauxmight@nosocomia.com"
 UPSTREAM_DOCUMENTATION="http://caml.inria.fr/resources/doc/index.en.html"
 
 SLOT="0"
@@ -27,11 +28,15 @@ MYOPTIONS="
     ocamlopt [[ description = [ Adds support for OCaml native code compiler ] ]]
     threads
     ncurses
+    dbm
+    tk
 "
 
 DEPENDENCIES="
     build+run:
         ncurses? ( sys-libs/ncurses )
+        dbm? ( sys-libs/gdbm )
+        tk? ( dev-lang/tk )
 "
 
 # FIXME - excluded call-ld-with-proper-ldfflags.patch
@@ -42,7 +47,6 @@ DEPENDENCIES="
 #                 3.11.1 set
 #         todo -- ONLY filter fomit-frame-pointer during the
 #                 compilation of opt
-#         todo -- add option for tk support and perhaps dbm
 
 DEFAULT_SRC_PREPARE_PATCHES=( "${FILES}/${PNV}-exec-stack-fixes.patch"
                               "${FILES}/${PNV}-configure.patch"
@@ -53,15 +57,17 @@ src_configure() {
     # ocamlopt uses -pg. -pg and -fomit-frame-pointer conflict
     option ocamlopt && filter-flags -fomit-frame-pointer
     ./configure \
-        $(option ncurses || echo "-no-curses") \
+        $(option ncurses || echo "-no-curses")  \
         $(option threads || echo "-no-pthread") \
         $(option X || echo "--no-graph")    \
+        $(option dbm || echo "--no-dbm")    \
+        $(option tk || echo "--no-tk")      \
         --host ${CHOST}                     \
         --prefix /usr                       \
         --bindir /usr/bin                   \
         --libdir /usr/$(get_libdir)/ocaml   \
         --mandir /usr/share/man             \
-        --no-tk --no-dbm || die "configure failed"
+        || die "configure failed"
 }
 
 
