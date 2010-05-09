@@ -1,0 +1,203 @@
+# Copyright 2010 Barry Schwartz
+# Distributed under the terms of the GNU General Public License v2
+
+#########################################################
+# FIXME/TODO:
+#    * Check all the dependencies
+#    * Explicitly de-select parts for negated options
+#########################################################
+
+SUMMARY="CamlImages, an image processing library for Objective Caml"
+HOMEPAGE="http://pauillac.inria.fr/camlimages/"
+DOWNLOADS="ftp://ftp.inria.fr/INRIA/Projects/cristal/caml-light/bazar-ocaml/${PNV}.tgz"
+
+LICENCES="LGPL-2 as-is"
+SLOT="0"
+PLATFORMS="~amd64"
+MYOPTIONS="
+    lablgtk    [[ description = [ support for lablgtk version 1 ] ]]
+    lablgtk2   [[ description = [ support for lablgtk version 2 ] ]]
+    freetype
+    gif
+    jpeg
+    png
+    tiff
+    xpm
+"
+
+DEPENDENCIES="
+    build+run:
+        lablgtk?  ( dev-ocaml/lablgtk:1 )
+        lablgtk2? ( dev-ocaml/lablgtk:2 )
+        freetype? ( media-libs/freetype:2 )
+        gif?      ( media-libs/giflib )
+        jpeg?     ( media-libs/jpeg )
+        png?      ( media-libs/libpng )
+        tiff?     ( media-libs/tiff )
+        xpm?      ( x11-libs/libXpm )
+"
+
+WORK="${WORKBASE}/${PN}-2.2"
+
+make_meta()
+{
+    echo 'version = "2.2.0"'
+    echo 'description = "Image processing library"'
+    cat <<EOF
+package "graphics" (
+  description = "Camlimages interface for Graphics core library"
+  requires = "graphics camlimages.core"
+  archive(byte) = "ci_graphics.cma"
+  archive(native) = "ci_graphics.cmxa"
+)
+EOF
+    if option lablgtk ; then
+        cat <<EOF
+package "lablgtk" (
+  description = "Camlimages interface for the lablgtk library"
+  requires = "lablgtk camlimages.core"
+  archive(byte) = "ci_lablgtk.cma"
+  archive(native) = "ci_lablgtk.cmxa"
+)
+EOF
+    fi
+    if option lablgtk2 ; then
+        cat <<EOF
+package "lablgtk2" (
+  description = "Camlimages interface for the lablgtk2 library"
+  requires = "lablgtk2 camlimages.core"
+  archive(byte) = "ci_lablgtk2.cma"
+  archive(native) = "ci_lablgtk2.cmxa"
+)
+EOF
+    fi
+    cat <<EOF
+package "bmp" (
+  description = "Camlimages support for bmp file format"
+  requires = "camlimages.core"
+  archive(byte) = "ci_bmp.cma"
+  archive(native) = "ci_bmp.cmxa"
+)
+EOF
+    if option gif ; then
+        cat <<EOF
+package "gif" (
+  description = "Camlimages support for gif file format"
+  requires = "camlimages.core"
+  archive(byte) = "ci_gif.cma"
+  archive(native) = "ci_gif.cmxa"
+)
+EOF
+    fi
+    if option jpeg ; then
+    cat <<EOF
+package "jpeg" (
+  description = "Camlimages support for jpeg file format"
+  requires = "camlimages.core"
+  archive(byte) = "ci_jpeg.cma"
+  archive(native) = "ci_jpeg.cmxa"
+)
+EOF
+    fi
+    if option png ; then
+        cat <<EOF
+package "png" (
+  description = "Camlimages support for png file format"
+  requires = "camlimages.core"
+  archive(byte) = "ci_png.cma"
+  archive(native) = "ci_png.cmxa"
+)
+EOF
+    fi
+    cat <<EOF
+package "ppm" (
+  description = "Camlimages support for ppm file format"
+  requires = "camlimages.core"
+  archive(byte) = "ci_ppm.cma"
+  archive(native) = "ci_ppm.cmxa"
+)
+EOF
+    if option tiff ; then
+        cat <<EOF
+package "tiff" (
+  description = "Camlimages support for tiff file format"
+  requires = "camlimages.core"
+  archive(byte) = "ci_tiff.cma"
+  archive(native) = "ci_tiff.cmxa"
+)
+EOF
+    fi
+    if option xpm ; then
+        cat <<EOF
+package "xpm" (
+  description = "Camlimages support for xpm file format"
+  requires = "camlimages.core"
+  archive(byte) = "ci_xpm.cma"
+  archive(native) = "ci_xpm.cmxa"
+)
+EOF
+    fi
+    cat <<EOF
+package "xvthumb" (
+  description = "Camlimages support for xv thumbnail file format"
+  requires = "camlimages.core"
+  archive(byte) = "ci_xvthumb.cma"
+  archive(native) = "ci_xvthumb.cmxa"
+)
+EOF
+    if option freetype ; then
+        cat <<EOF
+package "freetype" (
+  description = "Camlimages support for TrueType fonts"
+  requires = "camlimages.core"
+  archive(byte) = "ci_freetype.cma"
+  archive(native) = "ci_freetype.cmxa"
+)
+EOF
+    fi
+    cat <<EOF
+package "core" (
+  description = "Camlimages core"
+  archive(byte) = "ci_core.cma"
+  archive(native) = "ci_core.cmxa"
+)
+EOF
+    echo
+    echo -n 'requires="camlimages.core camlimages.graphics'
+    echo -n ' camlimages.bmp'
+    option gif && echo -n ' camlimages.gif'
+    option gif && echo -n ' camlimages.jpeg'
+    option gif && echo -n ' camlimages.png'
+    echo -n ' camlimages.ppm'
+    option gif && echo -n ' camlimages.tiff'
+    option gif && echo -n ' camlimages.xpm'
+    echo -n ' camlimages.xvthumb'
+    option gif && echo -n ' camlimages.freetype'
+    echo '"'
+}
+
+src_prepare()
+{
+    expatch -p0 "${FILES}/patch-aa-freetype1-ftlow.ml"
+    expatch -p0 "${FILES}/patch-ab-freetype1-freetype.ml"
+    expatch -p0 "${FILES}/patch-ac-tiff-tiffread.c"
+}
+
+src_configure()
+{
+    edo /bin/sh configure
+}
+
+src_install()
+{
+    local ocaml_dir camlimages_dir stublibs_dir
+
+    ocaml_dir="${IMAGE}$(ocamlc -where)"
+    camlimages_dir="${ocaml_dir}/${PN}"
+    stublibs_dir="${ocaml_dir}/stublibs"
+
+    edo mkdir -p "${camlimages_dir}" "${stublibs_dir}"
+    emake install LIBDIR="${camlimages_dir}"
+    edo mv "${camlimages_dir}"/dll*.so "${stublibs_dir}"
+    make_meta >> "${camlimages_dir}/META"
+}
