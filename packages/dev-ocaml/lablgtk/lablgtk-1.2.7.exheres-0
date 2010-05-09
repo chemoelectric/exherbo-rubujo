@@ -1,0 +1,97 @@
+# Copyright (c) 2010 Barry Schwartz
+# Distributed under the terms of the GNU General Public License v2
+
+require multilib
+
+SUMMARY="LablGTK, an Objective Caml interface to gtk+"
+HOMEPAGE="http://wwwfun.kurims.kyoto-u.ac.jp/soft/lsl/lablgtk.html"
+DOWNLOADS="http://wwwfun.kurims.kyoto-u.ac.jp/soft/lsl/dist/${PNV}.tar.gz"
+
+LICENCES="LGPL-2.1 as-is"
+SLOT="1"
+PLATFORMS="~amd64"
+MYOPTIONS=""
+
+DEPENDENCIES="
+    x11-libs/gtk+:1
+    dev-lang/ocaml
+"
+
+src_configure()
+{
+    emake -j1 configure
+}
+
+src_compile()
+{
+    emake -j1
+    emake -j1 opt
+    edo cd src
+    ranlib liblablgtk.a
+    if test -f lablgtk.a ; then
+        ranlib lablgtk.a
+    fi
+}
+
+src_install()
+{
+
+    # Let's do this by brute force, and let others clean it up, if
+    # they wish.
+
+    local package_dir="/usr/$(get_libdir)/ocaml/lablgtk"
+    local stublibs_dir="/usr/$(get_libdir)/ocaml/stublibs"
+
+    insinto "${package_dir}"
+
+    doins META
+
+    edo cd src
+
+    doins gaux.cmi gpointer.cmi glib.cmi gdk.cmi gdkEvent.cmi         \
+        gdkKeysyms.cmi gtk.cmi gtkArgv.cmi gtkSignal.cmi gtkData.cmi  \
+        gtkBase.cmi gtkPack.cmi gtkButton.cmi gtkMenu.cmi gtkMisc.cmi \
+        gtkWindow.cmi gtkTree.cmi gtkList.cmi gtkBin.cmi gtkEdit.cmi  \
+        gtkRange.cmi gtkMain.cmi gtkNew.cmi gDraw.cmi gObj.cmi        \
+        gMain.cmi gData.cmi gContainer.cmi gPack.cmi gButton.cmi      \
+        gMenu.cmi gMisc.cmi gTree.cmi gList.cmi gWindow.cmi gBin.cmi  \
+        gEdit.cmi gRange.cmi gUtil.cmi gToolbox.cmi gtkInit.cmi       \
+        gtkThread.cmi
+    doins *.mli
+    doins gaux.ml gpointer.ml glib.ml gdk.ml gdkEvent.ml              \
+        gdkKeysyms.ml gtk.ml gtkArgv.ml gtkSignal.ml gtkData.ml       \
+        gtkBase.ml gtkPack.ml gtkButton.ml gtkMenu.ml gtkMisc.ml      \
+        gtkWindow.ml gtkTree.ml gtkList.ml gtkBin.ml gtkEdit.ml       \
+        gtkRange.ml gtkMain.ml gtkNew.ml gDraw.ml gObj.ml gMain.ml    \
+        gData.ml gContainer.ml gPack.ml gButton.ml gMenu.ml gMisc.ml  \
+        gTree.ml gList.ml gWindow.ml gBin.ml gEdit.ml gRange.ml       \
+        gUtil.ml gToolbox.ml gtkInit.ml gtkThread.ml gtkThInit.ml
+    doins lablgtk.cma gtkThread.cmo gtkInit.cmo gtkThInit.cmo
+    doins liblablgtk.a
+    doins lablgtktop varcc
+    if test -f lablgtktop_t ; then
+        doins lablgtktop_t
+    fi
+    doins *.h
+    if test -f lablgtk.cmxa ; then
+        doins lablgtk.cmxa lablgtk.a
+        doins gaux.cmx gpointer.cmx glib.cmx gdk.cmx gdkEvent.cmx     \
+            gdkKeysyms.cmx gtk.cmx gtkArgv.cmx gtkSignal.cmx          \
+            gtkData.cmx gtkBase.cmx gtkPack.cmx gtkButton.cmx         \
+            gtkMenu.cmx gtkMisc.cmx gtkWindow.cmx gtkTree.cmx         \
+            gtkList.cmx gtkBin.cmx gtkEdit.cmx gtkRange.cmx           \
+            gtkMain.cmx gtkNew.cmx gDraw.cmx gObj.cmx gMain.cmx       \
+            gData.cmx gContainer.cmx gPack.cmx gButton.cmx gMenu.cmx  \
+            gMisc.cmx gTree.cmx gList.cmx gWindow.cmx gBin.cmx        \
+            gEdit.cmx gRange.cmx gUtil.cmx gToolbox.cmx gtkInit.cmx
+        doins gtkInit.o
+        if test -f gtkThread.cmx ; then
+            doins gtkThread.cmx gtkThread.o
+        fi
+    fi
+    if test -f dlllablgtk.so ; then
+       insinto "${stublibs_dir}"
+       insopts -m 0755
+	   doins dlllablgtk.so
+	fi
+}
