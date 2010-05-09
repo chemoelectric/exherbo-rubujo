@@ -72,6 +72,7 @@ src_install()
     dodoc CHANGELOG.txt
     if option doc; then
         dodoc doc/ps/omake-doc.{pdf,ps} doc/txt/omake-doc.txt
-        dohtml -r doc/html/*
+        edo cd doc
+        dodoc -r html
     fi
 }
