@@ -23,7 +23,15 @@ HOMEPAGE="http://ant.berlios.de"
 LICENCES="public-domain"
 SLOT="0"
 PLATFORMS="~amd64"
-MYOPTIONS=""
+CHOICES="ant_hyphen_patterns"
+MYOPTIONS="
+    british      [[ description = [ hyphenation patterns for British English ] ]]
+    us           [[ description = [ hyphenation patterns for US English ] ]]
+    deutsch-alt  [[ description = [ hyphenation patterns for German (traditional) ] ]]
+    deutsch-neu  [[ description = [ hyphenation patterns for German ] ]]
+    francais     [[ description = [ hyphenation patterns for French ] ]]
+    esperanto    [[ description = [ hyphenation patterns for Esperanto ] ]]
+"
 
 DEPENDENCIES="
     build+run:
@@ -35,15 +43,30 @@ DEPENDENCIES="
         dev-util/omake
 "
 
+DEFAULT_SRC_PREPARE_PATCHES=( "${FILES}/OMakefile-patch.diff" )
+
 src_prepare()
 {
-    edo cp /usr/share/UCD/UnicodeData.txt data
+    default
     edo mkdir lib
+    edo cp /usr/share/UCD/UnicodeData.txt data
+
+    edo mv OMakefile OMakefile.old
+    touch OMakefile
+    edo echo -n 'HYPHEN_PATTERNS[] =' >> OMakefile
+    option british && edo echo -n ' british' >> OMakefile
+    option us && edo echo -n ' us' >> OMakefile
+    option deutsch-alt && edo echo -n ' deutsch-alt' >> OMakefile
+    option deutsch-neu && edo echo -n ' deutsch-neu' >> OMakefile
+    option francais && edo echo -n ' français' >> OMakefile
+    option esperanto && edo echo -n ' esperanto' >> OMakefile
+    echo
+    edo cat OMakefile.old >> OMakefile
 }
 
 src_compile()
 {
-    edo omake
+    edo omake -U
 }
 
 src_install()

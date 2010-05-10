@@ -1,0 +1,23 @@
+--- ant.ORIG/OMakefile	2010-05-10 13:27:48.752653516 +0000
++++ ant/OMakefile	2010-05-10 21:38:06.363653199 +0000
+@@ -3,9 +3,6 @@
+ # Packages to be compiled into ant:
+ PACKAGES_USED[]   = #german advi
+ 
+-# Hyphenation patterns to be compiled into ant:
+-HYPHEN_PATTERNS[] = british us #deutsch-old deutsch-neu français
+-
+ # Compilation options:
+ 
+ #NATIVE_ENABLED = false # compile to native code
+@@ -32,8 +29,8 @@
+ KPATHSEA_FLAGS  = $(mapprefix -ccopt, $(KPATHSEA_CFLAGS))
+ SELFAUTO_FLAGS  = $(mapprefix -ccopt, $(SELFAUTO_CFLAGS))
+ FREETYPE_FLAGS  = $(mapprefix -ccopt, $(FREETYPE_CFLAGS))
+-KPATHSEA_LFLAGS = -cclib -L$(SELFAUTOPARENT)/lib
+-X11_LFLAGS      = -cclib -L/usr/X11/lib
++KPATHSEA_LFLAGS = 
++X11_LFLAGS      = 
+ 
+ if $(NATIVE_ENABLED)
+   CMO = cmx
