@@ -72,4 +72,5 @@ src_compile()
 src_install()
 {
     dobin ant
+    doman ant.1
 }
