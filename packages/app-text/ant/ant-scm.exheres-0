@@ -1,0 +1,52 @@
+# Copyright 2010 Barry Schwartz
+# Distributed under the terms of the GNU General Public License v2
+
+SCM_REPOSITORY="git://github.com/chemoelectric/ant.git"
+
+require scm-git
+
+SUMMARY="ant, ant is not TeX"
+DESCRIPTION="
+ant is a typesetting system inspired by TeX.
+All major features of TeX are implemented. In addition ant provides
+
+    * a saner macro language (no catcodes);
+    * a builtin high-level scripting language;
+    * UNICODE support;
+    * support for various font formats including Type1, TrueType, and OpenType;
+    * partial support for advanced OpenType features;
+    * support for colour and graphics;
+    * simple page layout specifications;
+    * river detection."
+HOMEPAGE="http://ant.berlios.de"
+
+LICENCES="public-domain"
+SLOT="0"
+PLATFORMS="~amd64"
+MYOPTIONS=""
+
+DEPENDENCIES="
+    build+run:
+        dev-lang/ocaml
+        dev-ocaml/camlimages[<3]
+        app-text/texlive
+    build:
+        data/UnicodeData
+        dev-util/omake
+"
+
+src_prepare()
+{
+    edo cp /usr/share/UCD/UnicodeData.txt data
+    edo mkdir lib
+}
+
+src_compile()
+{
+    edo omake
+}
+
+src_install()
+{
+    dobin ant
+}

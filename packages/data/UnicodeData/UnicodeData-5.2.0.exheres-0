@@ -8,6 +8,7 @@ DOWNLOADS="ftp://www.unicode.org/Public/${PV}/ucd/${PN}.txt -> ${PNV}.txt"
 LICENCES="UCD"
 SLOT="0"
 PLATFORMS="~amd64"
+MYOPTIONS=""
 
 DEPENDENCIES=""
 
