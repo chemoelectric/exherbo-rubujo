@@ -31,12 +31,13 @@ MYOPTIONS="
     deutsch-neu  [[ description = [ Hyphenation patterns for German ] ]]
     francais     [[ description = [ Hyphenation patterns for French ] ]]
     esperanto    [[ description = [ Hyphenation patterns for Esperanto ] ]]
+    doc
     examples
 "
 
 DEPENDENCIES="
     build+run:
-        dev-lang/ocaml
+        dev-lang/ocaml[ocamlopt][dbm]
         dev-ocaml/camlimages[<3]
         app-text/texlive
     build:
@@ -44,11 +45,16 @@ DEPENDENCIES="
         dev-util/omake
 "
 
-DEFAULT_SRC_PREPARE_PATCHES=( "${FILES}/OMakefile-patch.diff" )
+DEFAULT_SRC_PREPARE_PATCHES=(
+    "${FILES}/OMakefile-patch.diff"
+    "${FILES}/manual-fonts.diff"
+)
 
 src_prepare()
 {
+    edo cp -r Examples examples
     default
+
     edo mkdir lib
     edo cp /usr/share/UCD/UnicodeData.txt data
 
@@ -68,6 +74,11 @@ src_prepare()
 src_compile()
 {
     edo omake -U
+    if option doc ; then
+        edo omake manual
+        edo rm Examples/manual.pdf
+        edo omake manual
+    fi
 }
 
 src_install()
@@ -75,8 +86,6 @@ src_install()
     dobin ant
     doman ant.1
     dodoc README
-    if option examples ; then
-        edo mv Examples examples
-        dodoc -r examples
-    fi
+    option doc && dodoc Examples/manual.pdf
+    option examples && dodoc -r examples
 }

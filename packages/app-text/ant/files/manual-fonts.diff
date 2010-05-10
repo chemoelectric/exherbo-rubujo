@@ -1,0 +1,15 @@
+--- ant.ORIG/Examples/manual.ant	2010-05-10 22:36:06.418589606 +0000
++++ ant/Examples/manual.ant	2010-05-10 22:42:41.197777943 +0000
+@@ -9,9 +9,9 @@
+ \include{fonts.ant}
+ 
+ % If you do not have MinionPro then comment out the next three lines.
+-\include{MinionPro.ant}
+-\definecommand\scshape{\setparameter{font}{ features = {liga,kern,smcp} }}
+-\include{MnSymbol.ant}
++%\include{MinionPro.ant}
++%\definecommand\scshape{\setparameter{font}{ features = {liga,kern,smcp} }}
++%\include{MnSymbol.ant}
+ 
+ 
+ \include{manual.sty}
