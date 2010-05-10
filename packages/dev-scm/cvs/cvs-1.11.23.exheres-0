@@ -1,0 +1,18 @@
+# Copyright 2008 David Leverton <dleverton@exherbo.org>
+# Copyright 2010 Barry Schwartz
+# Distributed under the terms of the GNU General Public License v2
+
+require cvs autotools [ supported_autoconf=[ 2.5 ] supported_automake=[ 1.11 ] ]
+
+DOWNLOADS="mirror://gnu/non-gnu/cvs/source/stable/${PV}/${PNV}.tar.bz2"
+PLATFORMS="~amd64"
+
+src_prepare()
+{
+    # Please swear you didn't see the following ...
+    edo find . -name '*.[ch]' -exec sed -i -e 's/getline/my_getline/g' {} \;
+    edo find . -name '*.am' -exec sed -i -e 's/getline/my_getline/g' {} \;
+    edo mv lib/getline.c lib/my_getline.c
+    edo mv lib/getline.h lib/my_getline.h
+    eautoreconf
+}
