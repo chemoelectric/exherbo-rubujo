@@ -25,12 +25,13 @@ SLOT="0"
 PLATFORMS="~amd64"
 CHOICES="ant_hyphen_patterns"
 MYOPTIONS="
-    british      [[ description = [ hyphenation patterns for British English ] ]]
-    us           [[ description = [ hyphenation patterns for US English ] ]]
-    deutsch-alt  [[ description = [ hyphenation patterns for German (traditional) ] ]]
-    deutsch-neu  [[ description = [ hyphenation patterns for German ] ]]
-    francais     [[ description = [ hyphenation patterns for French ] ]]
-    esperanto    [[ description = [ hyphenation patterns for Esperanto ] ]]
+    british      [[ description = [ Hyphenation patterns for British English ] ]]
+    us           [[ description = [ Hyphenation patterns for US English ] ]]
+    deutsch-alt  [[ description = [ Hyphenation patterns for German (traditional) ] ]]
+    deutsch-neu  [[ description = [ Hyphenation patterns for German ] ]]
+    francais     [[ description = [ Hyphenation patterns for French ] ]]
+    esperanto    [[ description = [ Hyphenation patterns for Esperanto ] ]]
+    examples
 "
 
 DEPENDENCIES="
@@ -73,4 +74,9 @@ src_install()
 {
     dobin ant
     doman ant.1
+    dodoc README
+    if option examples ; then
+        edo mv Examples examples
+        dodoc -r examples
+    fi
 }
