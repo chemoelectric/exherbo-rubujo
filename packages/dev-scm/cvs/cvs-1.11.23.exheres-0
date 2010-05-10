@@ -7,8 +7,12 @@ require cvs autotools [ supported_autoconf=[ 2.5 ] supported_automake=[ 1.11 ] ]
 DOWNLOADS="mirror://gnu/non-gnu/cvs/source/stable/${PV}/${PNV}.tar.bz2"
 PLATFORMS="~amd64"
 
+DEFAULT_SRC_PREPARE_PATCHES=( "${FILES}/${PNV}-zlib-1.patch" )
+
 src_prepare()
 {
+    default
+
     # Please swear you didn't see the following ...
     edo find . -name '*.[ch]' -exec sed -i -e 's/getline/my_getline/g' {} \;
     edo find . -name '*.am' -exec sed -i -e 's/getline/my_getline/g' {} \;
