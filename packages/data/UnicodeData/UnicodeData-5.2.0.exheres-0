@@ -1,0 +1,19 @@
+# Copyright 2010 Barry Schwartz
+# Distributed under the terms of the GNU General Public License v2
+
+SUMMARY="Unicode data"
+HOMEPAGE="http://www.unicode.org/ucd/"
+DOWNLOADS="ftp://www.unicode.org/Public/${PV}/ucd/${PN}.txt -> ${PNV}.txt"
+
+LICENCES="UCD"
+SLOT="0"
+PLATFORMS="~amd64"
+
+DEPENDENCIES=""
+
+WORK="${WORKBASE}"
+
+src_install()
+{
+    edo install -D -m 0644 "${FETCHEDDIR}/${PNV}.txt" "${IMAGE}/usr/share/UCD/${PN}.txt"
+}
