@@ -5,7 +5,7 @@ require sourceforge findlib
 
 SUMMARY="Camomile, a comprehensive Unicode library for Objective Caml"
 
-LICENCES="LGPL-2 as-is"
+LICENCES="LGPL-2.1 as-is"
 SLOT="0"
 PLATFORMS="~amd64"
 MYOPTIONS=""
@@ -34,4 +34,6 @@ findlib_src_install()
     dodir /usr/bin /usr/share
 	emake -j1 prefix="${IMAGE}/usr" BINDIR="${IMAGE}/usr/bin" DATADIR="${IMAGE}/usr/share" install
     rmdir $(find "${IMAGE}" -name stublibs)
+
+    dodoc Changes README
 }
