@@ -1,0 +1,7 @@
+# Copyright 2010 Barry Schwartz
+# Distributed under the terms of the GNU General Public License v2
+
+require janestreet
+
+SUMMARY="Type-conv, a support library for preprocessor type conversions"
+PLATFORMS="~amd64"
