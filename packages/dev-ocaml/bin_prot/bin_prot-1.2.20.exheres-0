@@ -1,0 +1,14 @@
+# Copyright 2010 Barry Schwartz
+# Distributed under the terms of the GNU General Public License v2
+
+require janestreet
+
+SUMMARY="Bin_prot, a binary protocol generator" 
+DOWNLOADS="http://www.janestreet.com/ocaml/bin-prot-release-${PV}.tar.gz"
+LICENCES="LGPL-2.1 as-is BSD-3"
+PLATFORMS="~amd64"
+DEPENDENCIES+="
+   build+run:
+       dev-ocaml/ounit
+"
+WORK="${WORKBASE}/bin-prot-release-${PV}"

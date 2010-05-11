@@ -1,0 +1,36 @@
+# Copyright 2010 Barry Schwartz
+# Distributed under the terms of the GNU General Public License v2
+
+require findlib
+
+SUMMARY="OUnit, a unit test framework for Objective Caml"
+HOMEPAGE="http://www.xs4all.nl/~mmzeeman/ocaml/"
+DOWNLOADS="${HOMEPAGE}${PNV}.tar.gz"
+
+LICENCES="MIT"
+SLOT="0"
+PLATFORMS="~amd64"
+MYOPTIONS=""
+
+DEPENDENCIES="
+    build+run:
+        dev-lang/ocaml
+"
+
+src_configure()
+{
+    :
+}
+
+src_compile()
+{
+    emake -j1 all
+    emake -j1 allopt
+}
+
+src_install()
+{
+     findlib_src_preinst
+     default
+     rmdir $(find "${IMAGE}" -name stublibs)
+}

@@ -1,0 +1,13 @@
+# Copyright 2010 Barry Schwartz
+# Distributed under the terms of the GNU General Public License v2
+
+require janestreet
+
+SUMMARY="Fieldslib, folding over record fields"
+DOWNLOADS="http://www.janestreet.com/ocaml/${PNV}.tgz"
+LICENCES="LGPL-2.1 as-is"
+PLATFORMS="~amd64"
+DEPENDENCIES="
+    build+run:
+        dev-ocaml/type-conv
+"

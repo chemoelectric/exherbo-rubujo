@@ -1,0 +1,11 @@
+# Copyright 2010 Barry Schwartz
+# Distributed under the terms of the GNU General Public License v2
+
+require janestreet
+
+SUMMARY="Res, a library for automatically resizing contiguous memory (arrays and strings)"
+HOMEPAGE="http://www.ocaml.info/home/ocaml_sources.html"
+DOWNLOADS="http://hg.ocaml.info/release/${PN}/archive/release-${PV}.tar.bz2"
+LICENCES="LGPL-2.1 as-is"
+PLATFORMS="~amd64"
+WORK="${WORKBASE}/${PN}-release-${PV}"

@@ -3,12 +3,10 @@
 
 require findlib
 
-export_exlib_phases src_prepare src_configure src_compile src_install
+export_exlib_phases src_configure src_compile src_install
 
 HOMEPAGE="http://ocaml.janestreet.com/?q=node/13"
-DOWNLOADS="http://www.janestreet.com/ocaml/${PN}-release-${PV}.tar.gz"
 
-LICENCES="LGPL-2.1 as-is"
 SLOT="0"
 MYOPTIONS=""
 
@@ -18,14 +16,6 @@ DEPENDENCIES="
     build:
         dev-ocaml/ocaml-make
 "
-
-WORK="${WORKBASE}/${PN}-release-${PV}"
-
-janestreet_src_prepare()
-{
-    default
-    edo cp /usr/share/ocaml-make/OCamlMakefile .
-}
 
 janestreet_src_configure()
 {
@@ -41,5 +31,5 @@ janestreet_src_install()
 {
     findlib_src_preinst
     default
-    rmdir $(find "${IMAGE}" -name stublibs)
+    rmdir $(find "${IMAGE}" -name stublibs) || echo "stublibs is not empty."
 }
