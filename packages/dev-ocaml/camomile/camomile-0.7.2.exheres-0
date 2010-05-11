@@ -8,7 +8,7 @@ SUMMARY="Camomile, a comprehensive Unicode library for Objective Caml"
 LICENCES="LGPL-2.1 as-is"
 SLOT="0"
 PLATFORMS="~amd64"
-MYOPTIONS=""
+MYOPTIONS="doc"
 
 DEPENDENCIES="
     build+run:
@@ -26,6 +26,13 @@ src_configure()
 src_compile()
 {
     emake -j1 prefix="${IMAGE}/usr"
+    if option doc ; then
+        emake -j1 dochtml
+        mv dochtml html
+        emake -j1 doctexi
+        edo cd doctexi
+        makeinfo --force "${PN}.texi"
+    fi
 }
 
 findlib_src_install()
@@ -36,4 +43,9 @@ findlib_src_install()
     rmdir $(find "${IMAGE}" -name stublibs)
 
     dodoc Changes README
+    if option doc ; then
+        dodoc -r html
+        edo cd doctexi
+        doinfo "${PN}".info*
+    fi
 }
