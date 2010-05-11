@@ -17,6 +17,7 @@ DEPENDENCIES="
     build+run:
         dev-lang/python[=2*]
         python3? ( dev-lang/python[=3*] )
+        dev-lang/ocaml
     build:
         dev-ocaml/ocaml-make
 "
