@@ -1,0 +1,28 @@
+# Copyright 2010 Barry Schwartz
+# Distributed under the terms of the GNU General Public License v2
+# Based in part upon 'findlib.eclass' from Gentoo, which is:
+#     Copyright 1999-2008 Gentoo Foundation
+#
+# ocamlfind (a.k.a. findlib) exlib
+
+export_exlib_phases src_install
+
+# From this findlib version there is proper stublibs support.
+DEPENDENCIES="dev-ocaml/findlib"
+
+findlib_src_preinst()
+{
+	local destdir=$(ocamlfind printconf destdir)
+
+	dodir "${destdir}"
+	dodir "${destdir}/stublibs"
+
+	export OCAMLFIND_DESTDIR="${IMAGE}${destdir}"
+	export OCAMLFIND_LDCONF=ignore
+}
+
+findlib_src_install()
+{
+	findlib_src_preinst
+	emake DESTDIR="${IMAGE}" "$@" install
+}

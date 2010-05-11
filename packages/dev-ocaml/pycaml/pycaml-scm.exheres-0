@@ -1,0 +1,68 @@
+# Copyright 2010 Barry Schwartz
+# Distributed under the terms of the GNU General Public License v2
+
+SCM_REPOSITORY="git://github.com/chemoelectric/pycaml.git"
+
+require scm-git multilib python findlib
+
+SUMMARY="pycaml -- Python-OCaml bindings"
+HOMEPAGE="http://github.com/chemoelectric/${PN}"
+
+LICENCES="LGPL-2.1"
+SLOT="0"
+PLATFORMS="~amd64"
+MYOPTIONS="python3"
+
+DEPENDENCIES="
+    build+run:
+        dev-lang/python[=2*]
+        python3? ( dev-lang/python[=3*] )
+    build:
+        dev-ocaml/ocaml-make
+"
+
+WORK="${WORKBASE}"
+
+python3_abi()
+{
+    python3 -V |& sed -e 's/^Python //; s/\(3\.[0-9]*\).*/\1/'
+}
+
+src_compile()
+{
+    compile_abi_pycaml()
+    {
+        abi=$(echo "${1}" | sed -e 's/\./_/g')
+        name="${PN}${abi}"
+        edo cd "${WORK}"
+        edo cp -r "${PNV}" "${name}"
+        edo cd "${name}"
+        emake PYVER="${1}"             \
+            PYVER_PACK="${abi}"        \
+            get_libdir="$(get_libdir)" \
+            OCAMLMAKEFILE=/usr/share/ocaml-make/OCamlMakefile
+    }
+
+    compile_abi_pycaml "$(python_get_abi)"
+    option python3 && compile_abi_pycaml "$(python3_abi)"
+}
+
+src_install()
+{ 
+    findlib_src_preinst
+
+    install_abi_pycaml()
+    {
+        abi=$(echo "${1}" | sed -e 's/\./_/g')
+        name="${PN}${abi}"
+        edo cd "${WORK}/${name}"
+        edo ocamlfind install "${name}" \
+            dllpycaml"${abi}"_stubs.so* libpycaml"${abi}"_stubs.a    \
+            pycaml"${abi}".a  pycaml"${abi}".cma pycaml"${abi}".cmxa \
+            pycaml.cmi pycaml.cmo pycaml.cmx pycaml.ml pycaml.mli    \
+            pycaml.o pycaml_stubs.c pycaml_stubs.h pycaml_stubs.o META
+    }
+
+    install_abi_pycaml "$(python_get_abi)"
+    option python3 && install_abi_pycaml "$(python3_abi)"
+}
