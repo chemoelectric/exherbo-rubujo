@@ -1,0 +1,37 @@
+# Copyright 2010 Barry Schwartz
+# Distributed under the terms of the GNU General Public License v2
+
+require sourceforge findlib
+
+SUMMARY="Camomile, a comprehensive Unicode library for Objective Caml"
+
+LICENCES="LGPL-2 as-is"
+SLOT="0"
+PLATFORMS="~amd64"
+MYOPTIONS=""
+
+DEPENDENCIES="
+    build+run:
+        dev-lang/ocaml
+"
+
+DEFAULT_SRC_CONFIGURE_PARAMS=( --hates=docdir )
+
+src_configure()
+{
+    export CPP="${CC} -E"
+    default
+}
+
+src_compile()
+{
+    emake -j1 prefix="${IMAGE}/usr"
+}
+
+findlib_src_install()
+{
+	findlib_src_preinst
+    dodir /usr/bin /usr/share
+	emake -j1 prefix="${IMAGE}/usr" BINDIR="${IMAGE}/usr/bin" DATADIR="${IMAGE}/usr/share" install
+    rmdir $(find "${IMAGE}" -name stublibs)
+}
