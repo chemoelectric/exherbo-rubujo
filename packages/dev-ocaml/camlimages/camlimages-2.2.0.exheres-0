@@ -11,7 +11,7 @@ SUMMARY="CamlImages, an image processing library for Objective Caml"
 HOMEPAGE="http://pauillac.inria.fr/camlimages/"
 DOWNLOADS="ftp://ftp.inria.fr/INRIA/Projects/cristal/caml-light/bazar-ocaml/${PNV}.tgz"
 
-LICENCES="LGPL-2 as-is"
+LICENCES="LGPL-2-with-linking-exception"
 SLOT="0"
 PLATFORMS="~amd64"
 MYOPTIONS="

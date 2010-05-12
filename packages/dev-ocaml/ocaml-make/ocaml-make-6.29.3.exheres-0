@@ -1,9 +1,9 @@
 # Copyright 2010 Barry Schwartz
 # Distributed under the terms of the GNU General Public License v2
 
+require ocaml.info
+
 SUMMARY="ocaml-make, automated compilation of complex OCaml-projects"
-HOMEPAGE="http://ocaml.info/home/ocaml_sources.html"
-DOWNLOADS="http://hg.ocaml.info/release/${PN}/archive/release-${PV}.tar.bz2"
 
 LICENCES="LGPL-2.1"
 SLOT="0"
@@ -11,8 +11,6 @@ PLATFORMS="~amd64"
 MYOPTIONS="examples"
 
 DEPENDENCIES=""
-
-WORK="${WORKBASE}/${PN}-release-${PV}"
 
 src_install()
 {

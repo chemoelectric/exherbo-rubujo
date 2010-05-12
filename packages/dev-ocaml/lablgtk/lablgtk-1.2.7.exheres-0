@@ -7,7 +7,7 @@ SUMMARY="LablGTK, an Objective Caml interface to gtk+"
 HOMEPAGE="http://wwwfun.kurims.kyoto-u.ac.jp/soft/lsl/lablgtk.html"
 DOWNLOADS="http://wwwfun.kurims.kyoto-u.ac.jp/soft/lsl/dist/${PNV}.tar.gz"
 
-LICENCES="LGPL-2.1 as-is"
+LICENCES="LGPL-2.1-with-linking-exception"
 SLOT="1"
 PLATFORMS="~amd64"
 MYOPTIONS=""

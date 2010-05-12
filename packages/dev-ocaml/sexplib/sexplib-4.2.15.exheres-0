@@ -5,7 +5,7 @@ require janestreet
 
 SUMMARY="Sexplib, a library for automated conversion of OCaml values to and from s-expressions"
 DOWNLOADS="http://www.janestreet.com/ocaml/${PN}310-release-${PV}.tar.gz"
-LICENCES="LGPL-2.1 as-is BSD-3"
+LICENCES="LGPL-2.1-with-linking-exception BSD-3"
 PLATFORMS="~amd64"
 DEPENDENCIES="
     build+run:

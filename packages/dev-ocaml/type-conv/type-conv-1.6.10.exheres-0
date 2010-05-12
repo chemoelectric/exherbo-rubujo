@@ -5,6 +5,6 @@ require janestreet
 
 SUMMARY="Type-conv, a support library for preprocessor type conversions"
 DOWNLOADS="http://www.janestreet.com/ocaml/${PN}-release-${PV}.tar.gz"
-LICENCES="LGPL-2.1 as-is BSD-3"
+LICENCES="LGPL-2.1-with-linking-exception BSD-3"
 PLATFORMS="~amd64"
 WORK="${WORKBASE}/${PN}-release-${PV}"

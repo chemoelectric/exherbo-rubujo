@@ -3,11 +3,16 @@
 
 require janestreet
 
-SUMMARY="Fieldslib, folding over record fields"
+SUMMARY="Core and Core_extended, Jane Street's alternative to the standard library"
 DOWNLOADS="http://www.janestreet.com/ocaml/${PNV}.tgz"
 LICENCES="LGPL-2.1-with-linking-exception"
 PLATFORMS="~amd64"
 DEPENDENCIES="
     build+run:
+        dev-lang/ocaml[>=3.11]
+        dev-ocaml/bin_prot
+        dev-ocaml/sexplib
         dev-ocaml/type-conv
+        dev-ocaml/res
+        dev-ocaml/pcre-ocaml
 "

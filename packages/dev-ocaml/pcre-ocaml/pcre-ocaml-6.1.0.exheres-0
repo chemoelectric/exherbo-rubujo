@@ -1,0 +1,27 @@
+# Copyright 2010 Barry Schwartz
+# Distributed under the terms of the GNU General Public License v2
+
+require findlib ocaml.info janestreet
+
+SUMMARY="Perl compatible regular expressions for OCaml"
+
+LICENCES="LGPL-2.1-with-linking-exception MLton"
+SLOT="0"
+PLATFORMS="~amd64"
+MYOPTIONS="doc examples"
+
+DEPENDENCIES="
+    build+run:
+        dev-libs/pcre
+"
+
+src_install()
+{
+    janestreet_src_install
+    dodoc Changelog README.*
+    if option doc ; then
+        make htdoc
+        (edo cd lib/doc/pcre; dodoc -r html)
+    fi
+    option examples && dodoc -r examples
+}

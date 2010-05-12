@@ -1,0 +1,6 @@
+# Copyright 2010 Barry Schwartz
+# Distributed under the terms of the GNU General Public License v2
+
+HOMEPAGE="http://www.ocaml.info/home/ocaml_sources.html"
+DOWNLOADS="http://hg.ocaml.info/release/${PN}/archive/release-${PV}.tar.bz2 -> ${PN}-release-${PV}.tar.bz2"
+WORK="${WORKBASE}/${PN}-release-${PV}"
