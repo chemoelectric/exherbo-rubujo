@@ -1,0 +1,20 @@
+# Copyright 2010 Barry Schwartz
+# Distributed under the terms of the GNU General Public License v2
+
+SUMMARY="svg2pdf converts an SVG file to a PDF file (using cairo)"
+HOMEPAGE="http://cairographics.org/"
+DOWNLOADS="http://cairographics.org/snapshots/${PNV}.tar.gz"
+
+# This is a variant of an old-style MIT license.
+LICENCES="USC-ISI"
+
+SLOT="0"
+PLATFORMS="~amd64"
+MYOPTIONS=""
+
+DEPENDENCIES="
+    build+run:
+        x11-libs/libsvg-cairo[>=0.1.6]
+"
+
+DEFAULT_SRC_CONFIGURE_PARAMS=( --hates=docdir )

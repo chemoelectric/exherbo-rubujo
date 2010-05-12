@@ -1,0 +1,19 @@
+# Copyright 2010 Barry Schwartz
+# Distributed under the terms of the GNU General Public License v2
+
+SUMMARY="libsvg-cairo renders SVG content using cairo"
+HOMEPAGE="http://cairographics.org/"
+DOWNLOADS="http://cairographics.org/snapshots/${PNV}.tar.gz"
+
+LICENCES="LGPL-2.1"
+SLOT="0"
+PLATFORMS="~amd64"
+MYOPTIONS=""
+
+DEPENDENCIES="
+    build+run:
+        media-libs/libsvg[>=0.1.2]
+        x11-libs/cairo[>=0.5.0]
+"
+
+DEFAULT_SRC_CONFIGURE_PARAMS=( --hates=docdir )
