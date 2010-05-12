@@ -1,0 +1,44 @@
+# Copyright 2010 Barry Schwartz
+# Distributed under the terms of the GNU General Public License v2
+# Based in part upon 'cython-0.9.8.1.1.ebuild' from Gentoo, which is:
+#     Copyright 1999-2008 Gentoo Foundation
+
+# FIXME/TODO: COMPUTE THIS RATHER THAN HARDCODE IT ************************************
+PYTHON_ABIS=( 2.6 3.1 )
+***************************************************************************************
+
+abi_sources_dir()
+{
+    echo -n "_${1}_"
+}
+
+abi_work_dir()
+{
+    echo "${WORKBASE}/$(abi_sources_dir "${1}")${WORK#${WORKBASE}}"
+}
+
+separate_abi_sources()
+{
+    local abi abi_dir sources
+
+    cd "${WORKBASE}"
+    sources=$(ls)
+    for abi in "$@" ; do
+        abi_dir="$(abi_sources_dir "${abi}")"
+        edo mkdir "${abi_dir}"
+        edo cp -a ${sources} "${abi_dir}"
+    done
+}
+
+process_abi_sources()
+{
+    local abi work_dir processor
+
+    processor="${1}"
+    shift
+    for abi in "$@" ; do
+        work_dir="$(abi_work_dir "${abi}")"
+        edo cd "${work_dir}"
+        PYTHON="/usr/bin/python${abi}" "${processor}"
+    done
+}

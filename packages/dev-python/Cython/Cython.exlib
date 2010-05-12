@@ -1,0 +1,54 @@
+# Copyright 2010 Wulf C. Krueger <philantrop@exherbo.org>
+# Distributed under the terms of the GNU General Public License v2
+# Based in part upon 'cython-0.9.8.1.1.ebuild' from Gentoo, which is:
+#     Copyright 1999-2008 Gentoo Foundation
+
+require distutils [ python_dep=2.2 ]
+
+export_exlib_phases src_test_expensive src_install
+
+SUMMARY="A language for writing Python extension modules based on Pyrex"
+DESCRIPTION="
+Cython is a language that makes writing C extensions for the Python language as
+easy as Python itself. It is based on the well-known Pyrex, but supports more cutting
+edge functionality and optimizations.
+"
+HOMEPAGE="http://www.cython.org/"
+DOWNLOADS="http://www.cython.org/release/${PNV}.tar.gz"
+
+BUGS_TO="philantrop@exherbo.org"
+REMOTE_IDS="pypi:${PN} sourceforge:freshmeat_cython freshmeat:cython"
+
+UPSTREAM_CHANGELOG="http://trac.cython.org/cython_trac/query?group=component&milestone=${PV}"
+UPSTREAM_RELEASE_NOTES="http://article.gmane.org/gmane.comp.python.cython.devel/3534"
+UPSTREAM_DOCUMENTATION="http://docs.cython.org/ [[ lang = en ]]"
+
+LICENCES="Apache-2.0"
+SLOT="0"
+MYOPTIONS="doc examples"
+
+DEPENDENCIES=""
+
+# Literally thousands of expensive tests are run, one fails - have fun finding
+# it.
+RESTRICT="test"
+
+DEFAULT_SRC_INSTALL_EXTRA_DOCS=( ToDo.txt USAGE.txt )
+
+Cython_src_test_expensive() {
+    emake -j1 test
+}
+
+Cython_src_install() {
+    distutils_src_install
+
+    if option doc ; then
+        insinto /usr/share/doc/${PNVR}/html
+        doins -r Doc/*
+    fi
+
+    if option examples; then
+        insinto /usr/share/doc/${PNVR}/examples
+        doins -r Demos/*
+    fi
+}

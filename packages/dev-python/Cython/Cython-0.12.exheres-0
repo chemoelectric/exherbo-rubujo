@@ -1,6 +1,37 @@
 # Copyright 2010 Wulf C. Krueger <philantrop@exherbo.org>
+# Copyright 2010 Barry Schwartz
 # Distributed under the terms of the GNU General Public License v2
+# Based in part upon 'cython-0.9.8.1.1.ebuild' from Gentoo, which is:
+#     Copyright 1999-2008 Gentoo Foundation
 
-require Cython
+require Cython distutils python_abis
 
 PLATFORMS="~amd64 ~x86"
+
+src_prepare()
+{
+    distutils_src_prepare
+    separate_abi_sources "${PYTHON_ABIS[@]}"
+}
+
+src_compile()
+{
+    process_abi_sources distutils_src_compile "${PYTHON_ABIS[@]}"
+}
+
+src_install()
+{
+    process_abi_sources distutils_src_install "${PYTHON_ABIS[@]}"
+
+    cd "${WORK}"
+
+    if option doc ; then
+        insinto /usr/share/doc/${PNVR}/html
+        doins -r Doc/*
+    fi
+
+    if option examples; then
+        insinto /usr/share/doc/${PNVR}/examples
+        doins -r Demos/*
+    fi
+}
