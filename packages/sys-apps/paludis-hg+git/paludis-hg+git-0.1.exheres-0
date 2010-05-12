@@ -1,0 +1,28 @@
+# Copyright 2010 Barry Schwartz
+# Distributed under the terms of the GNU General Public License v2
+
+SUMMARY="Paludis syncer for Git repositories by way of a Mercurial client"
+HOMEPAGE="http://github.com/chemoelectric/exherbo-rubujo"
+DOWNLOADS=""
+
+SLOT="0"
+LICENCES="GPL-2"
+PLATFORMS="~amd64"
+MYOPTIONS=""
+
+DEPENDENCIES="
+    run:
+        dev-scm/mercurial
+        dev-scm/hg-git
+"
+
+WORK="${WORKBASE}"
+
+src_install()
+{
+    dodir /usr/share/paludis/syncers
+    insinto /usr/share/paludis/syncers
+    doins "${FILES}/dohg+git"
+    edo chmod 0755 "${IMAGE}/usr/share/paludis/syncers/dohg+git"
+}
+
