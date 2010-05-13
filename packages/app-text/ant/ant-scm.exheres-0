@@ -23,7 +23,6 @@ HOMEPAGE="http://ant.berlios.de"
 LICENCES="public-domain"
 SLOT="0"
 PLATFORMS="~amd64"
-CHOICES="ant_hyphen_patterns"
 MYOPTIONS="
     british      [[ description = [ Hyphenation patterns for British English ] ]]
     us           [[ description = [ Hyphenation patterns for US English ] ]]
