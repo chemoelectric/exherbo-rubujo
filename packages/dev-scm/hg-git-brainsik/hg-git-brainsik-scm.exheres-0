@@ -1,11 +1,11 @@
 # Copyright 2010 Barry Schwartz
 # Distributed under the terms of the GNU General Public License v2
 
-SCM_REPOSITORY="http://bitbucket.org/durin42/${PN}/"
+SCM_REPOSITORY="http://bitbucket.org/brainsik/hg-git/"
 
 require scm-hg distutils
 
-SUMMARY="hg-git, a plugin for Mercurial to let it push to and pull from a Git server"
+SUMMARY="hg-git, with Jeremy Avnet's changes"
 HOMEPAGE="http://hg-git.github.com/"
 
 LICENCES="GPL-2"
