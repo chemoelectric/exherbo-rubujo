@@ -13,7 +13,7 @@ MYOPTIONS=""
 DEPENDENCIES="
     run:
         dev-scm/mercurial
-        dev-scm/hg-git
+        || ( dev-scm/hg-git dev-scm/hg-git-brainsik )
 "
 
 WORK="${WORKBASE}"
