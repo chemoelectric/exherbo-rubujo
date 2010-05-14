@@ -1,0 +1,26 @@
+# Copyright 2010 Barry Schwartz
+# Distributed under the terms of the GNU General Public License v2
+
+SCM_REPOSITORY="git://github.com/chemoelectric/pyfilemagic.git"
+
+require scm-git python_abis
+
+SUMMARY="pyfilemagic, a Python interface to libmagic"
+HOMEPAGE="http://github.com/chemoelectric/pyfilemagic"
+
+LICENCES="BSD-2"
+SLOT="0"
+PLATFORMS="~amd64"
+MYOPTIONS=""
+
+DEPENDENCIES="
+    build+run:
+        dev-lang/python[>=2.6.4]
+        sys-apps/file
+"
+
+src_prepare()
+{
+    edo cp -f setup-no_cython.py setup.py
+    python_abis_src_prepare
+}
