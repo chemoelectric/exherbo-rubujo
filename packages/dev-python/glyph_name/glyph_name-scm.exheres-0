@@ -1,0 +1,25 @@
+# Copyright 2010 Barry Schwartz
+# Distributed under the terms of the GNU General Public License v2
+
+SCM_REPOSITORY="git://github.com/chemoelectric/glyph_name.git"
+
+require scm-git python_abis
+
+SUMMARY="glyph_name, a Python extension for computing Unicode sequences from glyph names"
+HOMEPAGE="http://github.com/chemoelectric/glyph_name"
+
+LICENCES="MIT"
+SLOT="0"
+PLATFORMS="~amd64"
+MYOPTIONS=""
+
+DEPENDENCIES="
+    build+run:
+        dev-lang/python[>=2.6.4]
+"
+
+src_prepare()
+{
+    edo cp -f setup-no_cython.py setup.py
+    python_abis_src_prepare
+}

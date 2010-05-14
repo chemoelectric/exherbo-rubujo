@@ -2,10 +2,18 @@
 # Distributed under the terms of the GNU General Public License v2
 # Based in part upon 'cython-0.9.8.1.1.ebuild' from Gentoo, which is:
 #     Copyright 1999-2008 Gentoo Foundation
+# Based in part upon 'distutils.exlib', which is:
+#     Copyright 2008, 2009 Ali Polatel
+#     Copyright 2009 Ingmar Vanhassel
+
 
 # FIXME/TODO: COMPUTE THIS RATHER THAN HARDCODE IT ************************************
 PYTHON_ABIS=( 2.6 3.1 )
-***************************************************************************************
+#**************************************************************************************
+
+require distutils python
+
+export_exlib_phases src_prepare src_compile src_install
 
 abi_sources_dir()
 {
@@ -41,4 +49,37 @@ process_abi_sources()
         edo cd "${work_dir}"
         PYTHON="/usr/bin/python${abi}" "${processor}"
     done
+}
+
+python_abis_src_prepare()
+{
+    distutils_src_prepare
+    separate_abi_sources "${PYTHON_ABIS[@]}"
+}
+
+python_abis_src_compile()
+{
+    process_abi_sources distutils_src_compile "${PYTHON_ABIS[@]}"
+}
+
+my_distutils_src_install() {
+    [[ -n ${@} ]] && die "${FUNCNAME} takes no arguments"
+
+    # need this for python-2.5 + setuptools in cases where
+    # a package uses distutils but does not install anything
+    # in site-packages. (eg. dev-java/java-config-2.x)
+    # - liquidx (14/08/2006)
+    pylibdir="$(${PYTHON} -c 'from distutils.sysconfig import get_python_lib; print(get_python_lib())')"
+    [[ -n "${pylibdir}" ]] && dodir "${pylibdir}"
+
+    edo ${PYTHON} -B setup.py install --root="${IMAGE}" --no-compile "${DISTUTILS_SRC_INSTALL_PARAMS[@]}"
+
+    emagicdocs
+
+    python_bytecompile
+}
+
+python_abis_src_install()
+{
+    process_abi_sources my_distutils_src_install "${PYTHON_ABIS[@]}"
 }
