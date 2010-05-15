@@ -1,0 +1,87 @@
+# Copyright 2010 Barry Schwartz
+# Distributed under the terms of the GNU General Public License v2
+
+require multilib
+
+SUMMARY="TeX Live"
+HOMEPAGE="http://www.tug.org/texlive/"
+DOWNLOADS="
+    ftp://tug.org/texlive/historic/2009/${PNV}-texmf.tar.xz
+    ftp://tug.org/texlive/historic/2009/${PNV}-extra.tar.xz
+    ftp://tug.org/texlive/historic/2009/${PNV}-source.tar.xz
+"
+
+LICENCES="FIXME"
+SLOT="0"
+PLATFORMS="~amd64"
+MYOPTIONS=""
+
+DEPENDENCIES="
+    build+run:
+        media-libs/freetype:2
+        media-libs/libpng
+        media-libs/t1lib
+        sys-libs/zlib
+        x11-libs/openmotif
+"
+
+WORK="${WORKBASE}/${PNV}-source"
+
+TEXLIVE_DIR="/usr/texlive"
+
+DEFAULT_SRC_PREPARE_PATCHES=(
+    "${FILES}/${PNV}-texmf.cnf.diff"
+)
+
+DEFAULT_SRC_CONFIGURE_PARAMS=(
+    --hates=docdir
+    --prefix="${TEXLIVE_DIR}"
+    --libdir="/usr/$(get_libdir)"
+    --includedir="/usr/include"
+    --mandir="${TEXLIVE_DIR}/texmf/doc/man"
+    --infodir="${TEXLIVE_DIR}/texmf/doc/info"
+    --disable-native-texlive-build
+    --disable-multiplatform
+    --disable-texlive
+    --enable-tetex
+    --enable-shared
+    --disable-threads
+    --disable-missing
+    --with-tex-banner="TeX Live 2009/Distribuaĵo Rubejplenigeja"
+    --disable-dump-share
+    --with-xdvi-x-toolkit=motif
+    --with-system-freetype2
+    --with-system-libpng
+    --with-system-t1lib
+    --with-system-zlib
+)
+
+src_install()
+{
+    local etc_dir texmf_dir env_file
+
+    dodir "${TEXLIVE_DIR}"
+    ( edo cd "${WORKBASE}/${PNV}-texmf";
+      edo mv texmf texmf-dist "${IMAGE}${TEXLIVE_DIR}";
+      edo cd "${WORKBASE}/${PNV}-extra";
+      edo mv tlpkg "${IMAGE}${TEXLIVE_DIR}";
+      edo chmod -R o-w ${IMAGE}${TEXLIVE_DIR}/* )
+
+    default
+
+    etc_dir="/etc/texmf"
+    texmf_dir="${IMAGE}${TEXLIVE_DIR}/texmf"
+    dodir "${etc_dir}/web2c"
+    edo echo "% You can rename this file to 'texmf.cnf' and put configuration changes it." > "${IMAGE}${etc_dir}/web2c/texmf.cnf.example"
+    edo mv "${texmf_dir}/web2c/context.cnf" "${IMAGE}${etc_dir}/web2c/context.cnf.example"
+
+    dodir /etc/env.d
+    env_file="${IMAGE}/etc/env.d/50texlive"
+    echo "PATH=\"${TEXLIVE_DIR}/bin\"" > "${env_file}"
+    echo "ROOTPATH=\"${TEXLIVE_DIR}/bin\"" >> "${env_file}"
+    echo "MANPATH=\"${TEXLIVE_DIR}/texmf/doc/man\"" >> "${env_file}"
+    echo "INFOPATH=\"${TEXLIVE_DIR}/texmf/doc/info\"" >> "${env_file}"
+
+    rmdir "${IMAGE}/usr/share/lcdf-typetools"
+    rmdir "${IMAGE}${TEXLIVE_DIR}/texmf-dist/tlpkg"
+}
