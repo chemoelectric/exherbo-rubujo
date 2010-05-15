@@ -15,9 +15,10 @@ MYOPTIONS=""
 
 DEPENDENCIES="
     build+run:
+        !dev-scm/hg-git-brainsik
         dev-lang/python
     run:
-        dev-python/dulwich[>=0.3.2]
+        dev-python/dulwich[~scm]
         dev-scm/mercurial[>=1.3]
 "
 
