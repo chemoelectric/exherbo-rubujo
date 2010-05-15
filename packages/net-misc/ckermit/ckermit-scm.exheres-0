@@ -3,7 +3,10 @@
 
 SUMMARY="C-Kermit"
 HOMEPAGE="http://kermit.columbia.edu/"
-DOWNLOADS="ftp://www.columbia.edu/kermit/test/tar/x.tar.gz"
+DOWNLOADS="
+    ftp://www.columbia.edu/kermit/test/tar/x.tar.gz -> ${PNV}.tar.gz
+    http://www.columbia.edu/kermit/ftp/c-kermit/ckermit.ini -> ${PNV}.ini
+"
 
 LICENCES="C-Kermit"
 SLOT="0"
@@ -40,6 +43,11 @@ src_install()
     newbin wermit kermit
     dosym kermit /usr/bin/kermit-sshsub
     option telnet && dosym kermit /usr/bin/telnet
+
+    edo cp "${FETCHEDDIR}/${PNV}.ini" ckermit.ini
+    edo sed -i -e '1i#!/usr/bin/kermit\n' ckermit.ini
+    dobin ckermit.ini
+
     newman ckuker.nr kermit.1
     dodoc *.txt
 }
