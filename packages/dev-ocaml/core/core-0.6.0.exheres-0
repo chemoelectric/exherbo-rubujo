@@ -11,6 +11,7 @@ DEPENDENCIES="
     build+run:
         dev-lang/ocaml[>=3.11]
         dev-ocaml/bin_prot
+        dev-ocaml/fieldslib
         dev-ocaml/sexplib
         dev-ocaml/type-conv
         dev-ocaml/res
