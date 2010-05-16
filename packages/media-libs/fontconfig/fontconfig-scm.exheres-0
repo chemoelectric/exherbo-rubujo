@@ -1,0 +1,69 @@
+# Copyright (c) 2007 Alexander Færøy <ahf@exherbo.org>
+# Copyright 2010 Barry Schwartz
+# Distributed under the terms of the GNU General Public License v2
+
+# This exheres was adapted by Barry Schwartz from an exheres, by
+# Alexander Færøy, for standard fontconfig
+# (fontconfig-2.8.0.exheres-0).
+
+SCM_REPOSITORY="git://github.com/chemoelectric/fontconfig.git"
+
+require scm-git
+
+SUMMARY="Crud Factory fontconfig"
+DESCRIPTION="The Crud Factory's altered fontconfig"
+HOMEPAGE="http://github.com/chemoelectric/fontconfig"
+
+LICENCES="MIT"
+SLOT="0"
+PLATFORMS="~amd64"
+MYOPTIONS="doc"
+
+DEPENDENCIES="
+    build:
+        dev-util/pkg-config
+    build+run:
+        dev-libs/expat
+        media-libs/freetype:2
+    post:
+        fonts/dejavu [[ description = [ Fontconfig needs at least one default truetype font installed ] ]]
+    suggestion:
+        app-admin/eclectic-fontconfig [[ description = [ Manage fontconfig /etc/fonts/conf.d/ symlinks ] ]]
+"
+
+DEFAULT_SRC_CONFIGURE_PARAMS=(
+    # Use expat2
+    --disable-libxml2
+    --localstatedir=/var
+)
+
+DEFAULT_SRC_CONFIGURE_OPTION_ENABLES=( "doc docs" )
+
+src_prepare()
+{
+    edo /bin/sh autogen.sh --noconf
+}
+
+src_install()
+{
+    default
+
+    doman fc-*/fc-*.1 doc/fonts-conf.5
+    dodoc doc/fontconfig-user.{txt,pdf}
+
+
+    # fc-lang/ directory contains language coverage datafiles
+    # which are needed to test the coverage of fonts.
+    insinto /usr/share/fc-lang
+    doins fc-lang/*.orth
+
+    keepdir /var/cache/fontconfig
+}
+
+pkg_postinst() {
+    if [[ ${ROOT} == "/" ]]; then
+        ebegin "Creating font cache"
+            fc-cache --really-force --system-only
+        eend $?
+    fi
+}
