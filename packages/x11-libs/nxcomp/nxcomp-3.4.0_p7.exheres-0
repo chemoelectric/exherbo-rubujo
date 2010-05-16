@@ -1,0 +1,31 @@
+# Copyright (c) 2010 Barry Schwartz
+# Distributed under the terms of the GNU General Public License v2
+
+SUMMARY="nxcomp, a library for X11 compression"
+HOMEPAGE="http://www.nomachine.com"
+DOWNLOADS="http://64.34.161.181/download/${PV%%_p*}/sources/${PNV/_p/-}.tar.gz"
+
+LICENCES="GPL-2"
+SLOT="0"
+PLATFORMS="~amd64"
+MYOPTIONS=""
+
+DEPENDENCIES="
+    build+run:
+        media-libs/libpng
+        media-libs/jpeg
+        sys-libs/zlib
+"
+
+WORK="${WORKBASE}/${PN}"
+
+DEFAULT_SRC_CONFIGURE_PARAMS=( --hates=docdir )
+
+src_install()
+{
+    default
+    dolib libXcomp.a libXcomp.so*
+    dodir /usr/include/NX/nxcomp
+    insinto /usr/include/NX/nxcomp
+    doins *.h
+}

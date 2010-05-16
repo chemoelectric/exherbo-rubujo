@@ -1,0 +1,65 @@
+# Copyright (c) 2010 Barry Schwartz
+# Distributed under the terms of the GNU General Public License v2
+
+SCM_REPOSITORY="https://remmina.svn.sourceforge.net/svnroot/remmina/"
+
+require scm-svn sourceforge
+
+SUMMARY=""
+LICENCES="GPL-2"
+SLOT="0"
+PLATFORMS="~amd64"
+MYOPTIONS="nx telepathy vnc"
+
+#    rdesktop?
+#    (
+#        net-libs/freerdp
+#    )
+
+DEPENDENCIES="
+    build+run:
+        x11-apps/remmina[~scm]
+        x11-libs/libXdmcp
+        x11-libs/libxkbfile
+    nx?
+    (
+        build+run:
+        run:
+            x11-apps/nxproxy
+    )
+    telepathy?
+    (
+        net-im/telepathy-glib[>=0.9.0]
+    )
+    vnc?
+    (
+        net-libs/libvncserver
+        dev-libs/gnutls[>=2.4.0]
+        media-libs/jpeg
+        net-libs/libssh
+        sys-libs/zlib
+    )
+"
+
+WORK="${WORKBASE}/${PNV}/${PN}"
+
+DEFAULT_SRC_CONFIGURE_OPTION_ENABLES=(
+    nx
+    telepathy
+    vnc
+)
+
+DEFAULT_SRC_CONFIGURE_PARAMS=(
+    --enable-ssh
+    --enable-xdmcp
+    --enable-xkbfile
+    --disable-freerdp
+)
+
+src_prepare()
+{
+    if ! grep -F nx/remminanxsessionmanager.c po/POTFILES.in ; then
+        echo nx/remminanxsessionmanager.c >> po/POTFILES.in
+    fi
+    edo /bin/sh autogen.sh
+}

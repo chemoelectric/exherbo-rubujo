@@ -1,0 +1,33 @@
+# Copyright (c) 2010 Barry Schwartz
+# Distributed under the terms of the GNU General Public License v2
+
+SUMMARY="nxproxy does X11 compression"
+HOMEPAGE="http://www.nomachine.com"
+DOWNLOADS="http://64.34.161.181/download/${PV%%_p*}/sources/${PNV/_p/-}.tar.gz"
+
+LICENCES="GPL-2"
+SLOT="0"
+PLATFORMS="~amd64"
+MYOPTIONS=""
+
+DEPENDENCIES="
+    build+run:
+        x11-libs/nxcomp
+"
+
+WORK="${WORKBASE}/${PN}"
+
+DEFAULT_SRC_CONFIGURE_PARAMS=( --hates=docdir )
+
+src_prepare()
+{
+    default
+    edo sed -i -e 's|-I\.\./nxcomp|-I/usr/include/NX/nxcomp|' Makefile.in
+    eautoreconf
+}
+
+src_install()
+{
+    dobin nxproxy
+    dodoc CHANGELOG README*
+}
