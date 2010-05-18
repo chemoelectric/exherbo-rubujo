@@ -19,7 +19,7 @@ DEPENDENCIES="
         dev-libs/libgcrypt
         dev-libs/unique
         dev-libs/vte
-        net-misc/openssh
+        net-libs/libssh
 "
 
 WORK="${WORKBASE}/${PNV}/${PN}"
