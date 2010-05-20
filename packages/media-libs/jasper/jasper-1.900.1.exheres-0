@@ -1,0 +1,36 @@
+# Copyright 2008 Ingmar Vanhassel <ingmar@exherbo.org>
+# Distributed under the terms of the GNU General Public License v2
+
+require autotools [ supported_autoconf=[ 2.5 ] supported_automake=[ 1.11 1.10 ] ] easy-multibuild
+
+SUMMARY="Software-based implementation of the codec specified in the JPEG-2000 Part-1 standard"
+HOMEPAGE="http://www.ece.uvic.ca/~mdadams/jasper/"
+DOWNLOADS="${HOMEPAGE}/software/${PNV}.zip
+     mirror://gentoo/${PNV}-fixes-20081208.patch.bz2"
+# Patches by Redhat to fix a number of security issues: Gentoo #222819. Upstream status unknown (dead?)
+
+LICENCES="Jasper-2.0"
+SLOT="0"
+PLATFORMS="~amd64 ~x86"
+MYOPTIONS="jpeg opengl multibuild_c: 32 64"
+
+DEPENDENCIES="
+    build:
+        app-arch/unzip
+    build+run:
+        jpeg? ( media-libs/jpeg )
+        opengl? (
+            x11-dri/freeglut
+            x11-dri/mesa
+            x11-libs/libX11
+            x11-libs/libXext
+            x11-libs/libXi
+            x11-libs/libXmu
+            x11-libs/libXt
+        )
+"
+
+DEFAULT_SRC_PREPARE_PATCHES=( "${WORKBASE}/${PNV}-fixes-20081208.patch" )
+DEFAULT_SRC_CONFIGURE_OPTION_ENABLES=( jpeg opengl )
+DEFAULT_SRC_CONFIGURE_PARAMS=( --enable-shared )
+
