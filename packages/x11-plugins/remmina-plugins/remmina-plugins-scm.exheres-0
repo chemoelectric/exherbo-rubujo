@@ -18,6 +18,7 @@ MYOPTIONS="nx telepathy vnc"
 
 DEPENDENCIES="
     build+run:
+        net-libs/libssh
         x11-apps/remmina[~scm]
         x11-libs/libXdmcp
         x11-libs/libxkbfile
@@ -36,7 +37,6 @@ DEPENDENCIES="
         net-libs/libvncserver
         dev-libs/gnutls[>=2.4.0]
         media-libs/jpeg
-        net-libs/libssh
         sys-libs/zlib
     )
 "
