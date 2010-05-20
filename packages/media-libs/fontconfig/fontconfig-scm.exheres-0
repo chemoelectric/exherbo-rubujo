@@ -8,7 +8,7 @@
 
 SCM_REPOSITORY="git://github.com/chemoelectric/fontconfig.git"
 
-require scm-git
+require scm-git easy-multibuild
 
 SUMMARY="Crud Factory fontconfig"
 DESCRIPTION="The Crud Factory's altered fontconfig"
@@ -17,14 +17,15 @@ HOMEPAGE="http://github.com/chemoelectric/fontconfig"
 LICENCES="MIT"
 SLOT="0"
 PLATFORMS="~amd64"
-MYOPTIONS="doc"
+MYOPTIONS="doc multibuild_c: 32 64"
 
 DEPENDENCIES="
     build:
         dev-util/pkg-config
     build+run:
-        dev-libs/expat
-        media-libs/freetype:2
+        sys-libs/zlib[multibuild_c:*(?)?]
+        dev-libs/expat[multibuild_c:*(?)?]
+        media-libs/freetype:2[multibuild_c:*(?)?]
     post:
         fonts/dejavu [[ description = [ Fontconfig needs at least one default truetype font installed ] ]]
     suggestion:
@@ -46,11 +47,7 @@ src_prepare()
 
 src_install()
 {
-    default
-
-    doman fc-*/fc-*.1 doc/fonts-conf.5
-    dodoc doc/fontconfig-user.{txt,pdf}
-
+    easy-multibuild_src_install
 
     # fc-lang/ directory contains language coverage datafiles
     # which are needed to test the coverage of fonts.
