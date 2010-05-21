@@ -20,7 +20,7 @@ MYOPTIONS="
     X
     opengl
     odbc
-    vorbis
+    audio
     doc
 "
 # Options to consider adding:
