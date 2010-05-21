@@ -1,0 +1,173 @@
+# Copyright 2008 David Leverton <dleverton@exherbo.org>
+# Distributed under the terms of the GNU General Public License v2
+
+if [[ -z ${SCM_TYPE} ]]; then
+    SCM_TYPE=cvs
+    require scm
+fi
+
+scm-cvs_do_dependencies() {
+    local cvs='dev-scm/cvs'
+    if [[ $(scm_get_var REPOSITORY) == :ext:* ]]; then
+        echo "${cvs} net-misc/openssh"
+    #elif [[ $(scm_get_var REPOSITORY) == :gserver:* ]]; then
+    #    echo "${cvs}[kerberos]"
+    else
+        echo "${cvs}"
+    fi
+}
+
+scm-cvs_do_check_vars() {
+    [[ -n $(scm_get_var TAG) ]] && \
+        [[ -n $(scm_get_var BRANCH) || -n $(scm_get_var REVISION) ]] \
+        && die "for cvs, $(scm_var_name TAG) must not be set at the same time as $(scm_var_name BRANCH) or $(scm_var_name REVISION)"
+    [[ -n $(scm_get_var REVISION) && ! $(scm_get_var REVISION) =~ ^[0-9]{4}(.[0-9]{2}){5}$ ]] \
+        && die "for cvs, $(scm_var_name REVISION) must be in the form YYYY.MM.DD.hh.mm.ss"
+    [[ -z $(scm_get_var SUBPATH) ]] && scm_set_var SUBPATH "${SCM_THIS:-${PN}}"
+
+    scm_modify_var REPOSITORY scm_trim_slashes -trailing
+    scm_modify_var SUBPATH    scm_trim_slashes -leading -trailing
+}
+
+scm-cvs_cvs() {
+    local echo=echo
+    if [[ ${1} == -q ]]; then
+        shift
+        echo=:
+    fi
+
+    local cmd=${1} global=( -z2 -d "$(scm_get_var REPOSITORY)" ) extra=( )
+    shift
+    local dir=$(scm_get_var CHECKOUT_TO)
+    if has "${cmd}" checkout co get; then
+        extra+=( -d "${dir##*/}" )
+        dir=${dir%/*}
+    fi
+    has "${cmd}" update up upd && extra+=( -dP -I.scm.exlib.timestamp )
+
+    ${echo} cd "${dir}" '&&' cvs "${global[@]}" "${cmd}" "${extra[@]}" ${@}
+    ( cd "${dir}" && cvs "${global[@]}" "${cmd}" "${extra[@]}" ${@} ) || die_unless_nonfatal "cvs ${cmd} failed"
+}
+
+scm-cvs_describe() {
+    case ${1} in
+        N*) echo "tag ${1#N}" ;;
+        X*) local what=${1#X}; echo "branch ${what%:*} as of ${what#*:}" ;;
+        T*) echo "branch ${1#T}" ;;
+        D*) echo "main branch as of ${1#D}" ;;
+        *) echo "main branch"
+    esac
+}
+
+scm-cvs_do_appraise() {
+    local dir=$(scm_get_var CHECKOUT_TO)
+
+    if [[ ! -d ${dir}/CVS ]]; then
+        echo "${dir} is not a cvs checkout"
+        return 3
+    fi
+
+    if [[ $(< ${dir}/CVS/Root) != $(scm_get_var REPOSITORY) ]]; then
+        echo "${dir} is a checkout of $(< ${dir}/CVS/Root), but wanted $(scm_get_var REPOSITORY)"
+
+        return 3
+    fi
+
+    if [[ $(< ${dir}/CVS/Repository) != $(scm_get_var SUBPATH) ]]; then
+        echo "${dir} is a checkout of the module $(< ${dir}/CVS/Repository), but wanted $(scm_get_var SUBPATH)"
+
+        return 3
+    fi
+
+    local f what=
+    for f in X-ScmCvsExlib-BranchDate Tag; do
+        if [[ -e ${dir}/CVS/${f} ]]; then
+            [[ -f ${dir}/CVS/${f} && -r ${dir}/CVS/${f} ]] || die "${dir}/CVS/${f} is not a readable regular file"
+            what=$(< "${dir}"/CVS/${f})
+            break
+        fi
+    done
+
+    local wanted=
+    if [[ -n $(scm_get_var TAG) ]]; then
+        wanted=N$(scm_get_var TAG)
+    elif [[ -n $(scm_get_var BRANCH) && -n $(scm_get_var REVISION) ]]; then
+        wanted=X$(scm_get_var BRANCH):$(scm_get_var REVISION)
+    elif [[ -n $(scm_get_var BRANCH) ]]; then
+        wanted=T$(scm_get_var BRANCH)
+    elif [[ -n $(scm_get_var REVISION) ]]; then
+        wanted=D$(scm_get_var REVISION)
+    fi
+
+    if [[ ${what} != ${wanted} ]]; then
+        echo "${dir} is a checkout of the $(scm-cvs_describe "${what}"), but wanted the $(scm-cvs_describe "${wanted}")"
+        return 1
+    fi
+
+    if [[ -n $(scm_get_var TAG) || -n $(scm_get_var REVISION) ]]; then
+        return 2
+    else
+        return 0
+    fi
+}
+
+scm-cvs_tagrevbranch() {
+    local rev=$(scm_get_var REVISION)
+    local date=${rev:0:10} time=${rev:11:8}
+    local datetime="${date//./-} ${time//./:} UTC"
+    if [[ -n $(scm_get_var TAG) ]]; then
+        echo -r$(scm_get_var TAG)
+    elif [[ -n $(scm_get_var BRANCH) ]]; then
+        if [[ -n $(scm_get_var REVISION) ]]; then
+            echo -r$(scm_get_var BRANCH):${datetime}
+        else
+            echo -r$(scm_get_var BRANCH)
+        fi
+    elif [[ -n $(scm_get_var REVISION) ]]; then
+        echo -D${datetime}
+    fi
+}
+
+scm-cvs_set_branchdate() {
+    if [[ -n $(scm_get_var BRANCH) && -n $(scm_get_var REVISION) ]]; then
+        echo "X$(scm_get_var BRANCH):$(scm_get_var REVISION)" >"$(scm_get_var CHECKOUT_TO)"/CVS/X-ScmCvsExlib-BranchDate
+    else
+        rm -f "$(scm_get_var CHECKOUT_TO)"/CVS/X-ScmCvsExlib-BranchDate
+    fi
+}
+
+scm-cvs_do_checkout() {
+    local dir=$(scm_get_var CHECKOUT_TO)
+    addfilter "${dir%/*}/CVS"
+    local what=$(scm-cvs_tagrevbranch) whatarr=
+    [[ -n ${what} ]] && whatarr=( "${what}" )
+    scm-cvs_cvs checkout "${whatarr[@]}" "$(scm_get_var SUBPATH)"
+    scm-cvs_set_branchdate
+    rmfilter "${dir%/*}/CVS"
+}
+
+scm-cvs_do_update() {
+    local what=$(scm-cvs_tagrevbranch) whatarr=
+    [[ -n ${what} ]] && whatarr=( "${what}" )
+    scm-cvs_cvs update -A "${whatarr[@]}"
+    scm-cvs_set_branchdate
+}
+
+scm-cvs_revision_list() {
+    ( cd "$(scm_get_var CHECKOUT_TO)" && find . -path '*/CVS/Entries' -exec grep -H ^/ '{}' + ) \
+        | sed -e 's,^\(.*\)/CVS/Entries:/\([^/]\+\)/\([^/]\+\)/[^/]\+/[^/]*/[^/]*$,\1/\2: \3,' -e 's,^./,,' | sort
+}
+
+scm-cvs_do_revision() {
+    scm-cvs_revision_list | sha1sum | cut -d' ' -f1
+}
+
+scm-cvs_do_set_actual_vars() {
+    scm_set_var CVS_ACTUAL_REVISION_LIST "$(scm-cvs_revision_list)"
+}
+
+scm-cvs_do_info() {
+    echo "CVS revision list for ${SCM_THIS:-primary repository}:"
+    scm_get_var CVS_ACTUAL_REVISION_LIST
+}
+

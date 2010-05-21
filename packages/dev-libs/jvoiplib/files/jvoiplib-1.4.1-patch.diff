@@ -1,0 +1,106 @@
+--- jvoiplib-1.4.1/configure.in.ORIG	2010-05-21 04:41:17.688046906 +0000
++++ jvoiplib-1.4.1/configure.in	2010-05-21 06:30:00.404796992 +0000
+@@ -1,7 +1,7 @@
+ AC_INIT(configure.in)
+ 
+ #JVOIP_CFLAGS="-g -Wall -Werror"
+-JVOIP_CFLAGS="-O3"
++JVOIP_CFLAGS="-O3 -fPIC"
+ JVOIP_TARGETS=dummymsg
+ JVOIP_ARFLAGS=
+ JVOIP_LDFLAGS=
+@@ -97,19 +97,21 @@
+ dnl Check if we can link using the C++ compiler
+ dnl ---------------------------------------------------------------------------
+ 
+-USE_CXXLINK=no
+-AC_MSG_CHECKING(if we can link using $CXX)
+-echo "int main(void){return 0;}" > configtest.c
+-if eval $CXX -c -o configtest.o configtest.c 2>/dev/null; then
+-	if eval $CXX -shared -Wl,-soname,conftest -o conftest.so configtest.o 2>/dev/null; then
+-		USE_CXXLINK=yes
+-		JVOIP_TARGETS="sharedlib_cxx"
+-		AC_MSG_RESULT(yes)
+-	else
+-		AC_MSG_RESULT(no)
+-	fi
+-	rm -f configtest.c configtest.so configtest.o 2>/dev/null
+-fi	
++#USE_CXXLINK=no
++#AC_MSG_CHECKING(if we can link using $CXX)
++#echo "int main(void){return 0;}" > configtest.c
++#if eval $CXX -c -o configtest.o configtest.c 2>/dev/null; then
++#	if eval $CXX -shared -Wl,-soname,libconftest.so.1 -o libconftest.so configtest.o 2>/dev/null; then
++#		USE_CXXLINK=yes
++#		JVOIP_TARGETS="sharedlib_cxx"
++#		AC_MSG_RESULT(yes)
++#	else
++#		AC_MSG_RESULT(no)
++#	fi
++#	rm -f configtest.c configtest.so configtest.o 2>/dev/null
++#fi	
++USE_CXXLINK=yes
++JVOIP_TARGETS="sharedlib_cxx"
+ 
+ dnl ---------------------------------------------------------------------------
+ dnl Check if 'ld' exists and which syntax to use
+--- jvoiplib-1.4.1/Makefile.in.ORIG	2005-10-21 07:35:59.000000000 +0000
++++ jvoiplib-1.4.1/Makefile.in	2010-05-21 06:01:26.990859172 +0000
+@@ -44,7 +44,7 @@
+ 	done
+ 	rm -f $(JVOIPLIB_DYNAMIC)
+ 	ld $(LDFLAGS) $(JVOIPLIB_DYNAMIC_INTERN) -o $(JVOIPLIB_DYNAMIC) lib/*.o
+-	
++
+ sharedlib_cxx:
+ 	@for i in $(SUBDIRS) ; do\
+ 		if ! (cd $$i ; make) ; then\
+@@ -131,19 +131,19 @@
+ 	rm -fr $(DISTRIBARCHIVEDIR)
+ 
+ install: all
+-	if ! test -d $(LIBRARYDIR) ; then \
+-		mkdir -m 755 -p $(LIBRARYDIR) ; \
++	if ! test -d $(DESTDIR)$(LIBRARYDIR) ; then \
++		mkdir -m 755 -p $(DESTDIR)$(LIBRARYDIR) ; \
+ 	fi
+-	if ! test -d $(INCLUDEDIR) ; then \
+-		mkdir -m 755 -p $(INCLUDEDIR) ; \
++	if ! test -d $(DESTDIR)$(INCLUDEDIR) ; then \
++		mkdir -m 755 -p $(DESTDIR)$(INCLUDEDIR) ; \
+ 	fi
+ 	if test -e $(JVOIPLIB_STATIC) ; then \
+-		install -m 644 $(JVOIPLIB_STATIC) $(LIBRARYDIR) ; \
++		install -m 644 $(JVOIPLIB_STATIC) $(DESTDIR)$(LIBRARYDIR) ; \
+ 	fi
+ 	if test -e $(JVOIPLIB_DYNAMIC) ; then \
+-		install -m 755 $(JVOIPLIB_DYNAMIC) $(LIBRARYDIR) ; \
++		install -m 755 $(JVOIPLIB_DYNAMIC) $(DESTDIR)$(LIBRARYDIR) ; \
+ 	fi
+-	install -m 644 include/*.h $(INCLUDEDIR)
+-	(cd $(LIBRARYDIR) ; ln -sf $(JVOIPLIB_DYNAMIC) $(JVOIPLIB_DYNAMIC_SHORT) )
+-	(cd $(LIBRARYDIR) ; ln -sf $(JVOIPLIB_DYNAMIC) $(JVOIPLIB_DYNAMIC_INTERN) )
++	install -m 644 include/*.h $(DESTDIR)$(INCLUDEDIR)
++	(cd $(DESTDIR)$(LIBRARYDIR) ; ln -sf $(JVOIPLIB_DYNAMIC) $(JVOIPLIB_DYNAMIC_SHORT) )
++	(cd $(DESTDIR)$(LIBRARYDIR) ; ln -sf $(JVOIPLIB_DYNAMIC) $(JVOIPLIB_DYNAMIC_INTERN) )
+ 
+--- jvoiplib-1.4.1/src/libcomponents/impl/jvoipnoinput.cpp.ORIG	2010-05-21 04:33:56.361734007 +0000
++++ jvoiplib-1.4.1/src/libcomponents/impl/jvoipnoinput.cpp	2010-05-21 04:35:29.358745625 +0000
+@@ -33,6 +33,7 @@
+ 
+ */
+ 
++#include <string.h>
+ #include "jvoipconfig.h"
+ #include "jvoipnoinput.h"
+ #include "jvoiperrors.h"
+--- jvoiplib-1.4.1/src/libcomponents/impl/oss/jvoipsoundcardoutput.cpp.ORIG	2005-10-21 07:35:59.000000000 +0000
++++ jvoiplib-1.4.1/src/libcomponents/impl/oss/jvoipsoundcardoutput.cpp	2010-05-21 04:37:10.056793447 +0000
+@@ -28,6 +28,7 @@
+ 
+ */
+ 
++#include <string.h>
+ #include "jvoipconfig.h"
+ #include "jvoipsoundcardoutput.h"
+ #include "jvoipsounddevice.h"

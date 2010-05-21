@@ -1,0 +1,28 @@
+# Copyright 2010 Barry Schwartz
+# Distributed under the terms of the GNU General Public License v2
+
+require autotools [ supported_autoconf=[ 2.5 ] supported_automake=[ 1.11 1.10 ] ]
+
+SUMMARY="JVOIPLIB, an object-oriented Voice over IP (VoIP) library written in C++"
+HOMEPAGE="http://research.edm.uhasselt.be/~jori/page/index.php?n=CS.Jvoiplib"
+DOWNLOADS="http://research.edm.uhasselt.be/jori/${PN}/${PNV}.tar.bz2"
+
+LICENCES="LGPL-2"
+SLOT="0"
+PLATFORMS="~amd64"
+MYOPTIONS=""
+
+DEPENDENCIES="
+    dev-libs/jthread
+    dev-libs/jrtplib
+"
+
+EXJOBS=1
+
+DEFAULT_SRC_PREPARE_PATCHES=(
+    "${FILES}/${PNV}-patch.diff"
+)
+
+DEFAULT_SRC_CONFIGURE_PARAMS=(
+    --hates=docdir
+)

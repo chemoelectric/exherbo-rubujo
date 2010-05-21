@@ -1,0 +1,27 @@
+# Copyright 2010 Barry Schwartz
+# Distributed under the terms of the GNU General Public License v2
+# Based in part upon 'jrtplib-3.7.1-r1.ebuild' from Gentoo, which is:
+#     Copyright 1999-2009 Gentoo Foundation.
+
+SUMMARY="JRTPLIB, an object-oriented RTP library written in C++"
+HOMEPAGE="http://research.edm.uhasselt.be/~jori/page/index.php?n=CS.Jrtplib"
+DOWNLOADS="http://research.edm.uhasselt.be/jori/${PN}/${PNV}.tar.bz2"
+
+LICENCES="MIT"
+SLOT="0"
+PLATFORMS="~amd64"
+MYOPTIONS=""
+
+DEPENDENCIES="
+    build+run:
+        dev-libs/jthread
+"
+
+DEFAULT_SRC_PREPARE_PATCHES=(
+    -p1 "${FILES}/jrtplib-3.7.1-gcc43.patch"
+    -p0 "${FILES}/jrtplib-3.7.1-gcc-4.4.patch"
+)
+
+DEFAULT_SRC_CONFIGURE_PARAMS=(
+    --enable-jthread
+)

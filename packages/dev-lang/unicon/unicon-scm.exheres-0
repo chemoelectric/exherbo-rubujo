@@ -1,0 +1,185 @@
+# Copyright 2010 Barry Schwartz
+# Distributed under the terms of the GNU General Public License v2
+
+SCM_REPOSITORY=":pserver:anonymous@unicon.cvs.sourceforge.net:/cvsroot/unicon"
+
+require scm-cvs flag-o-matic autotools [ supported_autoconf=[ 2.5 ] supported_automake=[ 1.11 1.10 ] ]
+
+SUMMARY="Unicon, the Unified Extended Dialect of Icon"
+DESCRIPTION="
+Unicon is a very high level, goal-directed,
+object-oriented, general purpose applications language.
+"
+HOMEPAGE="http://unicon.org/"
+UPSTREAM_DOCUMENTATION="http://unicon.org/ubooks.html"
+
+SLOT="0"
+LICENCES="GPL-2 LGPL-2 public-domain"
+PLATFORMS="~amd64"
+MYOPTIONS="
+    X
+    opengl
+    odbc
+    vorbis
+    doc
+"
+# Options to consider adding:
+#    voip
+#    rswitch -- choice between pthreads.c and custom rswitch.
+
+#
+# *** A QUESTION: Is ftgl actually used in the opengl support? ***
+#
+DEPENDENCIES="
+    X? (
+        build+run:
+            x11-libs/libXext
+            x11-libs/libXau
+            x11-libs/libXdmcp
+            x11-libs/libXrender
+            x11-libs/libXpm
+    )
+    opengl? (
+        build+run:
+             x11-dri/mesa
+             x11-libs/libXft
+             media-libs/ftgl
+    )
+    odbc? (
+        build+run:
+            dev-db/libiodbc
+        build:
+            dev-util/pkg-config
+    )
+    audio? (
+        build+run:
+            media-libs/libogg
+            media-libs/libvorbis
+            media-libs/openal
+            media-libs/SDL
+            media-libs/smpeg
+    )
+
+    build+run:
+        sys-libs/gdbm
+
+"
+
+MY_DEFPATH="/usr/lib/unicon"
+
+configuration_name()
+{
+    if option X ; then
+       echo "X-Configure"
+    else
+       echo "Configure"
+    fi
+}
+
+platform_name()
+{
+    local platform="$(uname -a | sed 's/ /_/g')"
+
+    case "${platform}" in
+        Linux*alpha*)
+            echo "alpha_linux"
+            ;;
+        Linux*sparc64*)
+            echo "sun_linux"
+            ;;
+        Linux*i686*)
+            echo "intel_linux"
+            ;;
+        Linux*x86_64*)
+            echo "amd64_linux"
+            ;;
+        *)
+            die "Platform not supported by this exheres: ${platform}"
+    esac
+}
+
+src_prepare()
+{
+    default
+
+    # Enable libcrypt support.
+    edo sed -i -e 's|^#define[ \t][ \t]*NoCrypt[ \t]*|/* #define NoCrypt */|' "config/unix/$(platform_name)/define.h"
+    edo sed -i -e 's|\(^RLIBS[ \t]*=.*\)|\1 -lcrypt|' "config/unix/$(platform_name)/Makedefs"
+
+    # Use the system's gdbm instead of the one included with
+    # Unicon. And don't let Berkeley DB confuse us.
+    edo rm -rf src/gdbm
+    for f in "config/unix/$(platform_name)/"* ; do
+        if [[ -f "${f}" ]] ; then
+            edo sed -i -e '
+                s|-I\.\./gdbm||g;
+                s|-lgdbm|-lgdbm -lgdbm_compat|g;
+                s|^\(GDBM[ \t]*=\)|#\1|;
+                s|-I/usr/include/db1||g' "${f}"
+        fi
+    done
+
+    # Use the system's libXpm instead of the one included with Unicon.
+    edo rm -rf src/xpm
+    for f in "config/unix/$(platform_name)/"* ; do
+        if [[ -f "${f}" ]] ; then
+            edo sed -i -e '
+                s|-I\.\./xpm|-I/usr/include/X11|g;
+                s|^\(XPM[ \t]*=\)|#\1|;
+                s|^\(XPMLIB[ \t]*=\)|#\1|' "${f}"
+        fi
+    done
+    expatch -p0 "${FILES}/unicon-scm.patch.diff"
+
+	filter-flags -fstrict-aliasing -funit-at-a-time
+	append-flags -fno-strict-aliasing -fno-unit-at-a-time
+
+    option odbc && append-flags $(pkg-config --cflags libiodbc)
+
+	# Use the user's CFLAGS instead of the defaults.
+    for f in "config/unix/$(platform_name)/"* ; do
+        if [[ -f "${f}" ]] ; then
+            edo sed -i -e "s!\(-O2\|-fno-strict-aliasing -fno-unit-at-a-time\)!${CFLAGS}!" "${f}"
+        fi
+    done
+
+    eautoreconf
+}
+
+src_configure()
+{
+    emake -j1 "$(configuration_name)" name="$(platform_name)"
+}
+
+src_compile()
+{
+    # Within the Unicon makefiles, CFLAGS is used for something other
+    # than the usual.
+    unset CFLAGS
+
+    unset IPATH LPATH FPATH
+    PATH="${WORK}/bin:${PATH}"
+    emake -j1 Unicon
+}
+
+src_install()
+{
+    (cd bin; dobin icont iconx ivib ivibmigrate ivib-v1 patchstr rtt udb ui unicon unidep unidoc)
+
+    insinto /usr/lib/unicon
+    doins -r ipl
+
+    doman $(find doc -name '*.1' -type f)
+
+    dodoc README COPYING COPYING.LIB COPYING.UNICON
+    option doc && dodoc -r doc/*
+
+    # We may need procs in the LPATH if and when we install the Icon
+    # compiler.
+    # echo 'LPATH="/usr/lib/unicon/ipl/incl /usr/lib/unicon/ipl/gincl /usr/lib/unicon/ipl/procs /usr/lib/unicon/ipl/gprocs"' > 50unicon
+    echo 'LPATH="/usr/lib/unicon/ipl/incl /usr/lib/unicon/ipl/gincl"' > 50unicon
+    echo 'IPATH="/usr/lib/unicon/ipl/lib"' >> 50unicon
+    doenvd 50unicon
+
+    find "${IMAGE}" -name CVS -type d -exec rm -rf '{}' ';'
+}
