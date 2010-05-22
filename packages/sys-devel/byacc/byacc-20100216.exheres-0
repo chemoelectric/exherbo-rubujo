@@ -1,0 +1,26 @@
+# Copyright 2010 Barry Schwartz
+# Distributed under the terms of the GNU General Public License v2
+
+SUMMARY="Berkeley Yacc"
+HOMEPAGE="http://invisible-island.net/byacc/byacc.html"
+DOWNLOADS="ftp://invisible-island.net/${PN}/${PNV}.tgz"
+
+SLOT="0"
+LICENCES="public-domain"
+PLATFORMS="~amd64"
+MYOPTIONS=""
+
+DEFAULT_SRC_PREPARE_PATCHES=( "${FILES}/${PNV}-name-patch.diff" )
+DEFAULT_SRC_CONFIGURE_PARAMS=( --hates=docdir )
+
+src_compile()
+{
+    emake THIS=byacc
+}
+
+src_install()
+{
+    dobin byacc
+    newman yacc.1 byacc.1
+    dodoc ACKNOWLEDGEMENTS CHANGES NOTES README
+}

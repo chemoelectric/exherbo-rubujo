@@ -1,0 +1,11 @@
+--- byacc-20100216/test/run_test.sh.ORIG	2010-05-22 02:44:50.992007736 +0000
++++ byacc-20100216/test/run_test.sh	2010-05-22 02:45:01.757669208 +0000
+@@ -11,7 +11,7 @@
+ 	*)
+ 		root=`basename $i .y`
+ 		ROOT="test-$root"
+-		../yacc -v -d -p ${root}_ -b $ROOT $i
++		../byacc -v -d -p ${root}_ -b $ROOT $i
+ 		for type in .output .tab.c .tab.h
+ 		do
+ 			REF=${root}${type}
