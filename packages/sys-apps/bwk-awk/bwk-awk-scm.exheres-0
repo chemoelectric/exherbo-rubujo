@@ -1,0 +1,22 @@
+# Copyright 2010 Barry Schwartz
+# Distributed under the terms of the GNU General Public License v2
+
+SUMMARY="The One True Awk"
+HOMEPAGE="http://www.cs.princeton.edu/~bwk/btl.mirror/"
+DOWNLOADS="http://www.cs.princeton.edu/~bwk/btl.mirror/awk.tar.gz"
+
+SLOT="0"
+LICENCES="BWK-Awk"
+PLATFORMS="~amd64"
+MYOPTIONS=""
+
+WORK="${WORKBASE}"
+
+src_install()
+{
+    newman awk.1 bwk-awk.1
+    dodoc README FIXES
+
+    into /
+    newbin a.out bwk-awk
+}
