@@ -1,0 +1,144 @@
+--- flac-1.2.1/configure.in	2007-09-13 15:48:42.000000000 +0000
++++ flac-1.2.1.NEW/configure.in	2010-05-25 06:42:56.655808257 +0000
+@@ -18,7 +18,8 @@
+ # NOTE that for many of the AM_CONDITIONALs we use the prefix FLaC__
+ # instead of FLAC__ since autoconf triggers off 'AC_' in strings
+ 
+-AC_INIT(src/flac/main.c)
++AC_INIT
++AC_CONFIG_SRCDIR([src/flac/main.c])
+ AM_INIT_AUTOMAKE(flac, 1.2.1)
+ 
+ # Don't automagically regenerate autoconf/automake generated files unless
+@@ -44,7 +45,7 @@
+ AC_CHECK_SIZEOF(void*,0)
+ 
+ #@@@ new name is AC_CONFIG_HEADERS
+-AM_CONFIG_HEADER(config.h)
++AC_CONFIG_HEADERS([config.h])
+ 
+ AC_C_BIGENDIAN
+ 
+@@ -110,7 +111,7 @@
+ AH_TEMPLATE(FLAC__ALIGN_MALLOC_DATA, [define to align allocated memory on 32-byte boundaries])
+ fi
+ 
+-AC_ARG_ENABLE(asm-optimizations, AC_HELP_STRING([--disable-asm-optimizations], [Don't use any assembly optimization routines]), asm_opt=no, asm_opt=yes)
++AC_ARG_ENABLE(asm-optimizations, AS_HELP_STRING([--disable-asm-optimizations],[Don't use any assembly optimization routines]), asm_opt=no, asm_opt=yes)
+ AM_CONDITIONAL(FLaC__NO_ASM, test "x$asm_opt" = xno)
+ if test "x$asm_opt" = xno ; then
+ AC_DEFINE(FLAC__NO_ASM)
+@@ -118,7 +119,7 @@
+ fi
+ 
+ AC_ARG_ENABLE(debug,
+-AC_HELP_STRING([--enable-debug], [Turn on debugging]),
++AS_HELP_STRING([--enable-debug],[Turn on debugging]),
+ [case "${enableval}" in
+ 	yes) debug=true ;;
+ 	no)  debug=false ;;
+@@ -127,7 +128,7 @@
+ AM_CONDITIONAL(DEBUG, test "x$debug" = xtrue)
+ 
+ AC_ARG_ENABLE(sse,
+-AC_HELP_STRING([--enable-sse], [Enable SSE support by asserting that the OS supports SSE instructions]),
++AS_HELP_STRING([--enable-sse],[Enable SSE support by asserting that the OS supports SSE instructions]),
+ [case "${enableval}" in
+ 	yes) sse_os=true ;;
+ 	no)  sse_os=false ;;
+@@ -140,7 +141,7 @@
+ fi
+ 
+ AC_ARG_ENABLE(3dnow,
+-AC_HELP_STRING([--disable-3dnow], [Disable 3DNOW! optimizations]),
++AS_HELP_STRING([--disable-3dnow],[Disable 3DNOW! optimizations]),
+ [case "${enableval}" in
+ 	yes) use_3dnow=true ;;
+ 	no)  use_3dnow=false ;;
+@@ -153,7 +154,7 @@
+ fi
+ 
+ AC_ARG_ENABLE(altivec,
+-AC_HELP_STRING([--disable-altivec], [Disable Altivec optimizations]),
++AS_HELP_STRING([--disable-altivec],[Disable Altivec optimizations]),
+ [case "${enableval}" in
+ 	yes) use_altivec=true ;;
+ 	no)  use_altivec=false ;;
+@@ -166,14 +167,14 @@
+ fi
+ 
+ AC_ARG_ENABLE(thorough-tests,
+-AC_HELP_STRING([--disable-thorough-tests], [Disable thorough (long) testing, do only basic tests]),
++AS_HELP_STRING([--disable-thorough-tests],[Disable thorough (long) testing, do only basic tests]),
+ [case "${enableval}" in
+ 	yes) thorough_tests=true ;;
+ 	no)  thorough_tests=false ;;
+ 	*) AC_MSG_ERROR(bad value ${enableval} for --enable-thorough-tests) ;;
+ esac],[thorough_tests=true])
+ AC_ARG_ENABLE(exhaustive-tests,
+-AC_HELP_STRING([--enable-exhaustive-tests], [Enable exhaustive testing (VERY long)]),
++AS_HELP_STRING([--enable-exhaustive-tests],[Enable exhaustive testing (VERY long)]),
+ [case "${enableval}" in
+ 	yes) exhaustive_tests=true ;;
+ 	no)  exhaustive_tests=false ;;
+@@ -189,7 +190,7 @@
+ AC_SUBST(FLAC__TEST_LEVEL)
+ 
+ AC_ARG_ENABLE(valgrind-testing,
+-AC_HELP_STRING([--enable-valgrind-testing], [Run all tests inside Valgrind]),
++AS_HELP_STRING([--enable-valgrind-testing],[Run all tests inside Valgrind]),
+ [case "${enableval}" in
+ 	yes) FLAC__TEST_WITH_VALGRIND=yes ;;
+ 	no)  FLAC__TEST_WITH_VALGRIND=no ;;
+@@ -198,7 +199,7 @@
+ AC_SUBST(FLAC__TEST_WITH_VALGRIND)
+ 
+ AC_ARG_ENABLE(doxygen-docs,
+-AC_HELP_STRING([--disable-doxygen-docs], [Disable API documentation building via Doxygen]),
++AS_HELP_STRING([--disable-doxygen-docs],[Disable API documentation building via Doxygen]),
+ [case "${enableval}" in
+ 	yes) enable_doxygen_docs=true ;;
+ 	no)  enable_doxygen_docs=false ;;
+@@ -209,30 +210,12 @@
+ fi
+ AM_CONDITIONAL(FLaC__HAS_DOXYGEN, test -n "$DOXYGEN")
+ 
+-AC_ARG_ENABLE(local-xmms-plugin,
+-AC_HELP_STRING([--enable-local-xmms-plugin], [Install XMMS plugin to ~/.xmms/Plugins instead of system location]),
+-[case "${enableval}" in
+-	yes) install_xmms_plugin_locally=true ;;
+-	no)  install_xmms_plugin_locally=false ;;
+-	*) AC_MSG_ERROR(bad value ${enableval} for --enable-local-xmms-plugin) ;;
+-esac],[install_xmms_plugin_locally=false])
+-AM_CONDITIONAL(FLaC__INSTALL_XMMS_PLUGIN_LOCALLY, test "x$install_xmms_plugin_locally" = xtrue)
+-
+-AC_ARG_ENABLE(xmms-plugin,
+-AC_HELP_STRING([--disable-xmms-plugin], [Do not build XMMS plugin]),
+-[case "${enableval}" in
+-	yes) enable_xmms_plugin=true ;;
+-	no)  enable_xmms_plugin=false ;;
+-	*) AC_MSG_ERROR(bad value ${enableval} for --enable-xmms-plugin) ;;
+-esac],[enable_xmms_plugin=true])
+-if test "x$enable_xmms_plugin" != xfalse ; then
+-	AM_PATH_XMMS(0.9.5.1, , AC_MSG_WARN([*** XMMS >= 0.9.5.1 not installed - XMMS support will not be built]))
+-fi
+-AM_CONDITIONAL(FLaC__HAS_XMMS, test -n "$XMMS_INPUT_PLUGIN_DIR")
++AM_CONDITIONAL(FLaC__INSTALL_XMMS_PLUGIN_LOCALLY, false)
++AM_CONDITIONAL(FLaC__HAS_XMMS, false)
+ 
+ dnl build FLAC++ or not
+ AC_ARG_ENABLE([cpplibs],
+-AC_HELP_STRING([--disable-cpplibs], [Do not build libFLAC++]),
++AS_HELP_STRING([--disable-cpplibs],[Do not build libFLAC++]),
+ [case "${enableval}" in
+ 	yes) disable_cpplibs=false ;;
+ 	no)  disable_cpplibs=true ;;
+@@ -242,7 +225,7 @@
+ 
+ dnl check for ogg library
+ AC_ARG_ENABLE([ogg],
+-	AC_HELP_STRING([--disable-ogg], [Disable ogg support (default: test for libogg)]),
++	AS_HELP_STRING([--disable-ogg],[Disable ogg support (default: test for libogg)]),
+ 	[ want_ogg=$enableval ], [ want_ogg=yes ] )
+ 
+ if test "x$want_ogg" != "xno"; then

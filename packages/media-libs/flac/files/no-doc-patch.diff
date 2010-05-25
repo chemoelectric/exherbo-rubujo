@@ -1,0 +1,11 @@
+--- flac-1.2.1/Makefile.am.ORIG	2010-05-25 05:40:48.357632177 +0000
++++ flac-1.2.1/Makefile.am	2010-05-25 05:41:03.286635895 +0000
+@@ -30,7 +30,7 @@
+ 
+ AUTOMAKE_OPTIONS = foreign 1.7
+ 
+-SUBDIRS = doc include m4 man src examples test build obj
++SUBDIRS = include m4 man src examples test build obj
+ 
+ DISTCLEANFILES = libtool-disable-static
+ 

@@ -1,0 +1,31 @@
+# Copyright 2008 Bernd Steinhauser <berniyh@exherbo.org>
+# Distributed under the terms of the GNU General Public License v2
+# Based in part upon 'libvorbis-1.2.0.ebuild' from Gentoo, which is:
+#     Copyright 1999-2008 Gentoo Foundation.
+
+require easy-multibuild
+
+SUMMARY="Ogg Vorbis sound file format library"
+HOMEPAGE="http://xiph.org/vorbis/"
+DOWNLOADS="http://downloads.xiph.org/releases/vorbis/${PNV}.tar.bz2"
+
+LICENCES="BSD-3"
+SLOT="0"
+PLATFORMS="~amd64 ~ppc64 ~x86"
+MYOPTIONS="multibuild_c: 32 64"
+
+DEPENDENCIES="
+    build:
+        dev-util/pkg-config
+    build+run:
+        media-libs/libogg[multibuild_c:*(?)?]"
+
+src_prepare() {
+    easy-multibuild_src_prepare
+
+    # Kill some hard coded flags
+    sed -e "s:-O20::g" -e "s:-mfused-madd::g" -e "s:-mcpu=750::g" \
+        -i "${WORK}"/configure || die "sed failed"
+    default
+}
+

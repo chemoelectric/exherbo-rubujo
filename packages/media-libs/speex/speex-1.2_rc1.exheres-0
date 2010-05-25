@@ -1,0 +1,32 @@
+# Copyright 2008 Daniel Mierswa <impulze@impulze.org>
+# Distributed under the terms of the GNU General Public License v2
+
+require easy-multibuild
+
+MY_PNVR=${PNVR/_/}
+
+SUMMARY="An audio compression format designed for speech."
+DESCRIPTION="Speex is based on CELP  and is designed to compress voice at bitrates ranging from 2 to 44 kbps."
+HOMEPAGE="http://www.${PN}.org/"
+DOWNLOADS="http://downloads.xiph.org/releases/${PN}/${MY_PNVR}.tar.gz"
+
+REMOTE_IDS="freshmeat:${PN}"
+UPSTREAM_DOCUMENTATION="http://www.${PN}.org/docs/"
+UPSTREAM_RELEASE_NOTES="http://www.${PN}.org/news/"
+
+LICENCES="BSD-3"
+SLOT="0"
+PLATFORMS="~amd64 ~x86"
+MYOPTIONS="multibuild_c: 32 64"
+
+DEPENDENCIES="
+    build+run:
+        media-libs/libogg[multibuild_c:*(?)?]
+"
+
+WORK="${WORKBASE}/${MY_PNVR}"
+
+configure_one_multibuild()
+{
+    econf --with-ogg-libraries=/usr/${LIBDIR}
+}

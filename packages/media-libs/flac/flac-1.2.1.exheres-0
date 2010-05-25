@@ -1,0 +1,54 @@
+# Copyright 2008 Anders Ossowicki <arkanoid@exherbo.org>
+# Copyright 2010 Barry Schwartz
+# Distributed under the terms of the GNU General Public License v2
+
+require easy-multibuild autotools [ supported_autoconf=[ 2.5 ] supported_automake=[ 1.11 ] ]
+
+SUMMARY="The Free Lossless Audio Codec"
+HOMEPAGE="http://flac.sourceforge.net"
+DOWNLOADS="mirror://sourceforge/${PN}/${PNV}.tar.gz"
+LICENCES="Xiph || ( GPL-2 GPL-3 )"
+SLOT="0"
+PLATFORMS="~amd64 ~x86"
+MYOPTIONS="ogg multibuild_c: 32 64"
+
+DEPENDENCIES="ogg? ( media-libs/libogg[multibuild_c:*(?)?] )"
+
+# no-doc-patch.diff stops the doc directory from being built;
+# it doesn't like out-of-source builds. If someone wants to
+# fix it, that would be nice.
+DEFAULT_SRC_PREPARE_PATCHES=(
+    ${FILES}/fix-gcc-4.3.patch
+    ${FILES}/no-doc-patch.diff
+    ${FILES}/configure.in-update-and-no-xmms.diff
+)
+
+# All tests are slow, so use only src_test_expensive
+RESTRICT="test"
+
+src_prepare()
+{
+    edo rm aclocal.m4
+    default
+    eautoreconf
+}
+
+configure_one_multibuild()
+{
+    case "${MULTIBUILD_TARGET}" in
+        32)
+            export CC="${CC} -m32"
+            export CXX="${CXX} -m32"
+            ;;
+        64)
+            export CC="${CC/ -m32/}"
+            export CXX="${CXX/ -m32/}"
+            ;;
+    esac
+    econf --with-ogg-libraries=/usr/${LIBDIR} --enable-ogg --hates=docdir
+}
+
+src_test_expensive()
+{
+    emake check
+}

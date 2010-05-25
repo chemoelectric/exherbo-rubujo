@@ -1,0 +1,27 @@
+Source: Exherbo
+Upstream: no
+Reason: Add missing #include statements needed by gcc >= 4.3
+diff --git a/examples/cpp/decode/file/main.cpp b/examples/cpp/decode/file/main.cpp
+index 5614050..4c4bc71 100644
+--- a/examples/cpp/decode/file/main.cpp
++++ b/examples/cpp/decode/file/main.cpp
+@@ -28,6 +28,7 @@
+ #  include <config.h>
+ #endif
+ 
++#include <cstring>
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include "FLAC++/decoder.h"
+diff --git a/examples/cpp/encode/file/main.cpp b/examples/cpp/encode/file/main.cpp
+index 22448bb..9560042 100644
+--- a/examples/cpp/encode/file/main.cpp
++++ b/examples/cpp/encode/file/main.cpp
+@@ -28,6 +28,7 @@
+ #  include <config.h>
+ #endif
+ 
++#include <cstring>
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include "FLAC++/metadata.h"

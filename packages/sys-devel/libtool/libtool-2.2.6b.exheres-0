@@ -1,0 +1,47 @@
+# Copyright 2007 Bryan Østergaard
+# Copyright 2008 Richard Brown
+# Distributed under the terms of the GNU General Public License v2
+
+require gnu [ suffix=lzma ] easy-multibuild
+
+SUMMARY="Generic library support script"
+
+LICENCES="GPL-2"
+SLOT="0"
+PLATFORMS="~amd64 ~arm ~ia64 ~ppc64 ~x86"
+MYOPTIONS="multibuild_c: 32 64"
+
+DEPENDENCIES="
+    build:
+        sys-devel/autoconf:2.5 [[ note = [
+            We patch testsuite.at, so the build system runs autom4te
+            automatically.  We can't use eautotest from autotools.exlib
+            because the Makefile rules has some extra weird magic
+        ] ]]
+    build+run:
+        sys-devel/gnuconfig"
+
+DEFAULT_SRC_PREPARE_PATCHES=(
+    "${FILES}"/libtool-2.2.6-locale.patch
+    "${FILES}"/libtool-2.2.6-zsh-path.patch
+)
+DEFAULT_SRC_INSTALL_EXTRA_DOCS=( docs/PLATFORMS )
+
+WORK="${WORKBASE}/${PNV%a}"
+
+src_prepare() {
+    # Force regeneration of broken infopages
+    edo rm doc/libtool.info{,-{1,2}}
+
+    easy-multibuild_src_prepare
+}
+
+src_install() {
+    easy-multibuild_src_install
+
+    for f in $(find "${IMAGE}" -type f -name config.guess -o -name config.sub); do
+        edo rm ${f}
+        edo ln -s /usr/share/gnuconfig/${f##*/} "${f}"
+    done
+}
+

@@ -1,0 +1,41 @@
+# Copyright 2008 Saleem Abdulrasool <compnerd@compnerd.org>
+# Distributed under the terms of the GNU General Purpose License v2
+
+require gnome-2 easy-multibuild
+
+SUMMARY="XDG Sound Theme and Name Specification Implementation"
+HOMEPAGE="http://0pointer.de/lennart/projects/libcanberra/"
+DOWNLOADS="http://0pointer.de/lennart/projects/${PN}/${PNV}.tar.gz"
+
+LICENCES="LGPL-2"
+SLOT="0"
+PLATFORMS="~amd64 ~x86"
+MYOPTIONS="alsa doc gstreamer gtk pulseaudio multibuild_c: 32 64"
+
+DEPENDENCIES="
+    build:
+        dev-util/pkg-config[>=0.20]
+        doc? ( dev-doc/gtk-doc[>=1.9] )
+    build+run:
+        media-libs/libvorbis[multibuild_c:*(?)?]
+        alsa? ( sys-sound/alsa-lib[multibuild_c:*(?)?][>=1.0.0] )
+        gstreamer? ( media-libs/gstreamer:0.10[>=0.10.15]
+                     media-plugins/gst-plugins-base:0.10[gstreamer_plugins:vorbis] )
+        gtk? ( x11-libs/gtk+:2[multibuild_c:*(?)?][>=2.13.4]
+               dev-libs/glib:2[multibuild_c:*(?)?]
+               gnome-platform/GConf:2 )
+        pulseaudio? ( media-sound/pulseaudio[>=0.9.11] )
+    recommendation:
+        sound-themes/sound-theme-freedesktop
+"
+
+DEFAULT_SRC_CONFIGURE_PARAMS=( --disable-oss --disable-tdb --disable-lynx )
+DEFAULT_SRC_CONFIGURE_OPTION_ENABLES=( alsa 'doc gtk-doc' gtk gstreamer 'pulseaudio pulse' )
+
+src_install() {
+    easy-multibuild_src_install
+
+    exeinto /etc/X11/xinit/xinitrc.d/
+    doexe "${FILES}/50-libcanberra"
+}
+
