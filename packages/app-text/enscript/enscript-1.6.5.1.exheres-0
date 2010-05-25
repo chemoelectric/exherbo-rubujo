@@ -1,0 +1,13 @@
+# Copyright 2010 Barry Schwartz
+# Distributed under the terms of the GNU General Public License v2
+
+SUMMARY="GNU Enscript, a free replacement for Adobe's enscript"
+HOMEPAGE="http://www.gnu.org/software/${PN}/"
+DOWNLOADS="http://ftp.gnu.org/gnu/${PN}/${PNV}.tar.gz"
+LICENCES="GPL-3"
+
+SLOT="0"
+PLATFORMS="~amd64"
+MYOPTIONS=""
+
+DEPENDENCIES=""
