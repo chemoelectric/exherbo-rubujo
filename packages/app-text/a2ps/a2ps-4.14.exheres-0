@@ -1,0 +1,24 @@
+# Copyright 2010 Barry Schwartz
+# Distributed under the terms of the GNU General Public License v2
+
+SUMMARY="a2ps, an Any to PostScript filter"
+HOMEPAGE="http://www.gnu.org/software/a2ps/"
+DOWNLOADS="http://ftp.gnu.org/gnu/${PN}/${PNV}.tar.gz"
+LICENCES="GPL-3"
+
+SLOT="0"
+PLATFORMS="~amd64"
+MYOPTIONS=""
+
+DEPENDENCIES="
+    build+run:
+        fonts/ghostscript-fonts-std
+"
+
+src_prepare()
+{
+    default
+
+    # There is an oversight in a couple of test files.
+    edo sed -i -e 's/version 2/version 3/' tests/tstfiles/{InsertBlock.java,bookie.idl}
+}
