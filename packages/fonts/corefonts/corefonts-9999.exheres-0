@@ -1,0 +1,18 @@
+# Copyright 2010 Barry Schwartz
+# Distributed under the terms of the GNU General Public License v2
+
+SUMMARY="Phony core fonts"
+HOMEPAGE="http://localhost"
+DOWNLOADS="${PNV}.tar.xz"
+LICENCES="FIXME"
+
+SLOT="0"
+PLATFORMS="~amd64"
+MYOPTIONS=""
+DEPENDENCIES=""
+
+src_install()
+{
+    insinto /usr/share/fonts/X11/${PN}
+    doins *
+}
