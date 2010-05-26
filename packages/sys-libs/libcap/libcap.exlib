@@ -1,0 +1,45 @@
+# Copyright 2009 Wulf C. Krueger
+# Distributed under the terms of the GNU General Public License v2
+# Based in part upon 'libcap-2.08-r1.ebuild' from Gentoo, which is:
+#     Copyright 1999-2008 Gentoo Foundation
+
+require multilib pam
+
+export_exlib_phases src_compile src_install
+
+SUMMARY="POSIX 1003.1e capabilities"
+HOMEPAGE="http://sites.google.com/site/fullycapable/"
+DOWNLOADS="mirror://kernel/linux/libs/security/linux-privs/${PN}${PV:0:1}/${PNV}.tar.bz2"
+
+LICENCES="|| ( GPL-2 BSD-3 )"
+SLOT="0"
+MYOPTIONS="pam"
+
+DEPENDENCIES="
+    build:
+        sys-kernel/linux-headers
+    build+run:
+        sys-apps/attr
+        pam? ( sys-libs/pam )
+"
+
+DEFAULT_SRC_INSTALL_PARAMS=( lib=$(get_libdir) )
+
+unset IPATH
+
+libcap_src_compile() {
+    export PAM_CAP=$(option pam && echo yes || echo no)
+
+    default
+}
+
+libcap_src_install() {
+    default
+
+    if option pam ; then
+       dopammod pam_cap/pam_cap.so
+       dopamsecurity '' pam_cap/capability.conf
+    fi
+
+    dodoc doc/capability.notes
+}
