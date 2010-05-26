@@ -4,14 +4,14 @@
 # Based in part upon 'gdbm-1.8.3-r3.ebuild' from Gentoo, which is:
 #     Copyright 1999-2007 Gentoo Foundation.
 
-require gnu [ suffix=gz ]
+require gnu [ suffix=gz ] easy-multibuild flag-o-matic
 
 SUMMARY="GNU replacement for dbm and ndbm libraries"
 
 LICENCES="GPL-2"
 SLOT="0"
 PLATFORMS="~amd64 ~ia64 ~ppc64 ~x86"
-MYOPTIONS=""
+MYOPTIONS="multibuild_c: 32 64"
 
 DEPENDENCIES=""
 
@@ -20,11 +20,23 @@ DEFAULT_SRC_PREPARE_PATCHES=(
     "${FILES}/${PNV}-compat-linking.patch"
 )
 DEFAULT_SRC_CONFIGURE_PARAMS=( --hates=docdir )
-DEFAULT_SRC_INSTALL_PARAMS=( INSTALL_ROOT="${IMAGE}" )
 
-src_install()
+configure_one_multibuild()
 {
+    case "${MULTIBUILD_TARGET}" in
+        32)
+            export CC="${CC} -m32"
+            ;;
+        64)
+            export CC="${CC/ -m32/}"
+            ;;
+    esac
     default
+}
+
+install_one_multibuild()
+{
+    emake install INSTALL_ROOT="${IMAGE}"
 
     # The following assumes gdbm is going to be the dbm- and
     # ndbm-compatible library. (Alternatives include Berkeley db1.)
