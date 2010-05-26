@@ -1,0 +1,88 @@
+# Copyright 2007 Danny van Dyk
+# Copyright 2009 Ingmar Vanhassel
+# Copyright 2009 Thomas Anderson
+# Distributed under the terms of the GNU General Public License v2
+
+require easy-multibuild
+
+SUMMARY="FFTW is a C subroutine library for computing the discrete Fourier transform"
+DESCRIPTION="
+FFTW is a C subroutine library for computing the discrete Fourier transform
+(DFT) in one or more dimensions, of arbitrary input size, and of both real and
+complex data (as well as of even/odd data, i.e. the discrete cosine/sine
+transforms or DCT/DST)
+FFTW's performance is typically superior to that of other publicly available
+FFT software, and is even competitive with vendor-tuned codes. In contrast to
+vendor-tuned codes, however, FFTW's performance is portable: the same program
+will perform well on most architectures without modification. Hence the name,
+\"FFTW\", which stands for the somewhat whimsical title of \"Fastest Fourier
+Transform in the West.\"
+"
+HOMEPAGE="http://www.fftw.org"
+DOWNLOADS="${HOMEPAGE}/${PNV}.tar.gz"
+
+UPSTREAM_DOCUMENTATION="
+${HOMEPAGE}/faq/    [[ lang = en description = FAQ ]]
+"
+UPSTREAM_RELEASE_NOTES="${HOMEPAGE}/release-notes.html"
+
+LICENCES="GPL-2"
+SLOT="0"
+MYOPTIONS="debug fortran multibuild_c: 32 64"
+
+RESTRICT="test"
+
+DEPENDENCIES="
+    build:
+        dev-util/pkg-config
+        sys-devel/gcc:*[fortran?]
+"
+
+ECONF_SOURCE=${WORK}
+
+changesrcdir() {
+    cd "${1}/${PNV}-${2}" || die "Chdir to ${1}/${PNV}-${2} failed"
+    [[ -n "${3}" ]] && "${3}"
+}
+
+configure_one_multibuild() {
+    local target_dir="$(pwd)"
+
+    mkdir ${PNV}-float || die "Mkdir of ${target_dir}/${PNV}-float failed"
+    mkdir ${PNV}-normal || die "Mkdir of ${target_dir}/${PNV}-normal failed"
+
+    changesrcdir ${target_dir} float
+    econf \
+        --enable-float \
+        --enable-shared \
+        --enable-threads \
+        $(option_enable debug) \
+        $(option_enable fortran)
+
+    changesrcdir ${target_dir} normal
+    econf \
+        --enable-shared \
+        --enable-threads \
+        $(option_enable debug) \
+        $(option_enable fortran)
+}
+
+compile_one_multibuild() {
+    local target_dir="$(pwd)"
+    changesrcdir ${target_dir} float default
+    changesrcdir ${target_dir} normal  default
+}
+
+test_expensive_one_multibuild() {
+    local target_dir="$(pwd)"
+    changesrcdir ${target_dir} float default
+    changesrcdir ${target_dir} normal default
+}
+
+install_one_multibuild() {
+    local target_dir="$(pwd)"
+    emagicdocs
+    changesrcdir ${target_dir} float default
+    changesrcdir ${target_dir} normal default
+}
+

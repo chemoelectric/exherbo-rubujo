@@ -1,0 +1,7 @@
+# Copyright 2009 Ingmar Vanhassel <ingmar@exherbo.org>
+# Distributed under the terms of the GNU General Public License v2
+
+require fftw
+
+PLATFORMS="~amd64 ~x86"
+
