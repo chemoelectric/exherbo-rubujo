@@ -1,0 +1,156 @@
+# Copyright 2008, 2009 Saleem Abdulrasool <compnerd@compnerd.org>
+# Distributed under the terms of the GNU General Public License v2
+# Based in part on 'hal-0.5.11-r1.ebuild' from Gentoo which is:
+#    Copyright 1999-2008 Gentoo Foundation
+
+require easy-multibuild autotools [ supported_autoconf=[ 2.5 ] supported_automake=[ 1.11 1.10 ] ]
+
+PATCH_VERSION="0"
+
+SUMMARY="Hardware Abstraction Layer"
+HOMEPAGE="http://hal.freedesktop.org/"
+DOWNLOADS="http://hal.freedesktop.org/releases/${PNV}.tar.bz2
+           http://dev.exherbo.org/~compnerd/files/${PN}/${PNV}-exherbo-patches-${PATCH_VERSION}.tar.bz2"
+
+LICENCES="GPL-2"
+SLOT="0"
+PLATFORMS="~amd64 ~ppc64 ~x86"
+MYOPTIONS="
+    acpi
+    apm
+    partition-data [[ description = [ Allows HAL to use libparted from sys-apps/parted to read raw partition data from your disks and process that data. Future versions of HAL (possibly 0.5.11 and higher) will allow you to create, modify, delete and format partitions from a GUI interface agnostic of your desktop environment. ] ]]
+    policykit
+    verbose
+    platform:
+        amd64
+        ia64
+        x86
+    multibuild_c:
+        32
+        64
+"
+
+DEPENDENCIES="
+    build:
+        dev-util/pkg-config[>=0.20]
+        dev-util/intltool[>=0.35]
+    build+run:
+        user/haldaemon
+        group/haldaemon
+        group/plugdev
+        sys-fs/udev[>=130]
+        sys-apps/dbus[>=1.0]
+        dev-libs/glib:2[>=2.14]
+        dev-util/gperf[>=3.0.3]
+        dev-libs/expat[>=1.95.8]
+        dev-libs/libusb:0.1[>=0.1.10a]
+        dev-libs/dbus-glib:1[>=0.61]
+        sys-apps/pciutils[>=2.2.7]
+        sys-apps/util-linux-ng[>=2.15]
+        sys-kernel/linux-headers[>=2.6.22]
+        partition-data? ( sys-fs/parted[>=1.8] )
+        platform:amd64? ( sys-apps/dmidecode[>=2.7] )
+        platform:ia64? ( sys-apps/dmidecode[>=2.7] )
+        platform:x86? ( sys-apps/dmidecode[>=2.7] )
+        policykit? ( sys-auth/PolicyKit:0[>=0.7]
+                     sys-auth/ConsoleKit[>=0.3.0] )
+    run:
+        sys-apps/usbutils-data
+    post:
+        app-misc/hal-info[>=20081001]
+    suggestion:
+        platform:amd64? ( sys-power/pm-utils[>=0.99.2]  [[ description = [ Necessary for suspending, hibernating ] ]] )
+        platform:x86? ( sys-power/pm-utils[>=0.99.2]    [[ description = [ Necessary for suspending, hibernating ] ]] )
+"
+
+# tests for HAL *NEVER* actually work/ed
+RESTRICT="test"
+
+AM_OPTS="--foreign"
+
+DEFAULT_SRC_PREPARE_PATCHES=( "${WORKBASE}/${PNV}-patches/" )
+
+configure_one_multibuild() {
+    econf \
+        $(option_enable acpi) \
+        $(option_enable acpi acpi-proc) \
+        $(option_enable apm) \
+        $(option_enable partition-data parted) \
+        $(option_enable policykit console-kit) \
+        $(option_enable policykit policy-kit) \
+        $(option_enable verbose verbose-mode) \
+        --with-os-type=exherbo \
+        --with-pid-file=/var/run/hald.pid \
+        --with-hwdata=/usr/share/misc \
+        --with-socket-dir=/var/run \
+        --with-udev-prefix="${LIBDIR}" \
+        --disable-acpi-acpid \
+        --disable-acpi-ibm \
+        --disable-acpi-toshiba \
+        --with-keymaps \
+        --disable-acl-management \
+        --enable-umount-helper \
+        --disable-pmu \
+        --enable-pci \
+        --without-omap \
+        --with-cpufreq \
+        --with-usb-csr \
+        --without-dell-backlight \
+        --enable-sonypic \
+        --enable-man-pages \
+        --disable-docbook-docs \
+        --disable-gtk-doc
+}
+
+compile_one_multibuild() {
+    if [[ "${MULTIBUILD_TARGET}" == "${MULTIBUILD_C_DEFAULT_TARGET}" ]] ; then
+        default
+    else
+        (edo cd libhal && emake)
+        (edo cd libhal-storage && emake)
+    fi
+}
+
+install_one_multibuild() {
+    if [[ "${MULTIBUILD_TARGET}" == "${MULTIBUILD_C_DEFAULT_TARGET}" ]] ; then
+        default
+
+        # Empty directories
+        edo rmdir "${IMAGE}"/usr/share/hal/fdi/{information,preprobe,policy}/20thirdparty \
+                  "${IMAGE}"/usr/share/hal/fdi/information/{10freedesktop,}               \
+                  "${IMAGE}"/usr/share/hal/fdi/preprobe/{10osvendor,}
+
+        # useless directories
+        edo find "${IMAGE}"/var/run -type d -empty -delete
+
+        # hal unmount helper for unclean unmounts
+        exeinto /$(get_libdir)/udev
+        newexe "${FILES}/hal-unmount.dev" hal_unmount
+
+        # initscript
+        newinitd "${FILES}/0.5.11-hald.rc" hald
+
+        # configuration
+        hereconfd hald <<EOF
+# Should HAL be verbose to syslog? Useful for debugging
+HALD_VERBOSE="$(option verbose && echo yes || echo no)"
+EOF
+
+        # example configuration
+        dodoc "${WORKBASE}/hal-config-examples/"*.fdi
+
+        # create and keep /media to prevent DE mounters from colliding
+        keepdir /media
+
+        # HAL uses this location for its FDI cache
+        keepdir /var/lib/cache/hald/
+        edo chown haldaemon:haldaemon "${IMAGE}"/var/lib/cache/hald/
+
+        # cache directories
+        keepdir /etc/hal/fdi/{information,preprobe,policy}
+    else
+        (edo cd libhal && emake install DESTDIR="${IMAGE}")
+        (edo cd libhal-storage && emake install DESTDIR="${IMAGE}")        
+    fi
+}
+
