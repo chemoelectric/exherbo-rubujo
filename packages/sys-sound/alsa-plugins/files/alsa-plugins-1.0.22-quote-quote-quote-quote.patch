@@ -1,0 +1,15 @@
+Source: Saleem Abdulrasool <compnerd@compnerd.org>
+Upstream: should be submitted
+Reason: Fix insufficient quoting in configure.in resulting in error messages
+-- 
+--- alsa-1.0.21/configure.in	2009-12-03 20:08:21.000000000 -0800
++++ alsa-1.0.21/configure.in	2009-12-03 20:08:44.000000000 -0800
+@@ -90,7 +90,7 @@
+   LDFLAGS="$LDFLAGS_saved"
+ fi
+ 
+-if test $HAVE_AVCODEC = yes; then
++if test x"$HAVE_AVCODEC" = x"yes"; then
+   AVCODEC_HEADER=""
+   AC_CHECK_HEADER([ffmpeg/avcodec.h], [AVCODEC_HEADER='<ffmpeg/avcodec.h>'])
+   if test -z "$AVCODEC_HEADER"; then

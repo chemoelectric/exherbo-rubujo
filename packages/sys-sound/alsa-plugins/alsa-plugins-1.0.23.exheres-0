@@ -1,0 +1,65 @@
+# Copyright 2008 Alexander Færøy <eroyf@exherbo.org>
+# Copyright 2009 Bo Ørsted Andresen <zlin@exherbo.org>
+# Copyright 2009 Ali Polatel <alip@exherbo.org>
+# Distributed under the terms of the GNU General Public License v2
+# Based in part upon 'alsa-plugins-1.0.19.ebuild' from Gentoo, which is:
+#     Copyright 1999-2009 Gentoo Foundation
+
+require autotools [ supported_autoconf=[ 2.5 ] supported_automake=[ 1.11 ] ] easy-multibuild
+
+SUMMARY="Plugins for ALSA"
+HOMEPAGE="http://www.alsa-project.org/"
+DOWNLOADS="mirror://alsaproject/${PN#alsa-}/${PNV}.tar.bz2"
+
+LICENCES="GPL-2"
+SLOT="0"
+PLATFORMS="~amd64 ~x86"
+MYOPTIONS="ffmpeg pulseaudio jack samplerate speex multibuild_c: 32 64"
+
+DEPENDENCIES="
+    build+run:
+        sys-sound/alsa-lib[>=1.0.11]
+        ffmpeg? ( media/ffmpeg )
+        pulseaudio? ( media-sound/pulseaudio[multibuild_c:*(?)?][>=0.9.11] )
+        jack? ( media-sound/jack-audio-connection-kit[>=0.98] )
+        samplerate? ( media-libs/libsamplerate[multibuild_c:*(?)?] )
+        speex? ( media-libs/speex[multibuild_c:*(?)?][>=1.2_rc] )
+"
+
+AT_M4DIR=( m4 )
+
+DEFAULT_SRC_PREPARE_PATCHES=( "${FILES}/${PN}-1.0.22-automagic-speex.patch"
+                              "${FILES}/${PN}-1.0.22-quote-quote-quote-quote.patch"
+                              -p0 "${FILES}/${PN}-1.0.22-missing-avutil.patch" )
+
+configure_one_multibuild() {
+    if [[ "${MULTIBUILD_TARGET}" == "${MULTIBUILD_C_DEFAULT_TARGET}" ]] ; then
+        econf $(option_enable ffmpeg avcodec) \
+            $(option_enable pulseaudio) \
+            $(option_enable jack) \
+            $(option_enable samplerate) \
+            --with-speex=$(option speex && echo lib || echo no)
+    else
+        # TODO: ffmpeg support for 32-bit.
+        econf --disable-avcodec \
+            $(option_enable pulseaudio) \
+            $(option_enable jack) \
+            $(option_enable samplerate) \
+            --with-speex=$(option speex && echo lib || echo no)
+    fi
+}
+
+install_one_multibuild() {
+    default
+
+    if [[ "${MULTIBUILD_TARGET}" == "${MULTIBUILD_C_DEFAULT_TARGET}" ]] ; then
+        edo cd "${WORK}/doc"
+        dodoc README-pcm-oss upmix.txt vdownmix.txt
+        option ffmpeg && dodoc a52.txt lavcrate.txt
+        option jack && dodoc README-jack
+        option pulseaudio && dodoc README-pulse
+        option samplerate && dodoc samplerate.txt
+        option speex && dodoc speexdsp.txt speexrate.txt
+    fi
+}
+
