@@ -1,0 +1,51 @@
+# Copyright 2009 Ingmar Vanhassel
+# Distributed under the terms of the GNU General Public License v2
+
+require easy-multibuild
+
+SUMMARY="Secret Rabbit Code (aka libsamplerate) is a Sample Rate Converter for audio"
+DESCRIPTION="
+Secret Rabbit Code (aka libsamplerate) is a Sample Rate Converter for audio.
+One example of where such a thing would be useful is converting audio from the
+CD sample rate of 44.1kHz to the 48kHz sample rate used by DAT players.
+
+SRC is capable of arbitrary and time varying conversions ; from downsampling by
+a factor of 256 to upsampling by the same factor. Arbitrary in this case means
+that the ratio of input and output sample rates can be an irrational number.
+The conversion ratio can also vary with time for speeding up and slowing down effects.
+
+SRC provides a small set of converters to allow quality to be traded off
+against computation cost. The current best converter provides a signal-to-noise
+ratio of 145dB with -3dB passband extending from DC to 96% of the theoretical
+best bandwidth for a given pair of input and output sample rates.
+"
+HOMEPAGE="http://www.mega-nerd.com/SRC"
+DOWNLOADS="${HOMEPAGE}/${PNV}.tar.gz"
+
+LICENCES="GPL-2"
+SLOT="0"
+PLATFORMS="~amd64 ~x86"
+MYOPTIONS="examples multibuild_c: 32 64"
+
+DEPENDENCIES="
+    build:
+        dev-util/pkg-config
+        sci-libs/fftw[multibuild_c:*(?)?][>=0.15.0] [[ description = [ Needed for tests & example programs ] ]]
+    build+run:
+        media-libs/libsndfile[multibuild_c:*(?)?][>=1.0.6]
+"
+
+DEFAULT_SRC_PREPARE_PATCHES=( "${FILES}/${PNV}-tests.patch" )
+
+src_install() {
+    easy-multibuild_src_install
+
+    docinto html
+    dodoc doc/*.{css,html,png}
+
+    if option examples; then
+        insinto /usr/share/doc/${PNVR}/examples
+        doins examples/*.c
+    fi
+}
+
