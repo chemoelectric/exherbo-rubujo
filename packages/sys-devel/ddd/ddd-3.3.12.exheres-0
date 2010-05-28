@@ -1,0 +1,32 @@
+# Copyright (c) 2010 Barry Schwartz
+# Distributed under the terms of the GNU General Public License v2
+# Based in part on 'ddd-3.3.12-r1.ebuild' from Gentoo which is:
+#    Copyright 1999-2009 Gentoo Foundation
+
+require gnu [ suffix=gz ]
+
+SUMMARY="GNU DDD is a graphical front-end for command-line debuggers"
+#HOMEPAGE="http://developer.berlios.de/projects/smake/"
+#DOWNLOADS="ftp://ftp.berlios.de/pub/smake/${PNV}.tar.bz2"
+
+LICENCES="GPL-3 LGPL-3 FDL-1.1"
+#SLOT="0"
+PLATFORMS="~amd64"
+#MYOPTIONS=""
+
+DEPENDENCIES="
+    build+run:
+        sys-devel/gdb
+        x11-libs/openmotif
+        x11-libs/libX11
+        x11-libs/libXp
+    run:
+        sci-apps/gnuplot
+        x11-apps/xfontsel
+"
+
+DEFAULT_SRC_PREPARE_PATCHES=(
+    "${FILES}/${PNV}-gcc44.patch"
+)
+
+RESTRICT="test"

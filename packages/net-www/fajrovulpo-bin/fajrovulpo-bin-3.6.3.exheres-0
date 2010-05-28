@@ -35,4 +35,3 @@ src_install()
     echo 'exec /opt/fajrovulpo-bin/firefox ${1+"$@"}' >> fajrovulpo-bin
     dobin fajrovulpo-bin
 }
-
