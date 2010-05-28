@@ -32,6 +32,7 @@ src_install()
 
     echo '#!/bin/sh' > fajrovulpo-bin
     echo >> fajrovulpo-bin
+    echo >> export GDK_NATIVE_WINDOWS=1
     echo 'exec /opt/fajrovulpo-bin/firefox ${1+"$@"}' >> fajrovulpo-bin
     dobin fajrovulpo-bin
 }
