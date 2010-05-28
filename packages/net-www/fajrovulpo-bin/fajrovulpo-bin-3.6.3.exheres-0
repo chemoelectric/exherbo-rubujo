@@ -1,0 +1,38 @@
+# Copyright 2010 Barry Schwartz
+# Distributed under the terms of the GNU General Public License v2
+
+SUMMARY="Firefox in Esperanto"
+HOMEPAGE="http://www.mozilla.com/eo/"
+DOWNLOADS="http://download.mozilla.org/?product=firefox-3.6.3&os=linux&lang=eo -> ${PNV}.tar.bz2"
+
+LICENCES="MPL-1.1"
+SLOT="0"
+PLATFORMS="~amd64"
+MYOPTIONS=""
+
+# FIXME: note the dependencies.
+DEPENDENCIES=""
+
+WORK="${WORKBASE}"
+
+src_configure()
+{
+    :
+}
+
+src_compile()
+{
+    :
+}
+
+src_install()
+{
+    edo install -d "${IMAGE}/opt"
+    edo cp -rf firefox "${IMAGE}/opt/fajrovulpo-bin"
+
+    echo '#!/bin/sh' > fajrovulpo-bin
+    echo >> fajrovulpo-bin
+    echo 'exec /opt/fajrovulpo-bin/firefox ${1+"$@"}' >> fajrovulpo-bin
+    dobin fajrovulpo-bin
+}
+
