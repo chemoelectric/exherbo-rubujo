@@ -42,6 +42,13 @@ DEFAULT_SRC_CONFIGURE_OPTION_ENABLES=( "doc docs" )
 
 src_prepare()
 {
+    # For now, just use my old hacked-up patch that mainly turns off
+    # fontconfig's abuse of Preferred names. This patch isn't supposed
+    # to do the correct thing in general cases; it does, however and
+    # for instance, make Adobe Opticals fonts usable in GIMP and
+    # Inkscape.
+    expatch "${FILES}/fontfig-patch-2010.05.28.12.36.22.diff"
+
     edo /bin/sh autogen.sh --noconf
 }
 
