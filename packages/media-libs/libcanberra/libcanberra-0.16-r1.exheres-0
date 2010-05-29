@@ -24,7 +24,7 @@ DEPENDENCIES="
         gtk? ( x11-libs/gtk+:2[multibuild_c:*(?)?][>=2.13.4]
                dev-libs/glib:2[multibuild_c:*(?)?]
                gnome-platform/GConf:2 )
-        pulseaudio? ( media-sound/pulseaudio[>=0.9.11] )
+        pulseaudio? ( media-sound/pulseaudio[multibuild_c:*(?)?][>=0.9.11] )
     recommendation:
         sound-themes/sound-theme-freedesktop
 "
