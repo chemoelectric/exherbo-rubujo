@@ -7,7 +7,6 @@ SUMMARY="Camomile, a comprehensive Unicode library for Objective Caml"
 
 LICENCES="LGPL-2.1-with-linking-exception"
 SLOT="0"
-PLATFORMS="~amd64"
 MYOPTIONS="doc"
 
 DEPENDENCIES="
