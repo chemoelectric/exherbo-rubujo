@@ -1,0 +1,59 @@
+# Copyright 2008, 2009, 2010 Ingmar Vanhassel <ingmar@exherbo.org>
+# Distributed under the terms of the GNU General Public License v2
+# Based in part upon 'xine-ui-0.99.5.ebuild' from Gentoo, which is:
+#     Copyright 1999-2008 Gentoo Foundation.
+
+SUMMARY="Xine movie player"
+HOMEPAGE="http://xine.sourceforge.net/"
+DOWNLOADS="mirror://sourceforge/xine/${PNV}.tar.xz"
+
+LICENCES="GPL-2"
+SLOT="0"
+PLATFORMS="~amd64 ~x86"
+MYOPTIONS="aalib curl readline xinerama" # libcaca(needs patch) lirc ncurses vdr X
+
+DEPENDENCIES="
+    build:
+        dev-util/pkg-config
+        sys-devel/gettext
+        x11-proto/inputproto
+        x11-proto/xf86vidmodeproto
+        xinerama? ( x11-proto/xineramaproto )
+    build+run:
+        media-libs/libpng
+        media-libs/xine-lib[aalib?]
+        x11-libs/libICE
+        x11-libs/libSM
+        x11-libs/libX11
+        x11-libs/libXext
+        x11-libs/libXft
+        x11-libs/libXtst
+        x11-libs/libXrender
+        x11-libs/libXv
+        x11-libs/libXxf86vm
+        aalib? ( media-libs/aalib )
+        curl? ( net-misc/curl[>=7.10.2] )
+        xinerama? ( x11-libs/libXinerama )"
+
+DEFAULT_SRC_CONFIGURE_PARAMS=(
+    --enable-nls
+    --enable-x
+    --disable-lirc --disable-vdr-keys
+    --hates=docdir
+    --without-caca # no shit
+    --without-curses
+)
+DEFAULT_SRC_CONFIGURE_OPTION_ENABLES=( xinerama )
+DEFAULT_SRC_CONFIGURE_OPTION_WITHS=( aalib curl readline )
+DEFAULT_SRC_INSTALL_PARAMS=( docdir="/usr/share/doc/${PNVR}" docsdir="/usr/share/doc/${PNVR}" )
+
+src_install() {
+    default
+
+    # Remove on next snapshot (after 20070303)
+    dodir /usr/share/applications
+    mv "${IMAGE}"/usr/share/xine/desktop/xine.desktop "${IMAGE}"/usr/share/applications
+    # Empty dir because of the previous mv command.
+    rmdir "${IMAGE}"/usr/share/xine/desktop
+}
+
