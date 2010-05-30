@@ -7,6 +7,7 @@
 # (fontconfig-2.8.0.exheres-0).
 
 SCM_REPOSITORY="git://github.com/chemoelectric/fontconfig.git"
+SCM_REVISION="4cf9312a625249dd0d0a8e4e42e8eaa46562e0e5"
 
 require scm-git easy-multibuild
 
