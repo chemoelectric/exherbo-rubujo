@@ -1,0 +1,75 @@
+# Copyright 2010 Barry Schwartz
+# Distributed under the terms of the GNU General Public License v2
+# Based in part upon 'djbfft-0.76-r1.ebuild', which is:
+#   Copyright 1999-2008 Gentoo Foundation
+
+require flag-o-matic multilib
+
+SUMMARY="Extremely fast library for floating-point convolution"
+HOMEPAGE="http://cr.yp.to/djbfft.html"
+DOWNLOADS="http://cr.yp.to/djbfft/${PNV}.tar.gz"
+
+LICENCES="public-domain"
+SLOT="0"
+PLATFORMS="~amd64"
+MYOPTIONS=""
+
+src_prepare() {
+    local my_image my_cflags
+
+    expatch -p1 "${FILES}/${PNV}-gcc3.patch"
+    expatch -p1 "${FILES}/${PNV}-shared.patch"
+    expatch -p0 "${FILES}/${PNV}-headers.patch"
+
+    MY_PV="${PV:0:1}.${PV:2:1}.${PV:3:1}" # a.bc -> a.b.c
+    my_image="${IMAGE}/usr"
+
+    # Mask out everything not suggested by the author (RTFM).
+    ALLOWED_FLAGS="-fstack-protector -march -mcpu -pipe -mpreferred-stack-boundary -ffast-math"
+    strip-flags
+
+    my_cflags="${CFLAGS}"
+#    option platform:x86 && my_cflags="${CFLAGS} -malign-double"
+
+    edo sed -i -e "s:\"lib\":\"$(get_libdir)\":" hier.c
+
+    echo "${CC} ${my_cflags}" > "conf-cc"
+    echo "${CC} ${LDFLAGS}" > "conf-ld"
+    echo "${my_image}" > "conf-home"
+    einfo "conf-cc: $(<conf-cc)"
+
+    cp -r . ../shared
+    (cd ../shared ;
+        echo "${CC} ${my_cflags} -fPIC -DPIC" > "conf-cc" ;
+        echo "${CC} ${LDFLAGS}" > "conf-ld" ;
+        echo "${my_image}" > "conf-home" ;
+        einfo "conf-cc: $(<conf-cc)")
+
+    STATIC_LIBDJBFFT="libdjbfft.a"
+    SHARED_LIBDJBFFT="libdjbfft.so.${MY_PV}"
+}
+
+src_compile() {
+    emake LIBDJBFFT="${STATIC_LIBDJBFFT}" LIBPERMS="0644" ${STATIC_LIBDJBFFT}
+    (cd ../shared ;
+        emake LIBDJBFFT="${SHARED_LIBDJBFFT}" LIBPERMS="0755" ${SHARED_LIBDJBFFT})
+}
+
+src_test() {
+    for t in accuracy accuracy2 speed; do
+        emake ${t} || die "emake ${t} failed"
+        einfo "Testing ${t}"
+        LD_LIBRARY_PATH=. ./${t} > ${t}.out || die "test ${t} failed"
+    done
+}
+
+src_install() {
+    emake LIBDJBFFT="${STATIC_LIBDJBFFT}" LIBPERMS="0644" install
+    ./install || die "setup (static) failed"
+    (cd ../shared ;
+        emake LIBDJBFFT="${SHARED_LIBDJBFFT}" LIBPERMS="0755" install ;
+        ./install  || die "setup (shared) failed")
+    dosym "${SHARED_LIBDJBFFT}" /usr/$(get_libdir)/libdjbfft.so
+    dosym "${SHARED_LIBDJBFFT}" /usr/$(get_libdir)/libdjbfft.so.${MY_PV%%.*}
+    dodoc CHANGES README TODO VERSION
+}

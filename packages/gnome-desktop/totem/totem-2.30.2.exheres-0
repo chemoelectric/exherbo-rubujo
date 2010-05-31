@@ -1,0 +1,83 @@
+# Copyright 2008 Saleem Abdulrasool <compnerd@compnerd.org>
+# Distributed under the terms of the GNU General Public License v2
+
+require gnome-2
+
+SUMMARY="Media Player for the GNOME Desktop"
+HOMEPAGE="http://projects.gnome.org/totem"
+
+LICENCES="GPL-2"
+SLOT="0"
+PLATFORMS="~amd64 ~x86"
+MYOPTIONS="bluetooth doc nautilus nsplugin python tracker vala"
+
+DEPENDENCIES="
+    build:
+        dev-util/intltool[>=0.40.0]
+        dev-util/pkg-config[>=0.20]
+        doc? ( dev-doc/gtk-doc[>=1.11] )
+    build+run:
+        media-libs/gstreamer:0.10[>=0.10.28.1]
+        media-plugins/gst-plugins-base:0.10[>=0.10.28.1]
+        media-plugins/gst-plugins-good:0.10[gstreamer_plugins:gconf]
+        app-text/iso-codes
+        dev-libs/glib:2[>=2.22]
+        x11-libs/gtk+:2[>=2.19.5]
+        gnome-platform/GConf:2
+        gnome-desktop/totem-pl-parser[>=2.29.1]
+        x11-libs/cairo
+        gnome-desktop/gnome-icon-theme[>=2.15.90]
+        dev-libs/unique:1
+        dev-libs/dbus-glib:1[>=0.74]
+        bluetooth? ( net-wireless/bluez )
+        nautilus? ( gnome-desktop/nautilus )
+        nsplugin? ( x11-misc/shared-mime-info[>=0.22]
+                    x11-libs/startup-notification[>=0.8]
+                    dev-libs/xulrunner )
+        python? ( gnome-bindings/pygtk[>=2.12.0] )
+        tracker? ( app-pim/tracker[>=0.8] )
+        vala? ( dev-lang/vala[>=0.7.5] )
+"
+
+# brasero-disc-recorder
+# coherence_upnp
+# galago
+# lirc
+# mythtv
+# epc (publish)
+# jamendo
+# opensubtitles
+# youtube -- needs http://live.gnome.org/libgdata >= 0.40
+
+src_configure() {
+    local plugins=gromit,media-player-keys,ontop,properties,screensaver,screenshot,skipto,thumbnail
+
+    if option bluetooth ; then
+        plugins+=,bemused
+    fi
+
+    if option python ; then
+        plugins+=,dbus-service,iplayer,pythonconsole
+    fi
+
+    if option tracker ; then
+        plugins+=,tracker
+    fi
+
+    GST_REGISTRY="${TEMP}/.gstreamer-0.10" \
+        econf "--with-plugins=${plugins}" \
+              '--enable-easy-codec-installation' '--with-dbus' \
+              $(option_enable doc gtk-doc) $(option_enable nautilus) \
+              $(option_enable nsplugin browser-plugins) $(option_enable python) \
+              $(option_enable vala)
+}
+
+src_test() {
+    if ! option doc ; then
+        edo sed -e '/^GTKDOC_CHECK/cGTKDOC_CHECK = true' \
+                -i "${WORK}//docs/reference/Makefile"
+    fi
+
+    default
+}
+

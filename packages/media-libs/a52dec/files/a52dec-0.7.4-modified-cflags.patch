@@ -1,0 +1,21 @@
+Source: Written by Thomas Anderson
+Upstream: Unknown
+Reason: Fix autotools warnings due to overriding of $CFLAGS, second part fixes
+a fPIC issue.
+
+--- a52dec-0.7.4-orig/src/Makefile.am	2002-06-23 01:51:57.000000000 +0000
++++ a52dec-0.7.4/src/Makefile.am	2008-08-22 15:06:11.000000000 +0000
+@@ -1,5 +1,3 @@
+-CFLAGS = @A52DEC_CFLAGS@
+-
+ bin_PROGRAMS = a52dec extract_a52
+ a52dec_SOURCES = a52dec.c getopt.c gettimeofday.c
+ a52dec_LDADD = $(top_builddir)/liba52/liba52.la \
+--- a52dec-0.7.4-orig/liba52/Makefile.am	2002-01-28 04:36:48.000000000 +0000
++++ a52dec-0.7.4/liba52/Makefile.am	2008-08-22 15:14:40.000000000 +0000
+@@ -1,5 +1,3 @@
+-CFLAGS = @CFLAGS@ @LIBA52_CFLAGS@
+-
+ lib_LTLIBRARIES = liba52.la
+ 
+ liba52_la_SOURCES = bitstream.c imdct.c bit_allocate.c parse.c downmix.c
