@@ -29,5 +29,9 @@ src_install()
 {
     edo install -d "${IMAGE}/opt"
     edo cp -rf firefox "${IMAGE}/opt/fajrovulpo-bin"
+
+    echo '#!/bin/sh' > fajrovulpo-bin
+    echo >> fajrovulpo-bin
+    echo 'exec /opt/fajrovulpo-bin/firefox ${1+"$@"}' >> fajrovulpo-bin
     dobin fajrovulpo-bin
 }
