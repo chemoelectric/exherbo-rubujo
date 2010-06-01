@@ -1,0 +1,65 @@
+ Copyright 2010 Barry Schwartz
+# Distributed under the terms of the GNU General Public License v2
+# Based in part upon 'gxine-0.5.905.ebuild' from Gentoo, which is:
+#     Copyright 1999-2010 Gentoo Foundation.
+
+require gnome-2 multilib
+
+DESCRIPTION="GTK+ Front-End for libxine"
+HOMEPAGE="http://xine.sourceforge.net/"
+DOWNLOADS="mirror://sourceforge/xine/${PNV}.tar.bz2"
+
+LICENCES="GPL-2"
+SLOT="0"
+PLATFORMS="~amd64"
+MYOPTIONS="gnome lirc nls nsplugin udev xcb xinerama"
+
+DEPENDENCIES="
+    build+run:
+        media-libs/xine-lib
+        x11-libs/gtk+:2
+        dev-libs/glib:2
+        x11-libs/pango
+        dev-libs/spidermonkey
+        x11-libs/libX11
+        x11-libs/libXext
+        x11-libs/libXrender
+        gnome? ( dev-libs/dbus-glib
+                 gnome-desktop/gnome-screensaver )
+        lirc? ( app-misc/lirc )
+        nsplugin? ( dev-libs/nspr
+                    x11-libs/libXaw
+                    x11-libs/libXt )
+        udev? ( sys-fs/udev[glib] )
+        xcb? ( x11-libs/libxcb )
+        xinerama? ( x11-libs/libXinerama )
+    build:
+        dev-util/pkg-config
+"
+
+DEFAULT_SRC_CONFIGURE_OPTION_ENABLES=(
+    "gnome dbus"
+    lirc
+    nls
+    "nsplugin browser-plugin"
+    "udev gudev"
+    xcb
+    xinerama
+)
+
+DEFAULT_SRC_CONFIGURE_PARAMS=(
+    --disable-dependency-tracking
+    --enable-watchdog
+    --with-spidermonkey=/usr/include/js
+    --without-hal
+    --with-nls
+)
+
+src_install() {
+    default
+    if option nsplugin ; then
+        echo "MOZ_PLUGIN_PATH=\"/usr/$(get_libdir)/gxine\"" > 50gxine
+        insinto /etc/env.d
+        doins 50gxine
+    fi
+}
