@@ -1,0 +1,13 @@
+diff --git a/src/Window.cc b/src/Window.cc
+index 56cbd96..73353b8 100644
+--- a/src/Window.cc
++++ b/src/Window.cc
+@@ -3397,7 +3397,7 @@ void FluxboxWindow::fixSize() {
+     if (m_last_resize_h > 0)
+         h = m_last_resize_h;
+ 
+-    frame().applySizeHints(w, h);
++    frame().applySizeHints(w, h, true);
+ 
+     m_last_resize_w = w;
+     m_last_resize_h = h;

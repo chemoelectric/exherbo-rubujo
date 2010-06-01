@@ -1,0 +1,50 @@
+# Copyright (c) 2008 Alexander Færøy <ahf@exherbo.org>
+# Distributed under the terms of the GNU General Public License v2
+
+require common-metadata
+
+SCM_REPOSITORY="git://git.fluxbox.org/fluxbox.git"
+require scm-git
+
+DOWNLOADS=""
+SLOT="0"
+PLATFORMS="~amd64 ~x86"
+MYOPTIONS="
+    kde [[ description = [ Support for various KDE protocols. Does
+        not require KDE, but does increase package size. ] ]]
+    gnome [[ description = [ Support for various Gnome protocols. Does
+        not require Gnome, but does increase package size. ] ]]
+    xinerama [[ description = [ Support for the X11 Xinerama protocol ] ]]
+    imlib2 [[ description = [ Use imlib2 for drawing icons ] ]]"
+
+DEPENDENCIES="
+    build+run:
+        x11-libs/libX11
+        x11-libs/libXext
+        x11-libs/libXft
+        x11-libs/libXrender
+        x11-libs/libXpm
+        x11-libs/libXrandr
+        xinerama? ( x11-libs/libXinerama )
+        imlib2? ( media-libs/imlib2 )
+
+    run:
+        x11-apps/xmessage
+
+    build:
+        sys-devel/autoconf
+        sys-devel/automake
+        sys-devel/gettext
+"
+
+DEFAULT_SRC_CONFIGURE_PARAMS=( --enable-nls )
+DEFAULT_SRC_CONFIGURE_OPTION_ENABLES=( kde gnome xinerama imlib2 )
+
+src_prepare() {
+
+    # A temporary patch, until the problem is fixed upstream.
+    expatch "${FILES}/fluxbox-resizing-patch.diff"
+
+    ./autogen.sh || die "no autogen for you"
+}
+
