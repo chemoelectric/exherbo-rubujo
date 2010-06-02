@@ -1,0 +1,13 @@
+# Copyright 2010 Barry Schwartz
+# Distributed under the terms of the GNU General Public License v2
+
+SUMMARY="lsscsi -- lists information about SCSI devices in Linux"
+HOMEPAGE="http://sg.danny.cz/scsi/${PV}.html"
+DOWNLOADS="http://sg.danny.cz/scsi/${PNV}.tgz"
+
+LICENCES="GPL-2"
+SLOT="0"
+PLATFORMS="~amd64"
+MYOPTIONS=""
+
+DEPENDENCIES=""
