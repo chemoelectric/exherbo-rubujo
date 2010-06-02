@@ -1,0 +1,203 @@
+# Copyright 2010 Barry Schwartz
+# Distributed under the terms of the GNU General Public License v2
+# Based in part upon 'iscan-2.21.0.ebuild' from Gentoo, which is:
+#     Copyright 1999-2009 Gentoo Foundation.
+
+require flag-o-matic multilib autotools [ supported_autoconf=[ 2.5 ] supported_automake=[ 1.11 1.10 ] ]
+
+SRC_REV="4"  # revision used by upstream
+
+# HINTS:
+# -> non-free modules are x86 and amd64 only
+# -> iscan frontend needs non-free modules
+# -> sane-epkowa should be usable on every arch
+# -> ${P}-${SRC_REV}.tar.gz    (for gcc 3.2/3.3)
+# -> ${P}-${SRC_REV}.c2.tar.gz (for gcc 3.4 or later)
+
+# FIXME:
+# Make jpeg/png optional. The problem is, that the configure script ignores --disable-*,
+# if the corresponding lib is found on the system.
+# Furthermore, iscan doesn't compile w/o libusb, this should be fixed somehow.
+
+# feel free to add your arch, every non-x86
+# arch doesn't install any x86-only stuff.
+PLATFORMS="~amd64"
+
+SUMMARY="EPSON Image Scan! for Linux (including sane-epkowa backend)"
+HOMEPAGE="http://www.avasys.jp/english/linux_e/dl_scan.html"
+DOWNLOADS="http://linux.avasys.jp/drivers/iscan/${PV}/${PN}_${PV}-${SRC_REV}.tar.gz"
+LICENCES="GPL-2 AVASYSPL"
+SLOT="0"
+
+LINGUAS="de es fr it ja ko nl pt zh_CN zh_TW"
+MYOPTIONS="X gimp jpeg png tiff linguas: ${LINGUAS}"
+
+QA_TEXTRELS="usr/$(get_libdir)/iscan/lib*"
+
+# Upstream ships broken sanity test
+RESTRICT="test"
+
+DEPENDENCIES="
+    build+run:
+        media-gfx/sane-backends
+        sys-fs/udev
+        dev-libs/libusb
+        X? (
+            x11-libs/gtk+:2
+            gimp? ( media-gfx/gimp )
+            png? ( media-libs/libpng )
+            jpeg? ( media-libs/jpeg )
+            tiff? ( media-libs/tiff )
+        )
+    build:
+        X? ( sys-devel/gettext )
+"
+
+usermap_to_udev() {
+    echo '# udev rules file for iscan devices (udev >= 0.98)'
+    echo '#'
+    echo 'ACTION!="add", GOTO="iscan_rules_end"'
+    echo 'SUBSYSTEM!="usb*", GOTO="iscan_rules_end"'
+    echo 'KERNEL=="lp[0-9]*", GOTO="iscan_rules_end"'
+    echo
+
+    sed -n -e '
+        /^:model[[:space:]]*"[^"]/ {
+            # Create model name string
+            s|^:model[[:space:]]*"\([^"]\+\).*|# \1|
+
+            # Copy to hold buffer
+            h
+        }
+        /^:usbid[[:space:]]*"0x[[:xdigit:]]\+"[[:space:]]*"0x[[:xdigit:]]\+"/ {
+            # Append next line
+            N
+
+            # Check status
+            /\n:status[[:space:]]*:\(complete\|good\|untested\)/ {
+                # Exchange with hold buffer
+                x
+
+                # Print (model name string)
+                p
+
+                # Exchange with hold buffer
+                x
+
+                    # Create udev command string
+                s|^:usbid[[:space:]]*"0x\([[:xdigit:]]\+\)"[[:space:]]*"0x\([[:xdigit:]]\+\)".*|ATTRS{idVendor}=="\1", ATTRS{idProduct}=="\2", MODE="0660", GROUP="scanner"|
+
+                # Print (udev command string)
+                p
+            }
+        }
+    ' "${1}"
+
+    echo
+    echo 'LABEL="iscan_rules_end"'
+}
+
+src_prepare() {
+    local i
+
+    # convert japanese docs to UTF-8
+    if option linguas:ja ; then
+        for i in {NEWS,README}.ja non-free/*.ja.txt; do
+            if [ -f "${i}" ]; then
+                echo ">>> Converting ${i} to UTF-8"
+                edo iconv -f eucjp -t utf8 -o "${i}~" "${i}" && mv -f "${i}~" "${i}" || rm -f "${i}~"
+            fi
+        done
+    fi
+
+    # disable checks for gtk+
+    if ! option X ; then
+        edo sed -i -e "s:PKG_CHECK_MODULES(GTK,.*):AC_DEFINE([HAVE_GTK_2], 0):g" \
+                -e "s:\(PKG_CHECK_MODULES(GDK_IMLIB,.*)\):#\1:g" configure.ac
+    fi
+
+    expatch "${FILES}"/${PNV}-drop-ltdl.patch
+    expatch "${FILES}"/${PNV}-fix-g++-test.patch
+    expatch "${FILES}"/${PNV}-noinst-stuff.patch
+    AT_M4DIR="${WORK}/m4"
+    eautoreconf
+}
+
+src_configure() {
+    append-flags -D_GNU_SOURCE  # needed for 'strndup'
+    local myconf
+
+    if option X ; then
+        myconf="--enable-frontend
+            $(option_enable gimp)
+            $(option_enable jpeg)
+            $(option_enable png)
+            $(option_enable tiff)"
+    else
+        myconf="--disable-frontend --disable-gimp
+                --disable-jpeg --disable-png --disable-tiff"
+    fi
+
+    econf --disable-static ${myconf}
+}
+
+src_install() {
+    local MY_LIB="/usr/$(get_libdir)"
+    emake DESTDIR="${IMAGE}" install
+
+    dodoc AUTHORS NEWS README doc/epkowa.desc
+    option linguas:ja && dodoc NEWS.ja README.ja
+
+    rm -f "${IMAGE}usr/lib/iscan/make-udev-rules"
+
+    # install USB hotplug stuff
+    local USERMAP_FILE="doc/epkowa.desc"
+    if [ -f ${USERMAP_FILE} ]; then
+        dodir /etc/udev/rules.d
+        usermap_to_udev ${USERMAP_FILE} \
+            > "${IMAGE}etc/udev/rules.d/99-iscan.rules"
+    else
+        die "Can not find USB devices description file: ${USERMAP_FILE}"
+    fi
+
+    # install sane config
+    insinto /etc/sane.d
+    doins backend/epkowa.conf
+
+    # link iscan so it is seen as a plugin in gimp
+    if option X && option gimp ; then
+        local plugindir
+        if [ -x /usr/bin/gimptool ]; then
+            plugindir="$(gimptool --gimpplugindir)/plug-ins"
+        elif [ -x /usr/bin/gimptool-2.0 ]; then
+            plugindir="$(gimptool-2.0 --gimpplugindir)/plug-ins"
+        else
+            die "Can't find GIMP plugin directory."
+        fi
+        dodir "${plugindir}"
+        dosym /usr/bin/iscan "${plugindir}"
+    fi
+
+    # install desktop entry
+    if option X ; then
+        make_desktop_entry iscan "Image Scan! for Linux ${PV}" scanner
+    fi
+}
+
+pkg_postinst() {
+    local i
+    local DLL_CONF="/etc/sane.d/dll.conf"
+    local EPKOWA_CONF="/etc/sane.d/epkowa.conf"
+
+    elog
+    if grep -q "^[ \t]*\<epkowa\>" ${DLL_CONF}; then
+        elog "Please edit ${EPKOWA_CONF} to suit your needs."
+    elif grep -q "\<epkowa\>" ${DLL_CONF}; then
+        elog "Hint: to enable the backend, add 'epkowa' to ${DLL_CONF}"
+        elog "Then edit ${EPKOWA_CONF} to suit your needs."
+    else
+        echo "epkowa" >> ${DLL_CONF}
+        elog "A new entry 'epkowa' was added to ${DLL_CONF}"
+        elog "Please edit ${EPKOWA_CONF} to suit your needs."
+    fi
+}

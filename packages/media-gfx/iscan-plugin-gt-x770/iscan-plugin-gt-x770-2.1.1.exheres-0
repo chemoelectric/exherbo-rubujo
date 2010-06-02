@@ -1,0 +1,67 @@
+# Copyright 2010 Barry Schwartz
+# Distributed under the terms of the GNU General Public License v2
+# Based in part upon 'iscan-plugin-gt-f720-0.0.1.ebuild' from Gentoo, which is:
+#     Copyright 1999-2009 Gentoo Foundation.
+
+require multilib
+
+# Revision used by upstream
+SRC_REV="2"
+
+MY_PNV="${PNV}-${SRC_REV}"
+MY_MORESTUFF=".c2.x86_64"
+
+SUMMARY="Epson Perfection V500 scanner plugin for SANE 'epkowa' backend."
+HOMEPAGE="http://www.avasys.jp/english/linux_e/dl_scan.html"
+DOWNLOADS="http://linux.avasys.jp/drivers/scanner-plugins/GT-X770/${MY_PNV}${MY_MORESTUFF}.rpm"
+
+LICENCES="AVASYSPL"
+SLOT="0"
+PLATFORMS="~amd64"
+
+DEPENDENCIES="
+    build+run:
+        media-gfx/iscan[>=2.18.0]
+    build:
+        app-arch/rpm2targz
+"
+
+WORK="${WORKBASE}"
+
+src_unpack() {
+    edo cp "${FETCHEDDIR}/${MY_PNV}${MY_MORESTUFF}.rpm" .
+    edo rpm2targz "${MY_PNV}${MY_MORESTUFF}.rpm"
+    edo tar xzf "${MY_PNV}${MY_MORESTUFF}.tar.gz"
+}
+
+src_install() {
+    local MY_LIB="/usr/$(get_libdir)"
+
+    # install scanner firmware
+    insinto /usr/share/iscan
+    doins "${WORK}"/usr/share/iscan/*
+
+    # install scanner plugins
+    insinto "${MY_LIB}"/iscan
+    insopts -m0755
+    doins "${WORK}"/usr/$(get_libdir)/iscan/*
+}
+
+pkg_postinst() {
+    local MY_LIB="/usr/$(get_libdir)"
+    
+    # Needed for scanner to work properly.
+    iscan-registry --add interpreter usb 0x04b8 0x0130 ${MY_LIB}/iscan/libesint7C /usr/share/iscan/esfw7C.bin
+    
+    elog
+    elog "Firmware file esfw7C.bin for Epson Perfection V500"
+    elog "PHOTO has been installed in /usr/share/iscan and"
+    elog "registered for use."
+    elog
+}
+
+pkg_prerm() {
+    local MY_LIB="/usr/$(get_libdir)"
+
+    iscan-registry --remove interpreter usb 0x04b8 0x0130 ${MY_LIB}/iscan/libesint7C /usr/share/iscan/esfw7C.bin
+}
