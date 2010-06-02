@@ -1,9 +1,9 @@
 # Copyright 2010 Barry Schwartz
 # Distributed under the terms of the GNU General Public License v2
 
-SCM_REPOSITORY="git://github.com/chemoelectric/ant.git"
+SCM_REPOSITORY="http://bitbucket.org/chemoelectric/ant-devel"
 
-require scm-git
+require scm-hg
 
 SUMMARY="ant, ant is not TeX"
 DESCRIPTION="
@@ -37,7 +37,7 @@ MYOPTIONS="
 DEPENDENCIES="
     build+run:
         dev-lang/ocaml[ocamlopt][dbm]
-        dev-ocaml/camlimages[<3]
+        dev-ocaml/camlimages[>=3.0.2]
         app-text/texlive
     build:
         data/UnicodeData
