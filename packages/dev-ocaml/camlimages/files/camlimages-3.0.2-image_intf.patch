@@ -1,0 +1,10 @@
+--- camlimages-3.0.2/src/Makefile.am	2009-10-26 12:42:03.000000000 +0000
++++ camlimages-3.0.2.MODIFIED/src/Makefile.am	2010-06-02 06:47:58.035017883 +0000
+@@ -75,6 +75,7 @@
+ 		  region.mli \
+ 		  tmpfile.mli \
+ 		  bitmap.mli \
++		  image_intf.mli \
+ 		  genimage.mli \
+ 		  rgba32.mli \
+ 		  rgb24.mli \

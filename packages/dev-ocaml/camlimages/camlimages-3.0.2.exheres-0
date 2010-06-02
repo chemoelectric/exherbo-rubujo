@@ -1,0 +1,72 @@
+# Copyright 2010 Barry Schwartz
+# Distributed under the terms of the GNU General Public License v2
+# Based in part upon 'camlimages-3.0.2.ebuild' from Gentoo, which is:
+#     Copyright 1999-2010 Gentoo Foundation.
+
+require autotools [ supported_autoconf=[ 2.5 ] supported_automake=[ 1.11 ] ]
+
+SUMMARY="CamlImages, an image processing library for Objective Caml"
+HOMEPAGE="http://cristal.inria.fr/${PN}/eng.html"
+DOWNLOADS="http://caml.inria.fr/distrib/bazar-ocaml/${PNV}.tgz"
+
+LICENCES="LGPL-2-with-linking-exception"
+SLOT="0"
+PLATFORMS="~amd64"
+MYOPTIONS="
+    lablgtk2   [[ description = [ support for lablgtk version 2 ] ]]
+    freetype
+    gif
+    gs
+    jpeg
+    png
+    tiff
+    xpm
+"
+
+DEPENDENCIES="
+    build+run:
+        dev-lang/ocaml[X][ocamlopt]
+        lablgtk2? ( dev-ocaml/lablgtk:2 )
+        freetype? ( media-libs/freetype:2 )
+        gif?      ( media-libs/giflib )
+        gs?       ( app-text/ghostscript )
+        jpeg?     ( media-libs/jpeg )
+        png?      ( media-libs/libpng )
+        tiff?     ( media-libs/tiff )
+        xpm?      ( x11-libs/libXpm )
+    build:
+        dev-ocaml/ocaml-autoconf[>=1.1]
+        dev-ocaml/findlib
+"
+
+EXJOBS=1
+
+DEFAULT_SRC_CONFIGURE_PARAMS=(
+    --without-lablgtk
+    --with-ocamlfind
+    --with-gs
+    --hates=host
+    --hates=build
+)
+
+DEFAULT_SRC_CONFIGURE_OPTION_WITHS=(
+    lablgtk2
+    gif
+    jpeg
+    png
+    tiff
+    xpm
+)
+
+src_prepare()
+{
+    expatch "${FILES}/${PNV}-tiffread-CVE-2009-3296.patch"
+    expatch "${FILES}/${PNV}-ocaml-autoconf11.patch"
+    expatch "${FILES}/${PNV}-annot.patch"
+    expatch "${FILES}/${PNV}-noxpm.patch"
+    expatch "${FILES}/${PNV}-image_intf.patch"
+    edo sed -i -e 's|/site-lib/|/|' configure.ac
+    eaclocal --force
+    eautoreconf
+    eautoreconf
+}

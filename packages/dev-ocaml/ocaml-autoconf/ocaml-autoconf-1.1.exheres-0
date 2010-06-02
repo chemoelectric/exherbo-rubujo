@@ -1,0 +1,22 @@
+# Copyright 2010 Barry Schwartz
+# Distributed under the terms of the GNU General Public License v2
+
+SUMMARY="ocaml.m4 - Autoconf macros for OCaml"
+HOMEPAGE="http://forge.ocamlcore.org/frs/?group_id=69"
+DOWNLOADS="https://forge.ocamlcore.org/frs/download.php/282/${PNV}.tar.gz"
+
+SLOT="0"
+LICENCES="BSD-3"
+PLATFORMS="~amd64"
+MYOPTIONS=""
+
+src_compile()
+{
+    :
+}
+
+src_install()
+{
+    emake install DESTDIR="${IMAGE}" prefix=/usr
+    emagicdocs
+}
