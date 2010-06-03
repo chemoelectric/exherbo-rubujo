@@ -47,6 +47,7 @@ DEPENDENCIES="
 DEFAULT_SRC_PREPARE_PATCHES=(
     "${FILES}/OMakefile-patch.diff"
     "${FILES}/manual-fonts.diff"
+    "${FILES}/lm-texlive-patch.diff"
 )
 
 src_prepare()

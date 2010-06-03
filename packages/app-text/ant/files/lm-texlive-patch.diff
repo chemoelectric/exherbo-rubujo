@@ -1,0 +1,100 @@
+diff -r e5573e064d5c Examples/LatinModern.ant
+--- a/Examples/LatinModern.ant	Wed Jun 02 18:53:27 2010 -0500
++++ b/Examples/LatinModern.ant	Wed Jun 02 21:24:52 2010 -0500
+@@ -40,21 +40,21 @@
+     ps_declare_font "lmroman9-italic.otf"                      lmr  med  it   ( 8, 9) {};
+     ps_declare_font "lmroman10-italic.otf"                     lmr  med  it   (10,12) {};
+     ps_declare_font "lmroman12-italic.otf"                     lmr  med  it   (12, 0) {};
+-    ps_declare_font "lmroman8-oblique.otf"                     lmr  med  sl   ( 0, 8) {};
+-    ps_declare_font "lmroman9-oblique.otf"                     lmr  med  sl   ( 8, 9) {};
+-    ps_declare_font "lmroman10-oblique.otf"                    lmr  med  sl   (10,12) {};
+-    ps_declare_font "lmroman12-oblique.otf"                    lmr  med  sl   (12,17) {};
+-    ps_declare_font "lmroman17-oblique.otf"                    lmr  med  sl   (17, 0) {};
+-    ps_declare_font "lmroman10-capsregular.otf"                lmr  med  sc   ( 0, 0) {};
+-    ps_declare_font "lmroman10-capsoblique.otf"                lmr  med  scsl ( 0, 0) {};
++    ps_declare_font "lmromanslant8-regular.otf"                lmr  med  sl   ( 0, 8) {};
++    ps_declare_font "lmromanslant9-regular.otf"                lmr  med  sl   ( 8, 9) {};
++    ps_declare_font "lmromanslant10-regular.otf"               lmr  med  sl   (10,12) {};
++    ps_declare_font "lmromanslant12-regular.otf"               lmr  med  sl   (12,17) {};
++    ps_declare_font "lmromanslant17-regular.otf"               lmr  med  sl   (17, 0) {};
++    ps_declare_font "lmromancaps10-regular.otf"                lmr  med  sc   ( 0, 0) {};
++    ps_declare_font "lmromancaps10-oblique.otf"                lmr  med  scsl ( 0, 0) {};
+     ps_declare_font "lmroman10-bolditalic.otf"                 lmr  bold it   ( 0, 0) {};
+-    ps_declare_font "lmroman10-boldoblique.otf"                lmr  bold sl   ( 0, 0) {};
+-    ps_declare_font "lmroman10-demi.otf"                       lmr  sb   nor  ( 0, 0) {};
+-    ps_declare_font "lmroman10-demioblique.otf"                lmr  sb   sl   ( 0, 0) {};
++    ps_declare_font "lmromanslant10-bold.otf"                  lmr  bold sl   ( 0, 0) {};
++    ps_declare_font "lmromandemi10-regular.otf"                lmr  sb   nor  ( 0, 0) {};
++    ps_declare_font "lmromandemi10-oblique.otf"                lmr  sb   sl   ( 0, 0) {};
+ 
+-;;    ps_declare_font "lmroman10-dunhilloblique.otf"
+-;;    ps_declare_font "lmroman10-dunhill.otf"
+-;;    ps_declare_font "lmroman10-unslanted.otf"
++;;    ps_declare_font "lmromandunh10-oblique.otf"
++;;    ps_declare_font "lmromandunh10-regular.otf"
++;;    ps_declare_font "lmromanunsl10-regular.otf"
+ 
+     ps_declare_font "lmsans8-regular.otf"                      lms  med  nor ( 0, 9) {};
+     ps_declare_font "lmsans9-regular.otf"                      lms  med  nor ( 9,10) {};
+@@ -68,35 +68,35 @@
+     ps_declare_font "lmsans17-oblique.otf"                     lms  med  sl  (17, 0) {};
+     ps_declare_font "lmsans10-bold.otf"                        lms  bold nor ( 0, 0) {};
+     ps_declare_font "lmsans10-boldoblique.otf"                 lms  bold sl  ( 0, 0) {};
+-    ps_declare_font "lmsans10-demicondensed.otf"               lms  sbc  nor ( 0, 0) {};
+-    ps_declare_font "lmsans10-demicondensedoblique.otf"        lms  sbc  sl  ( 0, 0) {};
++    ps_declare_font "lmsansdemicond10-regular.otf"             lms  sbc  nor ( 0, 0) {};
++    ps_declare_font "lmsansdemicond10-oblique.otf"             lms  sbc  sl  ( 0, 0) {};
+ 
+-    ps_declare_font "lmsansquotation8-regular.otf"             lmsq med  nor ( 0, 0) {};
+-    ps_declare_font "lmsansquotation8-oblique.otf"             lmsq med  sl  ( 0, 0) {};
+-    ps_declare_font "lmsansquotation8-bold.otf"                lmsq bold nor ( 0, 0) {};
+-    ps_declare_font "lmsansquotation8-boldoblique.otf"         lmsq bold sl  ( 0, 0) {};
++    ps_declare_font "lmsansquot8-regular.otf"                  lmsq med  nor ( 0, 0) {};
++    ps_declare_font "lmsansquot8-oblique.otf"                  lmsq med  sl  ( 0, 0) {};
++    ps_declare_font "lmsansquot8-bold.otf"                     lmsq bold nor ( 0, 0) {};
++    ps_declare_font "lmsansquot8-boldoblique.otf"              lmsq bold sl  ( 0, 0) {};
+ 
+-    ps_declare_font "lmtypewriter8-regular.otf"                lmt  med  nor  ( 0, 9) {};
+-    ps_declare_font "lmtypewriter9-regular.otf"                lmt  med  nor  ( 9,10) {};
+-    ps_declare_font "lmtypewriter10-regular.otf"               lmt  med  nor  (10,12) {};
+-    ps_declare_font "lmtypewriter12-regular.otf"               lmt  med  nor  (12, 0) {};
+-    ps_declare_font "lmtypewriter10-italic.otf"                lmt  med  it   ( 0, 0) {};
+-    ps_declare_font "lmtypewriter10-oblique.otf"               lmt  med  sl   ( 0, 0) {};
+-    ps_declare_font "lmtypewriter10-capsregular.otf"           lmt  med  sc   ( 0, 0) {};
+-    ps_declare_font "lmtypewriter10-capsoblique.otf"           lmt  med  scsl ( 0, 0) {};
+-    ps_declare_font "lmtypewriter10-dark.otf"                  lmt  bold nor  ( 0, 0) {};
+-    ps_declare_font "lmtypewriter10-darkoblique.otf"           lmt  bold sl   ( 0, 0) {};
+-    ps_declare_font "lmtypewriter10-light.otf"                 lmt  lig  nor  ( 0, 0) {};
+-    ps_declare_font "lmtypewriter10-lightoblique.otf"          lmt  lig  sl   ( 0, 0) {};
+-    ps_declare_font "lmtypewriter10-lightcondensed.otf"        lmt  lic  nor  ( 0, 0) {};
+-    ps_declare_font "lmtypewriter10-lightcondensedoblique.otf" lmt  lic  sl   ( 0, 0) {};
++    ps_declare_font "lmmono8-regular.otf"                lmt  med  nor  ( 0, 9) {};
++    ps_declare_font "lmmono9-regular.otf"                lmt  med  nor  ( 9,10) {};
++    ps_declare_font "lmmono10-regular.otf"               lmt  med  nor  (10,12) {};
++    ps_declare_font "lmmono12-regular.otf"               lmt  med  nor  (12, 0) {};
++    ps_declare_font "lmmono10-italic.otf"                lmt  med  it   ( 0, 0) {};
++    ps_declare_font "lmmonoslant10-regular.otf"          lmt  med  sl   ( 0, 0) {};
++    ps_declare_font "lmmonocaps10-regular.otf"           lmt  med  sc   ( 0, 0) {};
++    ps_declare_font "lmmonocaps10-oblique.otf"           lmt  med  scsl ( 0, 0) {};
++    ps_declare_font "lmmono10-dark.otf"                  lmt  bold nor  ( 0, 0) {};
++    ps_declare_font "lmmono10-darkoblique.otf"           lmt  bold sl   ( 0, 0) {};
++    ps_declare_font "lmmonolt10-regular.otf"             lmt  lig  nor  ( 0, 0) {};
++    ps_declare_font "lmmonolt10-oblique.otf"             lmt  lig  sl   ( 0, 0) {};
++    ps_declare_font "lmmonoltcond10-regular.otf"         lmt  lic  nor  ( 0, 0) {};
++    ps_declare_font "lmmonoltcond10-oblique.otf"         lmt  lic  sl   ( 0, 0) {};
+ 
+-    ps_declare_font "lmtypewritervarwd10-regular.otf"          lmtv med  nor ( 0, 0) {};
+-    ps_declare_font "lmtypewritervarwd10-oblique.otf"          lmtv med  sl  ( 0, 0) {};
+-    ps_declare_font "lmtypewritervarwd10-dark.otf"             lmtv bold nor ( 0, 0) {};
+-    ps_declare_font "lmtypewritervarwd10-darkoblique.otf"      lmtv bold sl  ( 0, 0) {};
+-    ps_declare_font "lmtypewritervarwd10-light.otf"            lmtv lig  nor ( 0, 0) {};
+-    ps_declare_font "lmtypewritervarwd10-lightoblique.otf"     lmtv lig  sl  ( 0, 0) {};
++    ps_declare_font "lmmonoprop10-regular.otf"           lmtv med  nor ( 0, 0) {};
++    ps_declare_font "lmmonoprop10-oblique.otf"           lmtv med  sl  ( 0, 0) {};
++    ps_declare_font "lmmonoprop10-bold.otf"              lmtv bold nor ( 0, 0) {};
++    ps_declare_font "lmmonoprop10-boldoblique.otf"       lmtv bold sl  ( 0, 0) {};
++    ps_declare_font "lmmonoproplt10-regular.otf"         lmtv lig  nor ( 0, 0) {};
++    ps_declare_font "lmmonoproplt10-oblique.otf"         lmtv lig  sl  ( 0, 0) {};
+   end
+ }
+ 
