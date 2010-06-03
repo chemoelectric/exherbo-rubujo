@@ -1,0 +1,57 @@
+# Copyright 2010 Barry Schwartz
+# Distributed under the terms of the GNU General Purpose License v2
+# Copyright 2010 Saleem Abdulrasool <compnerd@compnerd.org>
+# Distributed under the terms of the GNU General Purpose License v2
+# Copyright 2008 Saleem Abdulrasool <compnerd@compnerd.org>
+# Distributed under the terms of the GNU General Public License v2
+
+require gnome.org easy-multibuild
+
+SUMMARY="SVG parsing library"
+HOMEPAGE="http://www.gnome.org/"
+
+LICENCES="LGPL-2"
+SLOT="2"
+PLATFORMS="~amd64"
+MYOPTIONS="doc svgz multibuild_c: 32 64"
+
+DEPENDENCIES="
+    build:
+        dev-util/pkg-config[>=0.18]
+        doc? ( dev-doc/gtk-doc[>=1.0] )
+    build+run:
+        dev-libs/glib:2[multibuild_c:*(?)?][>=2.15.4]
+        x11-libs/gtk+:2[multibuild_c:*(?)?][>=2.16.0]
+        media-libs/fontconfig[multibuild_c:*(?)?][>=1.0.1]
+        dev-libs/libxml2[multibuild_c:*(?)?][>=2.4.7]
+        x11-libs/cairo[multibuild_c:*(?)?][>=1.2.0]
+        x11-libs/pango[multibuild_c:*(?)?][>=1.10.0]
+        svgz? ( office-libs/libgsf:1[>=1.6.0] )
+"
+
+DEFAULT_SRC_CONFIGURE_OPTION_ENABLES=( 'doc gtk-doc' )
+DEFAULT_SRC_CONFIGURE_OPTION_WITHS=( svgz )
+
+install_one_multibuild() {
+    default
+
+    if ! ever at_least 2.26.1 ; then
+        edo rmdir "${IMAGE}"/usr/${LIBDIR}/mozilla/{plugins,}
+    fi
+}
+
+pkg_postinst() {
+    echo "Generating pixbuf list ..."
+
+    echo "gdk-pixbuf-query-loaders > /etc/gtk-2.0/gdk-pixbuf.loaders"
+    gdk-pixbuf-query-loaders > "${ROOT}/etc/gtk-2.0/gdk-pixbuf.loaders" ||
+        eerror "failed to update pixbuf loaders"
+}
+
+pkg_postrm() {
+    echo "Generating pixbuf list ..."
+
+    echo "gdk-pixbuf-query-loaders > /etc/gtk-2.0/gdk-pixbuf.loaders"
+    gdk-pixbuf-query-loaders > "${ROOT}/etc/gtk-2.0/gdk-pixbuf.loaders" ||
+        eerror "failed to update pixbuf loaders"
+}

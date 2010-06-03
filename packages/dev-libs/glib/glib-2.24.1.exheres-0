@@ -1,0 +1,29 @@
+# Copyright 2007 Bryan Østergaard <kloeri@exherbo.org>
+# Copyright 2008 Saleem Abdulrasool <compnerd@compnerd.org>
+# Distributed under the terms of the GNU General Public License v2
+
+require glib
+
+SLOT="2"
+PLATFORMS="~amd64 ~ia64 ~ppc64 ~x86"
+MYOPTIONS="doc fam man-pages"
+
+DEPENDENCIES="
+    build:
+        sys-devel/gettext[>=0.11]
+        dev-util/pkg-config[>=0.16]
+        doc? ( dev-doc/gtk-doc[>=1.11] )
+        man-pages? ( dev-libs/libxslt
+                     app-text/docbook-xml-dtd:4.1.2 )
+    build+run:
+        fam? ( app-admin/gamin[multibuild_c:*(?)?] )
+    test:
+        dev-util/desktop-file-utils
+    suggestion:
+        gnome-desktop/gvfs[multibuild_c:*(?)?]
+"
+
+DEFAULT_SRC_PREPARE_PATCHES=( "${FILES}"/${PNV}-assert-test.patch )
+DEFAULT_SRC_CONFIGURE_PARAMS=( '--enable-static' '--enable-regex' '--with-pcre=internal' '--with-threads=posix' )
+DEFAULT_SRC_CONFIGURE_OPTION_ENABLES=( 'doc gtk-doc' 'fam' 'man-pages man' )
+

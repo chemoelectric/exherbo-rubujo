@@ -1,0 +1,17 @@
+Source: Written by Robin Green.
+Upstream: No.
+Reason: Only needed to deal with sydbox issue - not for upstream. Two processes
+	(gdb and sydbox) can't ptrace the same process simultaneously.
+
+--- glib-2.24.0/tests/run-assert-msg-test.sh.orig	2010-04-13 08:57:22.775160674 +0000
++++ glib-2.24.0/tests/run-assert-msg-test.sh	2010-04-13 08:58:16.528224260 +0000
+@@ -24,6 +24,9 @@
+ echo "$OUT" | grep -q '^ERROR:.*assert-msg-test.c:.*:main: assertion failed: (42 < 0)' || \
+   fail "does not print assertion message"
+ 
++echo_v "Skipping gdb test - fundamentally incompatible with sydbox"
++exit 0
++
+ if ! type gdb >/dev/null 2>&1; then
+   echo_v "Skipped (no gdb installed)"
+   exit 0
