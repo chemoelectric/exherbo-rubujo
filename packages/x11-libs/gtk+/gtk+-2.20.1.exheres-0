@@ -1,0 +1,187 @@
+# Copyright 2008 Saleem Abdulrasool <compnerd@compnerd.org>
+# Copyright 2010 Barry Schwartz
+# Distributed under the terms of the GNU General Public License v2
+# Based in part upon 'gtk+-2.13.2.ebuild' from Gentoo which is:
+#    Copyright 1999-2008 Gentoo Foundation
+
+require gnome.org easy-multibuild
+
+SUMMARY="The GIMP Toolkit"
+HOMEPAGE="http://www.gtk.org/"
+SLOT="2"
+PLATFORMS="~amd64"
+
+LICENCES="LGPL-2"
+
+LANGS="af am ang ar as ast az az_IR be be@latin bg bn bn_IN br bs ca
+ca@valencia crh cs cy da de dz el en_CA en_GB eo es et eu fa fi fr ga gl gu he
+hi hr hu hy ia id io is it ja ka kn ko ku li lt lv mai mi mk ml mn mr ms nb ne
+nl nn nso oc or pa pl ps pt pt_BR ro ru rw si sk sl sq sr sr@latin sr@ije sv ta
+te th tk tr tt uk ur uz uz@cyrillic vi wa xh yi zh_CN zh_HK zh_TW"
+
+MYOPTIONS="cups doc
+gobject-introspection
+jpeg2000 [[ description = [ Support for JPEG 2000 Part-1 images using libjasper ] ]]
+man-pages [[ description = [ Build and install man pages for the GTK+ API ] ]]
+xinerama
+linguas: ${LANGS}
+platform: amd64
+multibuild_c: 32 64
+"
+
+DEPENDENCIES="
+    build:
+        sys-devel/gettext
+        dev-util/pkg-config[>=0.20]
+        x11-proto/xproto
+        x11-proto/xextproto
+        x11-proto/inputproto
+        x11-proto/damageproto
+        man-pages? ( dev-libs/libxslt
+                     app-text/docbook-xml-dtd:4.1.2
+                     app-text/docbook-xsl-stylesheets )
+        doc? ( dev-doc/gtk-doc[>=1.11] )
+        gobject-introspection? ( gnome-desktop/gobject-introspection[>=0.6.7] )
+        xinerama? ( x11-proto/xineramaproto )
+    build+run:
+        dev-libs/glib:2[>=2.23.6][multibuild_c:*(?)?]
+        dev-libs/atk[>=1.29.2][multibuild_c:*(?)?]
+        x11-libs/pango[>=1.20][X][multibuild_c:*(?)?][gobject-introspection?]
+        x11-libs/cairo[>=1.6][X][multibuild_c:*(?)?]
+        media-libs/libpng[multibuild_c:*(?)?]
+        media-libs/jpeg[>=6b][multibuild_c:*(?)?]
+        media-libs/tiff[>=3.5.7][multibuild_c:*(?)?]
+        ( media-libs/fontconfig[multibuild_c:*(?)?]
+          x11-libs/libX11[multibuild_c:*(?)?]
+          x11-libs/libXext[multibuild_c:*(?)?]
+          x11-libs/libXrender[multibuild_c:*(?)?]
+          x11-libs/libXi[multibuild_c:*(?)?]
+          x11-libs/libXrandr[>=1.3][multibuild_c:*(?)?]
+          x11-libs/libXcursor[multibuild_c:*(?)?]
+          x11-libs/libXfixes[multibuild_c:*(?)?]
+          x11-libs/libXcomposite[multibuild_c:*(?)?]
+          x11-libs/libXdamage[multibuild_c:*(?)?] ) [[ note = [ required for the X backend ] ]]
+        cups? ( net-print/cups[>=1.2][multibuild_c:*(?)?] )
+        jpeg2000? ( media-libs/jasper[multibuild_c:*(?)?] )
+        xinerama? ( x11-libs/libXinerama[multibuild_c:*(?)?] )
+    run:
+        x11-themes/hicolor-icon-theme
+    suggestion:
+        app-vim/gtk-syntax [[ description = [ A collection of vim syntax files for various GTK+ C extensions ] ]]
+        gnome-desktop/evince [[ description = [ used for print preview functionality ] ]]
+"
+
+RESTRICT="test"
+
+DEFAULT_SRC_CONFIGURE_PARAMS=(
+    '--with-xinput'
+    '--with-gdktarget=x11'
+    '--with-libpng'
+    '--with-libjpeg'
+    '--with-libtiff'
+)
+
+DEFAULT_SRC_CONFIGURE_OPTION_WITHS=(
+    'jpeg2000 libjasper'
+)
+
+DEFAULT_SRC_CONFIGURE_OPTION_ENABLES=(
+    'cups'
+    'doc gtk-doc'
+    'gobject-introspection introspection'
+    'man-pages man'
+    'xinerama'
+ )
+
+src_prepare()
+{
+    local multibuild_c_target
+
+    expatch "${FILES}/${PNV}-use-png_uint_32.patch"
+
+    if option platform:amd64 ; then
+
+        # Patch adapted from CBLFS. See
+        # http://cblfs.cross-lfs.org/index.php/Gtk2
+        expatch "${FILES}/${PNV}-multitarget.patch"
+
+        for multibuild_c_target in ${MULTIBUILD_C_TARGETS} ; do
+            edo mkdir -p "${WORKBASE}/C/${multibuild_c_target}"
+            edo pushd "${WORKBASE}/C/${multibuild_c_target}"
+            edo cp -r "${WORK}"/* .
+            edo sed -i "s/MULTILIB_TARGET/${multibuild_c_target}/" \
+                gdk-pixbuf/gdk-pixbuf-io.c \
+                gdk-pixbuf/Makefile.am \
+                gdk-pixbuf/Makefile.in \
+                gtk/gtkrc.c \
+                modules/input/Makefile.am \
+                modules/input/Makefile.in
+            edo popd
+        done
+    fi
+}
+
+configure_one_multibuild() {
+    if option platform:amd64 ; then
+        export ECONF_SOURCE="${WORKBASE}/C/${MULTIBUILD_TARGET}"
+    fi
+    default
+}
+
+install_one_multibuild() {
+
+    if option platform:amd64 ; then
+
+        edo mkdir -p "${IMAGE}/etc/gtk-2.0/${MULTIBUILD_TARGET}"
+        emake -j1 DESTDIR="${IMAGE}" install
+        edo mv "${IMAGE}"/usr/bin/gdk-pixbuf-query-loaders{,-${MULTIBUILD_TARGET}}
+        edo mv "${IMAGE}"/usr/bin/gtk-query-immodules-2.0{,-${MULTIBUILD_TARGET}}
+
+        if [[ "${MULTIBUILD_TARGET}" == "${MULTIBUILD_C_DEFAULT_TARGET}" ]] ; then
+            dosym gdk-pixbuf-query-loaders-${MULTIBUILD_TARGET} /usr/bin/gdk-pixbuf-query-loaders
+            dosym gtk-query-immodules-2.0-${MULTIBUILD_TARGET} /usr/bin/gtk-query-immodules-2.0
+        fi
+
+        # Set up default icon theme.
+        edo echo 'gtk-fallback-icon-theme = "gnome"' > "${IMAGE}/etc/gtk-2.0/${MULTIBUILD_TARGET}/gtkrc"
+
+    else
+        emake -j1 DESTDIR="${IMAGE}" install
+
+        # Set up default icon theme.
+        echo 'gtk-fallback-icon-theme = "gnome"' > "${IMAGE}/etc/gtk-2.0/gtkrc"
+    fi
+
+    emagicdocs
+
+    if [[ -d ${IMAGE}/usr/share/man/ ]] ; then
+        edo find "${IMAGE}"/usr/share/man/ -type d -empty -delete
+    fi
+
+    if [[ "${MULTIBUILD_TARGET}" == "${MULTIBUILD_C_DEFAULT_TARGET}" ]] ; then
+        hereenvd 50gtk2 <<-EOF
+# use XFT
+GDK_USE_XFT=1
+EOF
+    fi
+}
+
+pkg_postinst() {
+    echo "Generating pixbuf and immodules lists ..."
+
+    if option platform:amd64 ; then
+        for multibuild_c_target in ${MULTIBUILD_C_TARGETS} ; do
+            echo "gdk-pixbuf-query-loaders-${multibuild_c_target} > /etc/gtk-2.0/${multibuild_c_target}/gdk-pixbuf.loaders"
+            gdk-pixbuf-query-loaders-${multibuild_c_target} > "${ROOT}/etc/gtk-2.0/${multibuild_c_target}/gdk-pixbuf.loaders"
+
+            echo "gtk-query-immodules-2.0-${multibuild_c_target} > /etc/gtk-2.0/${multibuild_c_target}/gtk.immodules"
+            gtk-query-immodules-2.0-${multibuild_c_target} > "${ROOT}/etc/gtk-2.0/${multibuild_c_target}/gtk.immodules"
+        done
+    else
+        echo "gdk-pixbuf-query-loaders > /etc/gtk-2.0/gdk-pixbuf.loaders"
+        gdk-pixbuf-query-loaders > "${ROOT}/etc/gtk-2.0/gdk-pixbuf.loaders"
+
+        echo "gtk-query-immodules-2.0 > /etc/gtk-2.0/gtk.immodules"
+        gtk-query-immodules-2.0 > "${ROOT}/etc/gtk-2.0/gtk.immodules"
+    fi
+}

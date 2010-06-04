@@ -1,0 +1,24 @@
+Source: Timothy Redaelli
+Upstream: not yet
+Reason: Use png_uint_32 for icc_profile_size since it changes size between libpng 1.2 and 1.4
+
+--- gtk+-2.20.1/gdk-pixbuf/io-png.c.orig	2010-05-02 05:14:27.000000000 +0200
++++ gtk+-2.20.1/gdk-pixbuf/io-png.c	2010-05-14 15:01:21.000000000 +0200
+@@ -261,7 +261,7 @@
+         gchar *icc_profile_base64;
+         const gchar *icc_profile_title;
+         const gchar *icc_profile;
+-        gulong icc_profile_size;
++        png_uint_32 icc_profile_size;
+         guint32 retval;
+         gint compression_type;
+ 
+@@ -607,7 +607,7 @@
+         gchar *icc_profile_base64;
+         const gchar *icc_profile_title;
+         const gchar *icc_profile;
+-        gulong icc_profile_size;
++        png_uint_32 icc_profile_size;
+         guint32 retval;
+         gint compression_type;
+ 

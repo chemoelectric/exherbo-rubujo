@@ -1,0 +1,151 @@
+Based in part from a patch from CBLFS. Information about that patch:
+
+    Submitted By: Joe Ciccone
+    Date: 2007-05-29
+    Initial Package Version: 2.10.3
+    Upstream Status: None
+    Origin: Joe Ciccone
+    Description: Fixes multilib configuration issues where the config file has
+                 the path of libs in it.
+    ...
+                  Rediffed against 2.14.2 By Joe Ciccone on 2008-09-20
+                  Rediffed against 2.16.6 By Joe Ciccone on 2009-09-07
+                  Rediffed against 2.18.0 By Jim Gifford on 2009-09-22
+
+Also see http://cblfs.cross-lfs.org/index.php/Gtk2
+
+Usage for _this_ patch:
+
+    sed -i "s/MULTILIB_TARGET/32/" \
+                            gdk-pixbuf/gdk-pixbuf-io.c \
+                            gdk-pixbuf/Makefile.am \
+                            gdk-pixbuf/Makefile.in \
+                            gtk/gtkrc.c \
+                            modules/input/Makefile.am \
+                            modules/input/Makefile.in
+
+
+diff -Naur gtk+-2.20.1/gdk-pixbuf/Makefile.am gtk+-2.20.1.PATCHED/gdk-pixbuf/Makefile.am
+--- gtk+-2.20.1/gdk-pixbuf/Makefile.am	2010-04-10 02:19:52.000000000 +0000
++++ gtk+-2.20.1.PATCHED/gdk-pixbuf/Makefile.am	2010-06-03 23:45:48.143615472 +0000
+@@ -724,8 +724,8 @@
+ # after the libraries are installed in their final locations.
+ install-data-hook: install-ms-lib install-def-file
+ 	@if $(RUN_QUERY_LOADER_TEST) ; then \
+-	  $(mkinstalldirs) $(DESTDIR)$(sysconfdir)/gtk-2.0 ; \
+-	  $(top_builddir)/gdk-pixbuf/gdk-pixbuf-query-loaders > $(DESTDIR)$(sysconfdir)/gtk-2.0/gdk-pixbuf.loaders ; \
++	  $(mkinstalldirs) $(DESTDIR)$(sysconfdir)/gtk-2.0/MULTILIB_TARGET ; \
++	  $(top_builddir)/gdk-pixbuf/gdk-pixbuf-query-loaders > $(DESTDIR)$(sysconfdir)/gtk-2.0/MULTILIB_TARGET/gdk-pixbuf.loaders ; \
+ 	else \
+ 	  echo "***" ; \
+ 	  echo "*** Warning: gdk-pixbuf.loaders not built" ; \
+@@ -736,7 +736,7 @@
+ 	fi
+ 
+ uninstall-local: uninstall-ms-lib uninstall-def-file
+-	rm -f $(DESTDIR)$(sysconfdir)/gtk-2.0/gdk-pixbuf.loaders
++	rm -f $(DESTDIR)$(sysconfdir)/gtk-2.0/MULTILIB_TARGET/gdk-pixbuf.loaders
+ 
+ if CROSS_COMPILING
+ else
+diff -Naur gtk+-2.20.1/gdk-pixbuf/Makefile.in gtk+-2.20.1.PATCHED/gdk-pixbuf/Makefile.in
+--- gtk+-2.20.1/gdk-pixbuf/Makefile.in	2010-05-02 23:54:59.000000000 +0000
++++ gtk+-2.20.1.PATCHED/gdk-pixbuf/Makefile.in	2010-06-03 23:49:25.400407841 +0000
+@@ -2446,8 +2446,8 @@
+ # after the libraries are installed in their final locations.
+ install-data-hook: install-ms-lib install-def-file
+ 	@if $(RUN_QUERY_LOADER_TEST) ; then \
+-	  $(mkinstalldirs) $(DESTDIR)$(sysconfdir)/gtk-2.0 ; \
+-	  $(top_builddir)/gdk-pixbuf/gdk-pixbuf-query-loaders > $(DESTDIR)$(sysconfdir)/gtk-2.0/gdk-pixbuf.loaders ; \
++	  $(mkinstalldirs) $(DESTDIR)$(sysconfdir)/gtk-2.0/MULTILIB_TARGET ; \
++	  $(top_builddir)/gdk-pixbuf/gdk-pixbuf-query-loaders > $(DESTDIR)$(sysconfdir)/gtk-2.0/MULTILIB_TARGET/gdk-pixbuf.loaders ; \
+ 	else \
+ 	  echo "***" ; \
+ 	  echo "*** Warning: gdk-pixbuf.loaders not built" ; \
+@@ -2458,7 +2458,7 @@
+ 	fi
+ 
+ uninstall-local: uninstall-ms-lib uninstall-def-file
+-	rm -f $(DESTDIR)$(sysconfdir)/gtk-2.0/gdk-pixbuf.loaders
++	rm -f $(DESTDIR)$(sysconfdir)/gtk-2.0/MULTILIB_TARGET/gdk-pixbuf.loaders
+ 
+ @CROSS_COMPILING_FALSE@all-local: gdk-pixbuf.loaders
+ 
+diff -Naur gtk+-2.20.1/gdk-pixbuf/gdk-pixbuf-io.c gtk+-2.20.1.PATCHED/gdk-pixbuf/gdk-pixbuf-io.c
+--- gtk+-2.20.1/gdk-pixbuf/gdk-pixbuf-io.c	2010-04-10 02:19:52.000000000 +0000
++++ gtk+-2.20.1.PATCHED/gdk-pixbuf/gdk-pixbuf-io.c	2010-06-03 23:44:25.526294932 +0000
+@@ -305,7 +305,7 @@
+   gchar *result = g_strdup (g_getenv ("GDK_PIXBUF_MODULE_FILE"));
+ 
+   if (!result)
+-	  result = g_build_filename (GTK_SYSCONFDIR, "gtk-2.0", "gdk-pixbuf.loaders", NULL);
++	  result = g_build_filename (GTK_SYSCONFDIR, "gtk-2.0/MULTILIB_TARGET", "gdk-pixbuf.loaders", NULL);
+ 
+   return result;
+ }
+diff -Naur gtk+-2.20.1/gtk/gtkrc.c gtk+-2.20.1.PATCHED/gtk/gtkrc.c
+--- gtk+-2.20.1/gtk/gtkrc.c	2010-05-02 23:28:21.000000000 +0000
++++ gtk+-2.20.1.PATCHED/gtk/gtkrc.c	2010-06-03 23:46:51.931532591 +0000
+@@ -450,7 +450,7 @@
+       if (im_module_file)
+ 	result = g_strdup (im_module_file);
+       else
+-	result = g_build_filename (GTK_SYSCONFDIR, "gtk-2.0", "gtk.immodules", NULL);
++	result = g_build_filename (GTK_SYSCONFDIR, "gtk-2.0/MULTILIB_TARGET", "gtk.immodules", NULL);
+     }
+ 
+   return result;
+diff -Naur gtk+-2.20.1/modules/input/Makefile.am gtk+-2.20.1.PATCHED/modules/input/Makefile.am
+--- gtk+-2.20.1/modules/input/Makefile.am	2010-04-09 02:29:59.000000000 +0000
++++ gtk+-2.20.1.PATCHED/modules/input/Makefile.am	2010-06-03 23:50:21.149294429 +0000
+@@ -189,10 +189,10 @@
+ # after the libraries are installed in their final locations.
+ install-data-hook:
+ 	@if $(RUN_QUERY_IMMODULES_TEST) ; then \
+-	  echo $(mkinstalldirs) $(DESTDIR)$(sysconfdir)/gtk-2.0 ; \
+-	  $(mkinstalldirs) $(DESTDIR)$(sysconfdir)/gtk-2.0 ; \
+-	  echo "$(top_builddir)/gtk/gtk-query-immodules-2.0 > $(DESTDIR)$(sysconfdir)/gtk-2.0/gtk.immodules" ; \
+-	  $(top_builddir)/gtk/gtk-query-immodules-2.0 > $(DESTDIR)$(sysconfdir)/gtk-2.0/gtk.immodules ; \
++	  echo $(mkinstalldirs) $(DESTDIR)$(sysconfdir)/gtk-2.0/MULTILIB_TARGET ; \
++	  $(mkinstalldirs) $(DESTDIR)$(sysconfdir)/gtk-2.0/MULTILIB_TARGET ; \
++	  echo "$(top_builddir)/gtk/gtk-query-immodules-2.0 > $(DESTDIR)$(sysconfdir)/gtk-2.0/MULTILIB_TARGET/gtk.immodules" ; \
++	  $(top_builddir)/gtk/gtk-query-immodules-2.0 > $(DESTDIR)$(sysconfdir)/gtk-2.0/MULTILIB_TARGET/gtk.immodules ; \
+ 	else \
+ 	  echo "***" ; \
+ 	  echo "*** Warning: gtk.immodules not built" ; \
+@@ -203,7 +203,7 @@
+         fi
+ 
+ uninstall-local:
+-	rm -f $(DESTDIR)$(sysconfdir)/gtk-2.0/gtk.immodules
++	rm -f $(DESTDIR)$(sysconfdir)/gtk-2.0/MULTILIB_TARGET/gtk.immodules
+ 
+ if BUILD_DYNAMIC_MODULES
+ 
+diff -Naur gtk+-2.20.1/modules/input/Makefile.in gtk+-2.20.1.PATCHED/modules/input/Makefile.in
+--- gtk+-2.20.1/modules/input/Makefile.in	2010-05-02 23:55:02.000000000 +0000
++++ gtk+-2.20.1.PATCHED/modules/input/Makefile.in	2010-06-03 23:50:45.232345311 +0000
+@@ -1248,10 +1248,10 @@
+ # after the libraries are installed in their final locations.
+ install-data-hook:
+ 	@if $(RUN_QUERY_IMMODULES_TEST) ; then \
+-	  echo $(mkinstalldirs) $(DESTDIR)$(sysconfdir)/gtk-2.0 ; \
+-	  $(mkinstalldirs) $(DESTDIR)$(sysconfdir)/gtk-2.0 ; \
+-	  echo "$(top_builddir)/gtk/gtk-query-immodules-2.0 > $(DESTDIR)$(sysconfdir)/gtk-2.0/gtk.immodules" ; \
+-	  $(top_builddir)/gtk/gtk-query-immodules-2.0 > $(DESTDIR)$(sysconfdir)/gtk-2.0/gtk.immodules ; \
++	  echo $(mkinstalldirs) $(DESTDIR)$(sysconfdir)/gtk-2.0/MULTILIB_TARGET ; \
++	  $(mkinstalldirs) $(DESTDIR)$(sysconfdir)/gtk-2.0/MULTILIB_TARGET ; \
++	  echo "$(top_builddir)/gtk/gtk-query-immodules-2.0 > $(DESTDIR)$(sysconfdir)/gtk-2.0/MULTILIB_TARGET/gtk.immodules" ; \
++	  $(top_builddir)/gtk/gtk-query-immodules-2.0 > $(DESTDIR)$(sysconfdir)/gtk-2.0/MULTILIB_TARGET/gtk.immodules ; \
+ 	else \
+ 	  echo "***" ; \
+ 	  echo "*** Warning: gtk.immodules not built" ; \
+@@ -1262,7 +1262,7 @@
+         fi
+ 
+ uninstall-local:
+-	rm -f $(DESTDIR)$(sysconfdir)/gtk-2.0/gtk.immodules
++	rm -f $(DESTDIR)$(sysconfdir)/gtk-2.0/MULTILIB_TARGET/gtk.immodules
+ 
+ included-modules: $(noinst_LTLIBRARIES)
+ 
