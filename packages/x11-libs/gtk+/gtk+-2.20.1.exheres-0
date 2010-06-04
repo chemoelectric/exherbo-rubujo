@@ -98,6 +98,7 @@ src_prepare()
     local multibuild_c_target
 
     expatch "${FILES}/${PNV}-use-png_uint_32.patch"
+    expatch "${FILES}/${PNV}-XID_collision_patch.diff"
 
     if option platform:amd64 ; then
 
