@@ -1,0 +1,7 @@
+# Copyright 2008 Ingmar Vanhassel <ingmar@exherbo.org>
+# Distributed under the terms of the GNU General Public License v2
+
+require libsigc++
+
+PLATFORMS="~amd64 ~ppc64 ~x86"
+

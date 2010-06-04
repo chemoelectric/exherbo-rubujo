@@ -1,0 +1,28 @@
+# Copyright 2008, 2009 Ingmar Vanhassel <ingmar@exherbo.org>
+# Distributed under the terms of the GNU General Public License v2
+# Based in part upon 'common-metadata.ebuild' from Gentoo, which is:
+#     Copyright 1999-2008 Gentoo Foundation.
+
+require easy-multibuild
+
+SUMMARY="Typesafe callback system for standard C++"
+DESCRIPTION='
+libsigc++ implements a typesafe callback system for standard C++. It
+allows you to define signals and to connect those signals to any
+callback function, either global or a member function, regardless of
+whether it is static or virtual.
+
+libsigc++ is used by gtkmm to wrap the GTK+ signal system. It does not
+depend on GTK or gtkmm.
+'
+HOMEPAGE="http://libsigc.sourceforge.net/"
+DOWNLOADS="mirror://gnome/sources/${PN}/$(ever range 1-2)/${PNV}.tar.bz2"
+
+LICENCES="LGPL-2.1"
+SLOT="$(ever major)"
+MYOPTIONS="doc multibuild_c: 32 64"
+
+DEPENDENCIES=""
+
+DEFAULT_SRC_CONFIGURE_OPTION_ENABLES=( "doc documentation" )
+
