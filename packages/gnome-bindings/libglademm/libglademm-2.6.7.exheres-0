@@ -1,0 +1,22 @@
+# Copyright 2008 Saleem Abdulrasool <compnerd@compnerd.org>
+# Distributed under the terms of the GNU General Purpose License v2
+
+require gnome.org easy-multibuild
+
+SUMMARY="C++ bindings for glade"
+HOMEPAGE="http://www.gtkmm.org/"
+
+LICENCES="LGPL-2.1"
+SLOT="2.4"
+PLATFORMS="~amd64 ~x86"
+MYOPTIONS="multibuild_c: 32 64"
+
+DEPENDENCIES="
+    build+run:
+        gnome-platform/libglade:2[>=2.6.1][multibuild_c:*(?)?]
+        gnome-bindings/gtkmm:2.4[>=2.6.0][multibuild_c:*(?)?]
+        gnome-bindings/glibmm:2.4[multibuild_c:*(?)?]
+    build:
+        dev-lang/perl[>=5.6.0]
+        dev-util/pkg-config[>=0.20.0]
+"
