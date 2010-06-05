@@ -1,0 +1,18 @@
+# Copyright 2010 Barry Schwartz
+# Distributed under the terms of the GNU General Public License v2
+
+require googlecode [ suffix=tar.gz ] distutils
+
+SUMMARY="A Python based downloader for the Amazon mp3 store"
+
+LICENCES="GPL-3"
+SLOT="0"
+PLATFORMS="~amd64"
+MYOPTIONS=""
+
+DEPENDENCIES="
+    build+run:
+        dev-lang/python
+    run:
+        dev-python/pycrypto
+"
