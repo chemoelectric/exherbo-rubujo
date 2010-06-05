@@ -15,4 +15,5 @@ DEPENDENCIES="
         dev-lang/python
     run:
         dev-python/pycrypto
+        gnome-bindings/pygtk
 "
