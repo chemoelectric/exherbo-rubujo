@@ -39,8 +39,6 @@ DEPENDENCIES="
         dev-ocaml/findlib
 "
 
-EXJOBS=1
-
 DEFAULT_SRC_CONFIGURE_PARAMS=(
     --without-lablgtk
     --with-ocamlfind
@@ -69,4 +67,9 @@ src_prepare()
     eaclocal --force
     eautoreconf
     eautoreconf
+}
+
+src_compile()
+{
+    emake -j1
 }
