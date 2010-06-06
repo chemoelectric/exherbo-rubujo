@@ -1,0 +1,20 @@
+# Copyright 2010 Barry Schwartz
+# Distributed under the terms of the GNU General Public License v2
+
+require googlecode [ suffix=tar.gz ]
+
+SUMMARY="Downloader for the Amazon.com MP3 music store"
+
+LICENCES="GPL-3"
+SLOT="0"
+PLATFORMS="~amd64"
+MYOPTIONS=""
+
+DEPENDENCIES="
+    build+run:
+        dev-libs/expat
+        dev-libs/libgcrypt
+        dev-util/desktop-file-utils
+        net-misc/curl
+        x11-misc/shared-mime-info
+"
