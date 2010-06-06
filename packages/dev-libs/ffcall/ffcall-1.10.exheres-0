@@ -14,8 +14,6 @@ MYOPTIONS=""
 
 DEPENDENCIES=""
 
-EXJOBS=1
-
 DEFAULT_SRC_CONFIGURE_PARAMS=(
     --hates=docdir
 )
@@ -26,6 +24,11 @@ src_configure()
     replace-flags -O3 -O1
     replace-flags -Os -O1
     default
+}
+
+src_compile()
+{
+    emake -j1
 }
 
 src_install()
