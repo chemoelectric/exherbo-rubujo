@@ -1,0 +1,408 @@
+# Copyright 2007 Bryan Østergaard
+# Copyright 2008-2010 Ingmar Vanhassel
+# Copyright 2008-2009 Bo Ørsted Andresen
+# Copyright 2009 Saleem Abdulrasool
+# Distributed under the terms of the GNU General Public License v2
+
+require toolchain-funcs multilib versionator alternatives gnu
+
+SUMMARY="GNU Compiler Collection"
+DOWNLOADS="mirror://gnu/${PN}/${PNV}/${PNV}.tar.bz2"
+
+LICENCES="GPL-2"
+SLOT="$(ever range 1-2)"
+
+MYOPTIONS="ada doc fortran propolice
+    objc   [[ description = [ Build support for the Objective C code language ] ]]
+    obj-c++ [[ description = [ Build support for the Objective C++ language ] ]]
+    openmp [[ description = [ build support for OpenMP ] ]]
+"
+REMOTE_IDS="freshmeat:${PN}"
+UPSTREAM_RELEASE_NOTES="${HOMEPAGE}${PN}-${SLOT}/"
+UPSTREAM_CHANGELOG="${UPSTREAM_RELEASE_NOTES}changes.html"
+UPSTREAM_DOCUMENTATION="${HOMEPAGE}onlinedocs/libstdc++/libstdc++-html-USERS-${SLOT}/ [[ description = [ API documentation ] ]]"
+
+RESTRICT="test"
+
+DEPENDENCIES="
+    build:
+        sys-devel/gettext
+        sys-devel/make
+    test-expensive:
+        dev-util/dejagnu
+        sys-devel/autogen
+"
+
+if ever at_least 4.3; then
+    MYOPTIONS+=" java"
+    if [[ ${SLOT} == 4.4 ]]; then
+        ECJ_JAR_PV="4.3" # There is no ecj-4.4.jar
+    else
+        ECJ_JAR_PV=${SLOT}
+    fi
+    DOWNLOADS+=" java? ( mirror://sourceware/java/ecj-${ECJ_JAR_PV}.jar )"
+    DEPENDENCIES+="
+        build:
+            doc? ( app-doc/doxygen[>=1.5.1] )
+            java? ( app-arch/unzip
+                    app-arch/zip
+                    $([[ ${SLOT} == 4.4 ]] && echo dev-scm/git) )
+        build+run:
+            dev-libs/gmp[>=4.1]
+            dev-libs/mpfr[>=2.3]
+            ada? ( || ( sys-devel/gcc[ada] dev-lang/gnat:${SLOT} ) )"
+else
+    DEPENDENCIES+="
+        build:
+            doc? ( app-doc/doxygen[>=1.3.9] )
+        build+run:
+            fortran? ( dev-libs/gmp[>=4.1]
+                       dev-libs/mpfr[>=2.3] )
+            ada? ( || ( sys-devel/gcc[ada] dev-lang/gnat:${SLOT} ) )"
+fi
+
+if ever at_least 4.4.0-r1; then
+    MYOPTIONS+=" graphite [[ description = [ Enable support for Graphite based loop optimizations ] ]]"
+    DEPENDENCIES+="
+        build:
+            graphite? ( dev-libs/cloog-ppl[>=0.15.5] )"
+fi
+
+if ever at_least 4.5.0 ; then
+    DEPENDENCIES+="
+        build+run:
+            dev-libs/libelf         [[ note = [ Enable link-time optimisation ] ]]
+            dev-libs/mpc[>=0.8.1]"
+fi
+
+WORK="${WORKBASE}/build"
+ECONF_SOURCE="${WORKBASE}"/${PNV}
+
+DEFAULT_SRC_COMPILE_PARAMS=( bootstrap )
+
+src_unpack() {
+    if ever at_least 4.3 && option java ; then
+        unpack --if-compressed ${ARCHIVES//ecj-${ECJ_JAR_PV}.jar}
+        edo cp "${FETCHEDDIR}"/ecj-${ECJ_JAR_PV}.jar "${ECONF_SOURCE}"/ecj.jar
+    else
+        default
+    fi
+    edo mkdir "${WORK}"
+}
+
+src_prepare() {
+    edo cd  "${WORKBASE}/${PNV}"
+    default
+    # patch can't apply a binary diff. git apply can.
+    [[ ${SLOT} == 4.4 ]] && ! ever at_least 4.4.3 && option java &&
+        edo git apply "${FILES}"/${PN}-${SLOT}-jar-fix.patch
+}
+
+src_configure() {
+    local i LANGS="c,c++"
+    for i in ada fortran objc obj-c++; do
+        option ${i} && LANGS+=",${i}"
+    done
+    ever at_least 4.3 && option java && LANGS+=",java"
+
+    local supported_c_build_targets=( ${MULTIBUILD_C_TARGETS} )
+    if [[ ${#supported_c_build_targets[@]} -gt 1 ]]; then
+        multilib=--enable-multilib
+    else
+        multilib=--disable-multilib
+    fi
+
+    econf \
+        ${multilib} \
+        --libdir=/usr/${LIBDIR} \
+        $(ever at_least 4.5.0 || echo --hates=docdir) \
+        --enable-languages="${LANGS}" \
+        --enable-libstdcxx-pch=$(! tc-is-cross-compiler && echo yes || echo no) \
+        --enable-nls \
+        --program-suffix=-${SLOT} \
+        $(ever at_least 4.3.0 && echo --with-pkgversion="exherbo ${PNVR}") \
+        $(ever at_least 4.4.0-r1 && option_with graphite cloog) \
+        $(ever at_least 4.4.0-r1 && option_with graphite ppl) \
+        $(ever at_least 4.4.0 && echo --with-system-zlib) \
+        $(ever at_least 4.5.0 && echo --with-libelf) \
+        $(option_enable openmp libgomp) \
+        $(option_enable propolice libssp)
+}
+
+src_test_expensive() {
+    emake check
+}
+
+src_install() {
+    default
+
+    # Precompiled headers, disable for cross-compiling
+    local precompiled_headers=( "${WORK}"/${CHOST}/libstdc++-v3/include/${CHOST}/bits/*.gch )
+    if [[ -f ${precompiled_headers[0]} ]] ; then
+        insinto /usr/include/c++/${MY_PV:-${PV}}/${CHOST}/bits
+        doins -r "${WORK}"/${CHOST}/libstdc++-v3/include/${CHOST}/bits/*.gch
+    fi
+
+    if option doc; then
+        insinto /usr/share/doc/${PNVR}/html
+        if ever at_least 4.3; then
+            edo pushd "${WORK}"/${CHOST}/libstdc++-v3/doc
+            emake doc-html-doxygen
+            doins -r doxygen/html/*
+        else
+            edo pushd "${WORK}"/${CHOST}/libstdc++-v3
+            emake doxygen
+            doins -r docs/doxygen/html_user/*
+        fi
+        edo popd
+    fi
+
+    # nuke empty dir if applicable
+    if option openmp && option !fortran && ever at_least 4.2; then
+        edo rmdir "${IMAGE}"/usr/${LIBDIR}/${PN}/${CHOST}/${MY_PV:-${PV}}/finclude
+    fi
+
+    edo pushd "${IMAGE}"
+
+    ### slots handling
+    local x bn ext alternatives=( "${PN}" "${SLOT}" "${SLOT}" )
+
+    # binaries - slotted properly by upstream, manage with alternatives
+    for x in usr/bin/*-${SLOT}; do
+        bn=$(basename "${x}" -${SLOT})
+        alternatives+=( /usr/bin/${bn} ${bn}-${SLOT} )
+    done
+    alternatives+=( /usr/bin/cc gcc )
+
+    # libraries
+    local libdir
+    all_libdirs=$(get_all_libdirs)
+    for libdir in ${all_libdirs}; do
+        for x in usr/${libdir}/*-gdb.py ; do
+            [[ -f ${x} ]] || continue
+            [[ -d ${IMAGE}/usr/share/gdb/python/auto-load ]] || dodir /usr/share/gdb/python/auto-load
+
+            local x=${x##*/}
+            edo mv "usr/${libdir}/${x}" "usr/share/gdb/python/auto-load/${x%-gdb.py}"
+        done
+
+        for x in usr/${libdir}/*.* ; do
+            if [[ -L ${x} ]]; then
+                # letting the build system generate symlinks in src_install results in collisions, instead we do it in pkg_postinst
+                edo rm "${x}"
+                removed+=( "/${x}" ) # just a sanity check
+            elif [[ -f ${x} ]]; then
+                bn=$(basename "${x}") # libffi.so.4.0.1 libstdc++.so.6.0.10 libstdc++.la
+                ext=${bn#*.}          #        so.4.0.1           so.6.0.10           la
+                case "${bn}" in
+                    # always use newest available so version and create so symlinks
+                    libffi.so*|libgcc_s.so*|libgcj_bc.so*|libgomp.so*|libobjc.so*|*.so.0.0.0)
+                        # rename usr/lib/{libffi.so.4.0.1 => libffi-4.3.so.4.0.1}
+                        # symlinks+=( usr/lib/libffi-4.3.so.4.0.1 )
+                        # so_symlinks+=( usr/lib/libffi.so.4.0.1 )
+                        edo mv "${x%.${ext}}"{,-${SLOT}}.${ext}
+                        symlinks+=( "${x%.${ext}}-${SLOT}.${ext}" )
+                        so_symlinks+=( "${x}" )
+                        ;;
+                    # slotted properly by upstream (i.e. no collisions between slots), create so symlinks
+                    libgcj-tools.so*|libgcj.so*|libgfortran.so*|libgij.so*|libstdc++.so*)
+                        # so_symlinks+=( usr/lib/libstdc++.so.6.0.10 )
+                        [[ ${bn} == libstdc++.so.* ]] && libstdcpp="${bn}"
+                        so_symlinks+=( "${x}" )
+                        ;;
+                    # always use newest available version
+                    *.a|*.la|*.spec|*.security|*.properties)
+                        # rename usr/lib/{libstdc++.la => libstdc++-4.3.la}
+                        # symlinks+=( usr/lib/libstdc++-4.3.la )
+                        edo mv "${x%.${ext}}"{,-${SLOT}}.${ext}
+                        symlinks+=( "${x%.${ext}}-${SLOT}.${ext}" )
+                        ;;
+                esac
+            fi
+        done
+    done
+
+    # info pages
+    for x in usr/share/info/*.info; do
+        bn=$(basename "${x}" .info)
+        edo mv usr/share/info/${bn}{,-${SLOT}}.info
+        alternatives+=( /usr/share/info/${bn}.info ${bn}-${SLOT}.info )
+    done
+
+    # man pages
+    for x in usr/share/man/man1/*-${SLOT}.1; do
+        bn=$(basename "${x}" -${SLOT}.1)
+        alternatives+=( /usr/share/man/man1/${bn}.1 ${bn}-${SLOT}.1 )
+    done
+    for x in usr/share/man/man7/*; do
+        bn=$(basename "${x}" .7)
+        edo mv "${x%.7}"{,-${SLOT}}.7
+        alternatives+=( /usr/share/man/man7/${bn}.7 ${bn}-${SLOT}.7 )
+    done
+
+    # locales
+    for x in usr/share/locale/*/*/{cpplib,gcc}.mo; do
+        bn=$(basename "${x}" .mo)
+        edo mv "${x%.mo}"{,-${SLOT}}.mo
+        alternatives+=( /${x} ${bn}-${SLOT}.mo )
+    done
+
+    # ada
+    if option ada; then
+        for x in gnat gnatbind gnatchop gnatclean gnatfind gnatkr gnatlink gnatls gnatmake gnatname gnatprep gnatxref; do
+            echo mv usr/bin/${x} usr/bin/${x}-${SLOT}
+            mv usr/bin/${x} usr/bin/${x}-${SLOT} || die "mv /usr/bin/${x} failed"
+            alternatives+=( /usr/bin/${x} ${x}-${SLOT} )
+        done
+    fi
+
+    # java
+    if ever at_least 4.3 && option java; then
+        local classpaths=()
+        for libdir in ${all_libdirs}; do
+            classpaths+=( usr/${libdir}/security/classpath.security )
+        done
+        for x in "${classpaths[@]}" usr/share/java/ecj.jar; do
+            bn=$(basename "${x}")
+            ext=${bn#*.}
+            edo mv "${x%.${ext}}"{,-${SLOT}}.${ext}
+            alternatives+=( /${x} ${bn%.${ext}}-${SLOT}.${ext} )
+        done
+        alternatives+=( /usr/share/java/tools.jar libgcj-tools-${PV}.jar )
+    fi
+
+    alternatives_for "${alternatives[@]}"
+    edo popd
+
+    # fix libstdc++.so symlink
+    for libdir in ${all_libdirs}; do
+        edo rewrite_so_symlink ${libstdcpp} "${IMAGE}"/usr/${libdir} /usr/${libdir}
+    done
+
+    for dir in "${IMAGE}"/usr/${LIBDIR}/${PN}/${CHOST}/${MY_PV:-${PV}}/include{-fixed,} ; do
+        if [[ -d ${dir} ]] ; then
+            edo find "${dir}" -type d -empty -delete
+        fi
+    done
+}
+
+myln() {
+    local ret=0
+    # create symlink if it is missing or dangling
+    echo ln -fs "${1}" "${2}"
+    ln -fs "${1}" "${2}" || { ret=$?; eerror "Creating ${2} symlink failed"; }
+    return $ret
+}
+
+rewrite_symlink() {
+    local x ignore lib ext slot versions=() versions_sorted=() latest_slot
+    if [[ ${1} == --ignore ]]; then
+        ignore=${2}; shift
+    fi
+    lib=${1%-${SLOT}.*}
+    ext=${1#*-${SLOT}.}
+    for x in "${2}"/${lib}-+([[:digit:].]).${ext}; do
+        [[ ! -f ${x} || ${x##*/} == ${ignore} ]] && continue
+        slot=${x##*/${lib}-}
+        versions+=( "${slot%.${ext}}" )
+    done
+    if [[ ${#versions[@]} -le 0 ]]; then
+        eerror "Could not rewrite ${1/-${SLOT}}, no other versions available"
+        return 127
+    fi
+    versions_sorted=( $(version_sort "${versions[@]}") )
+    latest_slot=${versions_sorted[${#versions_sorted[@]}-1]}
+    myln ${lib}-${latest_slot}.${ext} "${2}"/${lib}.${ext}
+}
+
+rewrite_so_symlink() {
+    local ret=0 d l ignore ignored lib versions=() versions_sorted=() latest
+    if [[ ${1} == --ignore ]]; then
+        ignore=${2}; shift
+    fi
+    lib=${1%%+([[:digit:].])}; shift
+    for d in "$@"; do
+        for l in "${d}"/${lib}.+([[:digit:].]); do
+            [[ ! -f ${l} ]] && continue
+            [[ ${l##*/} == ${ignore} ]] && ignored=true && continue
+            versions+=( "${l##*/${lib}.}" )
+        done
+    done
+    if [[ ${#versions[@]} -le 0 ]]; then
+        [[ -n ${ignore} && -n ${ignored} ]] && return 0
+        eerror "Could not rewrite ${lib}, no other versions available"
+        return 127
+    fi
+    versions_sorted=( $(version_sort "${versions[@]}") )
+    latest=${lib}.${versions_sorted[${#versions_sorted[@]}-1]}
+    while [[ ${latest} == ${lib}.* ]]; do
+        myln ${latest} "${1}"/${latest%.*} || ((++ret))
+        latest=${latest%.*}
+    done
+    return $ret
+}
+
+cleanup_dangling_libstdcpp_symlinks() {
+    local l
+    for l in "${ROOT}"/usr/libstdc++.so*; do
+        if [[ -L ${l} && ! -f ${l} ]]; then
+            echo rm "${l}"
+            rm "${l}" || eerror "Failed to clean up ${l}"
+        fi
+    done
+}
+
+handle_symlinks() {
+    local x
+    # generate symlinks for libraries that were manually slotted in src_install, e.g.: libffi.so.4.0.1 -> libffi-4.3.so.4.0.1
+    for x in "${symlinks[@]}"; do
+        rewrite_symlink ${1} "${x##*/}" "${ROOT}${x%/*}"
+    done
+
+    # generate so symlinks, e.g.: libffi.so -> libffi.so.4 -> libffi.so.4.0 -> libffi.so.4.0.1
+    for x in "${so_symlinks[@]}"; do
+        rewrite_so_symlink ${1} ${x##*/} "${ROOT}"/${x%/*}
+    done
+
+    cleanup_dangling_libstdcpp_symlinks
+}
+
+pkg_postinst() {
+    alternatives_pkg_postinst
+
+    handle_symlinks
+
+    # get notification if symlinks were removed during src_install that wasn't handled above in pkg_postinst
+    for x in "${removed[@]}"; do
+        [[ ! -e ${ROOT}${x} ]] && eerror "/${x} was removed and never recreated"
+    done
+}
+
+pkg_prerm() {
+    alternatives_pkg_prerm
+
+    local ignore
+    [[ -n ${REPLACED_BY_ID} ]] || ignore=--ignore
+    handle_symlinks ${ignore}
+}
+
+pkg_postrm() {
+    local x
+    for x in "${symlinks[@]}"; do
+        if [[ -L ${ROOT}${x/-${SLOT}} && ! -e ${ROOT}${x/-${SLOT}} ]]; then
+            echo rm "${ROOT}${x/-${SLOT}}"
+            rm "${ROOT}${x/-${SLOT}}" || eerror "Failed to clean up dangling symlink"
+        fi
+    done
+
+    for x in "${so_symlinks[@]%.*}"; do
+        while [[ ${x} == */*.so* ]]; do
+            if [[ -L ${ROOT}${x} && ! -e ${ROOT}${x} ]]; then
+                echo rm "${ROOT}${x}"
+                rm "${ROOT}${x}" || eerror "Failed to clean up dangling symlink"
+            fi
+            x=${x%.*}
+        done
+    done
+}
+

@@ -1,0 +1,7 @@
+# Copyright 2007 Bryan Østergaard <kloeri@exherbo.org>
+# Distributed under the terms of the GNU General Public License v2
+
+require gcc
+
+PLATFORMS="~amd64 ~x86"
+
