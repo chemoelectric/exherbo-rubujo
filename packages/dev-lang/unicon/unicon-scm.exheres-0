@@ -164,7 +164,7 @@ src_compile()
 
 src_install()
 {
-    (cd bin; dobin icont iconx ivib ivibmigrate ivib-v1 patchstr rtt udb ui unicon unidep unidoc)
+    (cd bin; dobin icont iconx ivib ivibmigrate patchstr rtt udb ui unicon unidep unidoc)
 
     insinto /usr/lib/unicon
     doins -r ipl
