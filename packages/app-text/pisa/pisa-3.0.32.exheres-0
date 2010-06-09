@@ -1,0 +1,19 @@
+# Copyright 2010 Barry Schwartz
+# Distributed under the terms of the GNU General Public License v2
+
+require pypi distutils
+
+SUMMARY="pisa, also known as xhtml2pdf: PDF generator using HTML and CSS"
+
+SLOT="0"
+LICENCES="GPL-2"
+PLATFORMS="~amd64"
+MYOPTIONS=""
+
+DEPENDENCIES="
+    build+run:
+        dev-lang/python
+    run:
+        dev-python/html5lib
+        dev-python/ReportLab
+"
