@@ -1,0 +1,41 @@
+# Copyright 2010 Barry Schwartz
+# Distributed under the terms of the GNU General Public License v2
+
+SCM_REPOSITORY="http://bitbucket.org/chemoelectric/cficon"
+
+require scm-hg flag-o-matic autotools [ supported_autoconf=[ 2.5 ] supported_automake=[ 1.11 ] ]
+
+SUMMARY="Crud Factory Icon"
+HOMEPAGE="http://bitbucket.org/chemoelectric/cficon"
+
+SLOT="0"
+LICENCES="public-domain"
+PLATFORMS="~amd64"
+MYOPTIONS="X"
+
+DEPENDENCIES="
+    X? (
+        build+run:
+            x11-libs/libXau
+            x11-libs/libXdmcp
+            x11-libs/libXpm
+    )
+"
+
+src_configure()
+{
+    # -fstrict-aliasing definitely is trouble, and -funit-at-a-time
+    # -has in the past caused trouble in Unicon.
+    remove-flags -fstrict-aliasing -funit-at-a-time
+    append-flags -fno-strict-aliasing -fno-unit-at-a-time
+    default
+}
+
+src_install()
+{
+    default
+    hereenvd 50cficon <<EOF
+IPATH=/usr/share/cficon
+LPATH=/usr/share/cficon
+EOF
+}
