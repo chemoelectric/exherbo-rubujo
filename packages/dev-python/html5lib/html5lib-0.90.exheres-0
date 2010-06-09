@@ -1,0 +1,16 @@
+# Copyright 2010 Barry Schwartz
+# Distributed under the terms of the GNU General Public License v2
+
+require googlecode [ suffix=zip ] distutils
+
+SUMMARY="html5lib, a library for working with HTML documents"
+
+SLOT="0"
+LICENCES="MIT"
+PLATFORMS="~amd64"
+MYOPTIONS=""
+
+DEPENDENCIES="
+    build+run:
+        dev-lang/python
+"
