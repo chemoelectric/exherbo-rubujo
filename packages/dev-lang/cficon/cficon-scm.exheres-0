@@ -35,7 +35,7 @@ src_install()
 {
     default
     hereenvd 50cficon <<EOF
-IPATH=/usr/share/cficon
-LPATH=/usr/share/cficon
+IPATH="/usr/share/cficon/ipath"
+LPATH="/usr/share/cficon/lpath"
 EOF
 }
