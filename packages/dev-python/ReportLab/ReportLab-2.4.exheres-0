@@ -1,0 +1,20 @@
+# Copyright 2010 Barry Schwartz
+# Distributed under the terms of the GNU General Public License v2
+
+require distutils
+
+SUMMARY="ReportLab Toolkit, a PDF library"
+HOMEPAGE="http://www.reportlab.com/software/opensource/rl-toolkit/"
+DOWNLOADS="http://www.reportlab.com/ftp/${PN}_${PV/\./_}.tar.gz"
+
+SLOT="0"
+LICENCES="BSD-3"
+PLATFORMS="~amd64"
+MYOPTIONS=""
+
+DEPENDENCIES="
+    build+run:
+        dev-python/Imaging    
+"
+
+WORK="${WORKBASE}/${PN}_${PV/\./_}"
