@@ -26,8 +26,9 @@ src_configure()
 {
     # -fstrict-aliasing definitely is trouble, and -funit-at-a-time
     # -has in the past caused trouble in Unicon.
-    remove-flags -fstrict-aliasing -funit-at-a-time
+    filter-flags -fstrict-aliasing -funit-at-a-time
     append-flags -fno-strict-aliasing -fno-unit-at-a-time
+
     default
 }
 
@@ -35,7 +36,7 @@ src_install()
 {
     default
     hereenvd 50cficon <<EOF
-IPATH="/usr/share/cficon/ipath"
-LPATH="/usr/share/cficon/lpath"
+IPATH="/usr/share/${PN}/ipath"
+LPATH="/usr/share/${PN}/lpath"
 EOF
 }
