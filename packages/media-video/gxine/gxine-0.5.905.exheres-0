@@ -3,7 +3,7 @@
 # Based in part upon 'gxine-0.5.905.ebuild' from Gentoo, which is:
 #     Copyright 1999-2010 Gentoo Foundation.
 
-require gnome-2 multilib
+require gnome-2
 
 DESCRIPTION="GTK+ Front-End for libxine"
 HOMEPAGE="http://xine.sourceforge.net/"
@@ -58,7 +58,7 @@ DEFAULT_SRC_CONFIGURE_PARAMS=(
 src_install() {
     default
     if option nsplugin ; then
-        echo "MOZ_PLUGIN_PATH=\"/usr/$(get_libdir)/gxine\"" > 50gxine
+        echo "MOZ_PLUGIN_PATH=\"/usr/${LIBDIR}/gxine\"" > 50gxine
         insinto /etc/env.d
         doins 50gxine
     fi

@@ -1,8 +1,6 @@
 # Copyright 2009 A Frederick Christensen <fauxmight@nosocomia.com>
 # Distributed under the terms of the GNU General Public License v2
 
-require multilib
-
 SUMMARY="Camlp5 is a preprocessor-pretty-printer of OCaml"
 
 HOMEPAGE="http://pauillac.inria.fr/~ddr/camlp5/"
@@ -32,7 +30,7 @@ src_configure() {
         --prefix /usr \
         --bindir /usr/bin \
         --mandir /usr/share/man \
-        --libdir /usr/$(get_libdir)/ocaml \
+        --libdir /usr/${LIBDIR}/ocaml \
         "$CAMLP5_MODE" || die "Configure failed!"
 }
 
@@ -44,6 +42,6 @@ src_compile() {
 
 src_install() {
     default
-    insinto /usr/$(get_libdir)/ocaml/${PN}
+    insinto /usr/${LIBDIR}/ocaml/${PN}
     doins etc/META
 }

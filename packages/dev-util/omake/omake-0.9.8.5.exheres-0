@@ -40,7 +40,7 @@ src_configure()
 {
     echo "PREFIX = \$(dir \$\"/usr\")" > .config
     echo "BINDIR = \$(dir \$\"\$(PREFIX)/bin\")" >> .config
-    echo "LIBDIR = \$(dir \$\"\$(PREFIX)/$(get_libdir)\")" >> .config
+    echo "LIBDIR = \$(dir \$\"\$(PREFIX)/${LIBDIR}\")" >> .config
     echo "MANDIR = \$(dir \$\"\$(PREFIX)/man\")" >> .config
 
     echo "CC = ${CC-cc}" >> .config

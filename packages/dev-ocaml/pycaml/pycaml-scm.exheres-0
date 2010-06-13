@@ -3,7 +3,7 @@
 
 SCM_REPOSITORY="git://github.com/chemoelectric/pycaml.git"
 
-require scm-git multilib python findlib
+require scm-git python findlib
 
 SUMMARY="pycaml -- Python-OCaml bindings"
 HOMEPAGE="http://github.com/chemoelectric/${PN}"
@@ -31,6 +31,8 @@ python3_abi()
 
 src_compile()
 {
+    local libdir="${LIBDIR}"
+
     compile_abi_pycaml()
     {
         abi=$(echo "${1}" | sed -e 's/\./_/g')
@@ -38,9 +40,9 @@ src_compile()
         edo cd "${WORK}"
         edo cp -r "${PNV}" "${name}"
         edo cd "${name}"
-        emake PYVER="${1}"             \
-            PYVER_PACK="${abi}"        \
-            get_libdir="$(get_libdir)" \
+        emake PYVER="${1}"          \
+            PYVER_PACK="${abi}"     \
+            get_libdir="${libdir}"  \
             OCAMLMAKEFILE=/usr/share/ocaml-make/OCamlMakefile
     }
 

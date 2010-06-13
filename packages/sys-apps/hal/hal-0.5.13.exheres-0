@@ -124,7 +124,7 @@ install_one_multibuild() {
         edo find "${IMAGE}"/var/run -type d -empty -delete
 
         # hal unmount helper for unclean unmounts
-        exeinto /$(get_libdir)/udev
+        exeinto /${LIBDIR}/udev
         newexe "${FILES}/hal-unmount.dev" hal_unmount
 
         # initscript

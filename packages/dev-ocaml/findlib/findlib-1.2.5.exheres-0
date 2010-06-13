@@ -1,8 +1,6 @@
 # Copyright 2009 A Frederick Christensen <fauxmight@nosocomia.com>
 # Distributed under the terms of the GNU General Public License v2
 
-require multilib
-
 SUMMARY="Findlib, a library manager for Objective Caml"
 HOMEPAGE="http://projects.camlcity.org/projects/findlib.html"
 DOWNLOADS="http://download.camlcity.org/download/${PNV}.tar.gz"
@@ -21,10 +19,10 @@ DEPENDENCIES="
 
 src_configure()
 {
-    edo /bin/sh configure                   \
-        -bindir "/usr/bin"                  \
-        -sitelib "/usr/$(get_libdir)/ocaml" \
-        -config "/etc/${PN}.conf"           \
+    edo /bin/sh configure               \
+        -bindir "/usr/bin"              \
+        -sitelib "/usr/${LIBDIR}/ocaml" \
+        -config "/etc/${PN}.conf"       \
         -mandir "/usr/share/man"
 }
 
@@ -36,7 +34,7 @@ src_compile()
 
 src_install()
 {
-    edo install -d "/usr/$(get_libdir)/ocaml"
+    edo install -d "/usr/${LIBDIR}/ocaml"
     edo make -j1 install prefix="${IMAGE}"
     edo make -j1 install-doc prefix="${IMAGE}"
     if ! option toolbox ; then

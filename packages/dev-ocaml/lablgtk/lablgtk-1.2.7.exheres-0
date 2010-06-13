@@ -1,8 +1,6 @@
 # Copyright (c) 2010 Barry Schwartz
 # Distributed under the terms of the GNU General Public License v2
 
-require multilib
-
 SUMMARY="LablGTK, an Objective Caml interface to gtk+"
 HOMEPAGE="http://wwwfun.kurims.kyoto-u.ac.jp/soft/lsl/lablgtk.html"
 DOWNLOADS="http://wwwfun.kurims.kyoto-u.ac.jp/soft/lsl/dist/${PNV}.tar.gz"
@@ -39,8 +37,8 @@ src_install()
     # Let's do this by brute force, and let others clean it up, if
     # they wish.
 
-    local package_dir="/usr/$(get_libdir)/ocaml/lablgtk"
-    local stublibs_dir="/usr/$(get_libdir)/ocaml/stublibs"
+    local package_dir="/usr/${LIBDIR}/ocaml/lablgtk"
+    local stublibs_dir="/usr/${LIBDIR}/ocaml/stublibs"
 
     insinto "${package_dir}"
 

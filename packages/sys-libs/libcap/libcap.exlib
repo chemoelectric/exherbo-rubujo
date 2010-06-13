@@ -3,7 +3,7 @@
 # Based in part upon 'libcap-2.08-r1.ebuild' from Gentoo, which is:
 #     Copyright 1999-2008 Gentoo Foundation
 
-require multilib pam
+require pam
 
 export_exlib_phases src_compile src_install
 
@@ -23,8 +23,6 @@ DEPENDENCIES="
         pam? ( sys-libs/pam )
 "
 
-DEFAULT_SRC_INSTALL_PARAMS=( lib=$(get_libdir) )
-
 unset IPATH
 
 libcap_src_compile() {
@@ -34,12 +32,13 @@ libcap_src_compile() {
 }
 
 libcap_src_install() {
-    default
+    emake -j1 DESTDIR="${IMAGE}" "lib=${LIBDIR}" install
 
     if option pam ; then
        dopammod pam_cap/pam_cap.so
        dopamsecurity '' pam_cap/capability.conf
     fi
 
+    emagicdocs
     dodoc doc/capability.notes
 }

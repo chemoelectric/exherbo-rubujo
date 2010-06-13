@@ -3,8 +3,6 @@
 # Based in part upon 'iscan-plugin-gt-f720-0.0.1.ebuild' from Gentoo, which is:
 #     Copyright 1999-2009 Gentoo Foundation.
 
-require multilib
-
 # Revision used by upstream
 SRC_REV="2"
 
@@ -35,7 +33,7 @@ src_unpack() {
 }
 
 src_install() {
-    local MY_LIB="/usr/$(get_libdir)"
+    local MY_LIB="/usr/${LIBDIR}"
 
     # install scanner firmware
     insinto /usr/share/iscan
@@ -44,11 +42,11 @@ src_install() {
     # install scanner plugins
     insinto "${MY_LIB}"/iscan
     insopts -m0755
-    doins "${WORK}"/usr/$(get_libdir)/iscan/*
+    doins "${WORK}"/usr/${LIBDIR}/iscan/*
 }
 
 pkg_postinst() {
-    local MY_LIB="/usr/$(get_libdir)"
+    local MY_LIB="/usr/${LIBDIR}"
     
     # Needed for scanner to work properly.
     iscan-registry --add interpreter usb 0x04b8 0x0130 ${MY_LIB}/iscan/libesint7C /usr/share/iscan/esfw7C.bin
@@ -61,7 +59,7 @@ pkg_postinst() {
 }
 
 pkg_prerm() {
-    local MY_LIB="/usr/$(get_libdir)"
+    local MY_LIB="/usr/${LIBDIR}"
 
     iscan-registry --remove interpreter usb 0x04b8 0x0130 ${MY_LIB}/iscan/libesint7C /usr/share/iscan/esfw7C.bin
 }

@@ -65,7 +65,7 @@ src_configure() {
         --host ${CHOST}                     \
         --prefix /usr                       \
         --bindir /usr/bin                   \
-        --libdir /usr/$(get_libdir)/ocaml   \
+        --libdir /usr/${LIBDIR}/ocaml       \
         --mandir /usr/share/man             \
         || die "configure failed"
 }
@@ -80,18 +80,18 @@ src_compile() {
 
 src_install() {
     emake BINDIR="${IMAGE}/usr/bin"                 \
-          LIBDIR="${IMAGE}/usr/$(get_libdir)/ocaml" \
+          LIBDIR="${IMAGE}/usr/${LIBDIR}/ocaml" \
           MANDIR="${IMAGE}/usr/share/man" install || die "install failed"
 
     #Paludis barfs on installing empty dir ... and man3 is empty if !ocamlopt
     option ocamlopt || rmdir ${IMAGE}/usr/share/man/man3 || die "Couldn't remove man3 dir"
 
     # Empty directory
-    rmdir "${IMAGE}/usr/$(get_libdir)/ocaml/ocamldoc/custom" || die "Couldn't remove empty dir"
+    rmdir "${IMAGE}/usr/${LIBDIR}/ocaml/ocamldoc/custom" || die "Couldn't remove empty dir"
 
     # Compiler libraries
-    dodir /usr/$(get_libdir)/ocaml/compiler-libs
-    insinto /usr/$(get_libdir)/ocaml/compiler-libs
+    dodir /usr/${LIBDIR}/ocaml/compiler-libs
+    insinto /usr/${LIBDIR}/ocaml/compiler-libs
     doins "${WORK}"/{utils,typing,parsing}/*.{mli,cmi,cmo}
     if option ocamlopt; then
         #These only exist if native code compiler was built
@@ -100,8 +100,8 @@ src_install() {
 
     # Headers
     dodir /usr/include
-    dosym /usr/$(get_libdir)/ocaml/caml /usr/include
+    dosym /usr/${LIBDIR}/ocaml/caml /usr/include
 
     # Remove references to ${IMAGE} from ld.conf, the build doesnt deal with $(DESTDIR)
-    sed -i -e "s:${IMAGE}::g" "${IMAGE}/usr/$(get_libdir)/ocaml/ld.conf" || die "Couldn't remove DESTDIR references from ld.conf"
+    sed -i -e "s:${IMAGE}::g" "${IMAGE}/usr/${LIBDIR}/ocaml/ld.conf" || die "Couldn't remove DESTDIR references from ld.conf"
 }

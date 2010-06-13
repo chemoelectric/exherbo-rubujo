@@ -3,7 +3,7 @@
 # Based in part upon 'djbfft-0.76-r1.ebuild', which is:
 #   Copyright 1999-2008 Gentoo Foundation
 
-require flag-o-matic multilib
+require flag-o-matic
 
 SUMMARY="Extremely fast library for floating-point convolution"
 HOMEPAGE="http://cr.yp.to/djbfft.html"
@@ -31,7 +31,7 @@ src_prepare() {
     my_cflags="${CFLAGS}"
 #    option platform:x86 && my_cflags="${CFLAGS} -malign-double"
 
-    edo sed -i -e "s:\"lib\":\"$(get_libdir)\":" hier.c
+    edo sed -i -e "s:\"lib\":\"${LIBDIR}\":" hier.c
 
     echo "${CC} ${my_cflags}" > "conf-cc"
     echo "${CC} ${LDFLAGS}" > "conf-ld"
@@ -69,7 +69,7 @@ src_install() {
     (cd ../shared ;
         emake LIBDJBFFT="${SHARED_LIBDJBFFT}" LIBPERMS="0755" install ;
         ./install  || die "setup (shared) failed")
-    dosym "${SHARED_LIBDJBFFT}" /usr/$(get_libdir)/libdjbfft.so
-    dosym "${SHARED_LIBDJBFFT}" /usr/$(get_libdir)/libdjbfft.so.${MY_PV%%.*}
+    dosym "${SHARED_LIBDJBFFT}" /usr/${LIBDIR}/libdjbfft.so
+    dosym "${SHARED_LIBDJBFFT}" /usr/${LIBDIR}/libdjbfft.so.${MY_PV%%.*}
     dodoc CHANGES README TODO VERSION
 }

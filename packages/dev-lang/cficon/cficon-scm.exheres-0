@@ -24,6 +24,8 @@ DEPENDENCIES="
 
 DEFAULT_SRC_CONFIGURE_PARAMS=(
     --enable-loadfunc
+    --enable-ipath=ICON_IPATH
+    --enable-lpath=ICON_LPATH
     --enable-fpath=ICON_FPATH
 )
 
@@ -41,8 +43,8 @@ src_install()
 {
     default
     hereenvd 50cficon <<EOF
-IPATH="/usr/share/${PN}/ipath"
-LPATH="/usr/share/${PN}/lpath"
+ICON_IPATH="/usr/share/${PN}/ipath"
+ICON_LPATH="/usr/share/${PN}/lpath"
 ICON_FPATH="/usr/${LIBDIR}/${PN}"
 EOF
 }

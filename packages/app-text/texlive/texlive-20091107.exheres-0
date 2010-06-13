@@ -1,8 +1,6 @@
 # Copyright 2010 Barry Schwartz
 # Distributed under the terms of the GNU General Public License v2
 
-require multilib
-
 SUMMARY="TeX Live"
 HOMEPAGE="http://www.tug.org/texlive/"
 DOWNLOADS="
@@ -33,28 +31,30 @@ DEFAULT_SRC_PREPARE_PATCHES=(
     "${FILES}/${PNV}-texmf.cnf.diff"
 )
 
-DEFAULT_SRC_CONFIGURE_PARAMS=(
-    --hates=docdir
-    --prefix="${TEXLIVE_DIR}"
-    --libdir="/usr/$(get_libdir)"
-    --includedir="/usr/include"
-    --mandir="${TEXLIVE_DIR}/texmf/doc/man"
-    --infodir="${TEXLIVE_DIR}/texmf/doc/info"
-    --disable-native-texlive-build
-    --disable-multiplatform
-    --disable-texlive
-    --enable-tetex
-    --enable-shared
-    --disable-threads
-    --disable-missing
-    --with-tex-banner="TeX Live 2009/Distribuaĵo Rubejplenigeja"
-    --disable-dump-share
-    --with-xdvi-x-toolkit=motif
-    --with-system-freetype2
-    --with-system-libpng
-    --with-system-t1lib
-    --with-system-zlib
-)
+src_configure()
+{
+    econf \
+        --hates=docdir \
+        --prefix="${TEXLIVE_DIR}" \
+        --libdir="/usr/${LIBDIR}" \
+        --includedir="/usr/include" \
+        --mandir="${TEXLIVE_DIR}/texmf/doc/man" \
+        --infodir="${TEXLIVE_DIR}/texmf/doc/info" \
+        --disable-native-texlive-build \
+        --disable-multiplatform \
+        --disable-texlive \
+        --enable-tetex \
+        --enable-shared \
+        --disable-threads \
+        --disable-missing \
+        --with-tex-banner="TeX Live 2009/Distribuaĵo Rubejplenigeja" \
+        --disable-dump-share \
+        --with-xdvi-x-toolkit=motif \
+        --with-system-freetype2 \
+        --with-system-libpng \
+        --with-system-t1lib \
+        --with-system-zlib
+}
 
 src_install()
 {

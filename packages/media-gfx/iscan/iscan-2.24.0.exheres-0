@@ -3,7 +3,7 @@
 # Based in part upon 'iscan-2.21.0.ebuild' from Gentoo, which is:
 #     Copyright 1999-2009 Gentoo Foundation.
 
-require flag-o-matic multilib autotools [ supported_autoconf=[ 2.5 ] supported_automake=[ 1.11 1.10 ] ]
+require flag-o-matic autotools [ supported_autoconf=[ 2.5 ] supported_automake=[ 1.11 1.10 ] ]
 
 SRC_REV="4"  # revision used by upstream
 
@@ -32,7 +32,8 @@ SLOT="0"
 LINGUAS="de es fr it ja ko nl pt zh_CN zh_TW"
 MYOPTIONS="X gimp jpeg png tiff linguas: ${LINGUAS}"
 
-QA_TEXTRELS="usr/$(get_libdir)/iscan/lib*"
+## Gentoo sticks a QA_TEXTRELS in their ebuild.
+#QA_TEXTRELS="usr/$(get_libdir)/iscan/lib*"
 
 # Upstream ships broken sanity test
 RESTRICT="test"
@@ -142,7 +143,7 @@ src_configure() {
 }
 
 src_install() {
-    local MY_LIB="/usr/$(get_libdir)"
+    local MY_LIB="/usr/${LIBDIR}"
     emake DESTDIR="${IMAGE}" install
 
     dodoc AUTHORS NEWS README doc/epkowa.desc
