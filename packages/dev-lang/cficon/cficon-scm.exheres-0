@@ -11,7 +11,7 @@ HOMEPAGE="http://bitbucket.org/chemoelectric/cficon"
 SLOT="0"
 LICENCES="public-domain"
 PLATFORMS="~amd64"
-MYOPTIONS="X"
+MYOPTIONS="X doc"
 
 DEPENDENCIES="
     X? (
@@ -47,4 +47,16 @@ ICON_IPATH="/usr/share/${PN}/ipath"
 ICON_LPATH="/usr/share/${PN}/lpath"
 ICON_FPATH="/usr/${LIBDIR}/${PN}"
 EOF
+
+    if option doc ; then
+        edo mv doc html
+        dodoc -r html
+        edo mv ipl/packs/loadfuncpp/doc loadfuncpp
+        dodoc -r loadfuncpp
+        edo mv ipl/packs/loadfuncpp/examples loadfuncpp-examples
+        dodoc -r loadfuncpp-examples
+        dodir /usr/share/doc/${PNV}/ipl
+        edo ipl/progs/iplweb -ipl ipl "${IMAGE}usr/share/doc/${PNV}/ipl"
+        edo mv "${IMAGE}usr/share/doc/${PNV}/ipl/"{HTML,html}
+    fi
 }
