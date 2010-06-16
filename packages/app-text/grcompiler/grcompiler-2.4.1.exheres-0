@@ -1,0 +1,17 @@
+# Copyright 2008, 2009 David Leverton <dleverton@exherbo.org>
+# Distributed under the terms of the GNU General Public License v2
+
+require grcompiler [ need_autotools=true ]
+
+PLATFORMS="~amd64"
+
+DEFAULT_SRC_PREPARE_PATCHES=( -p1
+    "${FILES}/grcompiler-r829-64bit.patch"
+    "${FILES}/grcompiler-r815-debug-CFLAGS.patch"
+    "${FILES}/grcompiler-r976-dynamic-icu-versions.patch"
+    "${FILES}/grcompiler-r977-dynamic-icu-versions.patch"
+    "${FILES}/grcompiler-r829-include-path.patch"
+    "${FILES}/grcompiler-r815-xmlto.patch"
+    "${FILES}/grcompiler-r976-gcc-4.4.patch"
+)
+

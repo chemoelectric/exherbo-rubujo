@@ -1,0 +1,28 @@
+Source: dleverton
+Upstream: likes to ignore me :-(
+Reason: fix build with GCC 4.4
+
+Index: grcompiler/compiler/Generic/GrPlatform.h
+===================================================================
+--- grcompiler/compiler/Generic/GrPlatform.h    (revision 976)
++++ grcompiler/compiler/Generic/GrPlatform.h    (working copy)
+@@ -35,6 +35,7 @@
+
+ // Standard headers
+ #include <cstddef>
++#include <stdint.h>
+
+ // Platform headers
+ //
+Index: grcompiler/compiler/Grammar/Antlr/CharScanner.hpp
+===================================================================
+--- grcompiler/compiler/Grammar/Antlr/CharScanner.hpp   (revision 976)
++++ grcompiler/compiler/Grammar/Antlr/CharScanner.hpp   (working copy)
+@@ -40,6 +40,7 @@
+ #include "Antlr/BitSet.hpp"
+ #include "Antlr/LexerSharedInputState.hpp"
+ #include <map>
++#include <cstdio>
+
+ class CharScanner;
+

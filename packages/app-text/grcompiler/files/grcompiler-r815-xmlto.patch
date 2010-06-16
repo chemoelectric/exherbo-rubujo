@@ -1,0 +1,16 @@
+Source: dleverton
+Upstream: no; presumably docbook2x works for them
+Reason: I never managed to get docbook2x to work in Gentoo, and we
+        don't have it at all in Exherbo, so use xmlto instead
+
+Index: grcompiler/doc/Makefile.am
+===================================================================
+--- grcompiler/doc/Makefile.am	(revision 815)
++++ grcompiler/doc/Makefile.am	(working copy)
+@@ -10,5 +10,5 @@
+ DISTCLEANFILES = $(man_MANS)
+ 
+ grcompiler.1: $(srcdir)/grcompiler.1.xml
+-	docbook2x-man $(srcdir)/grcompiler.1.xml
++	xmlto man $(srcdir)/grcompiler.1.xml
+ 

@@ -1,0 +1,28 @@
+Source: dleverton
+Upstream: http://sourceforge.net/tracker/index.php?func=detail&aid=1895608&group_id=66144&atid=513479
+Reason: allow the preprocessor to find stddef.gdh
+
+--- grcompiler/compiler/ParserTreeWalker.cpp~	2008-03-15 19:31:11.000000000 +0000
++++ grcompiler/compiler/ParserTreeWalker.cpp	2008-03-15 19:33:32.000000000 +0000
+@@ -213,9 +213,9 @@
+ 		exit(-1);
+ 		case 0 : 
+ 			if (m_verbose)
+-				testexec = execlp(staGdlppFile.c_str(),staGdlppFile.c_str(),"-V",staFileName.c_str(),tmpgdl,static_cast<const char *>(0)); // this is the code the child runs
++				testexec = execlp(staGdlppFile.c_str(),staGdlppFile.c_str(),"-I"PKGDATADIR,"-V",staFileName.c_str(),tmpgdl,static_cast<const char *>(0)); // this is the code the child runs
+ 			else
+-				testexec = execlp(staGdlppFile.c_str(),staGdlppFile.c_str(),staFileName.c_str(),tmpgdl,static_cast<const char *>(0)); // this is 
++				testexec = execlp(staGdlppFile.c_str(),staGdlppFile.c_str(),"-I"PKGDATADIR,staFileName.c_str(),tmpgdl,static_cast<const char *>(0)); // this is 
+ 			cout << "// exec retval:" << testexec << ", errno:" << strerror(errno) << "(" << errno << ")\n";
+ 			cout << "// tmpfile " << tmpgdl << endl;
+ 			cout << "// file " << staFileName.c_str() << endl;
+Index: grcompiler/compiler/Makefile.am
+===================================================================
+--- grcompiler/compiler/Makefile.am	(revision 815)
++++ grcompiler/compiler/Makefile.am	(working copy)
+@@ -1,4 +1,4 @@
+-AM_CPPFLAGS = -I@srcdir@/Generic -I@srcdir@/Grammar
++AM_CPPFLAGS = -I@srcdir@/Generic -I@srcdir@/Grammar -DPKGDATADIR=\"$(pkgdatadir)\"
+ 
+ SUBDIRS = Generic Grammar
+ LIBS = @LIBS@ @LIBICONV@ -LGeneric -LGrammar -lgeneric -lparser

@@ -1,0 +1,28 @@
+--- grcompiler-2.4.1/configure.ac	2010-06-16 22:25:55.619294370 +0000
++++ grcompiler-2.4.1.MODIFIED/configure.ac	2010-06-16 22:50:10.210232449 +0000
+@@ -37,19 +37,12 @@
+ 
+ # Checks for libraries.
+ 
+-AC_CHECK_LIB(icuuc, u_charType_3_6)
+-AC_CHECK_LIB(icuuc, u_charType_3_8)
+-AC_CHECK_LIB(icuuc, u_charType_3_9)
+-AC_CHECK_LIB(icuuc, u_charType_4_0)
+-AC_CHECK_LIB(icuuc, u_charType_4_1)
+-AC_CHECK_LIB(icuuc, u_charType_4_2)
+-AC_CHECK_LIB(icuuc, u_charType_4_3)
+-AC_CHECK_LIB(icuuc, u_charType_4_4)
+-AC_CHECK_LIB(icuuc, u_charType_4_5)
+-AC_CHECK_LIB(icuuc, u_charType_4_6)
+-AC_CHECK_LIB(icuuc, u_charType_4_7)
+-AC_CHECK_LIB(icuuc, u_charType_4_8)
+-AC_CHECK_LIB(icuuc, u_charType_4_9)
++AC_CHECK_LIB(icuuc, u_charType_44)
++AC_CHECK_LIB(icuuc, u_charType_45)
++AC_CHECK_LIB(icuuc, u_charType_46)
++AC_CHECK_LIB(icuuc, u_charType_47)
++AC_CHECK_LIB(icuuc, u_charType_48)
++AC_CHECK_LIB(icuuc, u_charType_49)
+ 
+ # Checks for header files.
+ # need to check for icu .h files as in unicode/uchar.h

@@ -1,0 +1,63 @@
+# Copyright 2008, 2009 David Leverton <dleverton@exherbo.org>
+# Distributed under the terms of the GNU General Public License v2
+
+SUMMARY="SIL Graphite compiler"
+HOMEPAGE="http://graphite.sil.org/"
+
+# from README
+DESCRIPTION="The SIL Graphite compiler builds a Graphite enabled font
+from a smart font description, written in GDL (Graphite Description
+Language) and a TrueType font by adding extra TrueType tables to it
+which the Graphite engine can interpret."
+
+BUGS_TO="dleverton@exherbo.org"
+UPSTREAM_DOCUMENTATION="http://graphite.sil.org/#document"
+
+[[ ${PV} != scm && ${PV} != *_p* ]] && myexparam -b svn_tag=false
+if [[ ${PV} == scm || ${PV} == *_p* ]] || exparam -b svn_tag; then
+    DOWNLOADS=""
+
+    SCM_REPOSITORY="http://scripts.sil.org/svn-public/graphite/grcompiler"
+    if [[ ${PV} == *_p* ]]; then
+        SCM_REVISION="${PV##*_p?(re)}"
+    elif [[ ${PV} != scm ]]; then
+        SCM_TAG="v${PV}"
+    fi
+    require scm-svn
+
+else
+    DOWNLOADS="mirror://sourceforge/silgraphite/${PNV}.tar.gz"
+fi
+
+myexparam -b need_autotools=false
+{ exparam -b need_autotools || [[ -n ${SCM_REPOSITORY} ]]; } \
+    && require autotools [ supported_autoconf=[ 2.5 ] supported_automake=[ 1.10 1.11 ] ]
+
+LICENCES="|| ( LGPL-2.1 CPL-0.5 )"
+SLOT="0"
+MYOPTIONS="debug doc"
+
+DEPENDENCIES="
+    build:
+        app-text/docbook-xml-dtd:4.5
+        app-text/xmlto
+        dev-util/pkg-config
+        media-libs/silgraphite [[
+            note = [ only used for tests, but configure checks for it unconditionally ]
+        ]]
+
+    build+run:
+        dev-libs/icu[=4.4*|=4.5*|=4.6*|=4.7*|=4.8*|=4.9*]
+"
+
+DEFAULT_SRC_CONFIGURE_OPTION_ENABLES=( debug )
+
+grcompiler_src_install() {
+    default
+    # not all versions have .odt docs
+    option doc && ( shopt -s nullglob; dodoc doc/*.{odt,pdf,rtf} )
+    rm -rf "${IMAGE}"/usr/share/doc/grcompiler
+}
+
+export_exlib_phases src_install
+

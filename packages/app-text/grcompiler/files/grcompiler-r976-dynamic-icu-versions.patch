@@ -1,0 +1,33 @@
+Source: dleverton
+Upstream: no; one assumes they link staticly on purpose
+Reason: link against the shared ICU library instead of the static one,
+        and accept lots more versions
+
+Index: grcompiler/configure.ac
+===================================================================
+--- grcompiler/configure.ac     (revision 976)
++++ grcompiler/configure.ac     (working copy)
+@@ -38,10 +38,19 @@
+
+ # Checks for libraries.
+
+-AC_CHECK_LIB(sicuuc, u_charType_3_6)
+-AC_CHECK_LIB(sicuuc, u_charType_3_8)
+-AC_CHECK_LIB(sicuuc, u_charType_3_9)
+-AC_CHECK_LIB(sicuuc, u_charType_4_0)
++AC_CHECK_LIB(icuuc, u_charType_3_6)
++AC_CHECK_LIB(icuuc, u_charType_3_8)
++AC_CHECK_LIB(icuuc, u_charType_3_9)
++AC_CHECK_LIB(icuuc, u_charType_4_0)
++AC_CHECK_LIB(icuuc, u_charType_4_1)
++AC_CHECK_LIB(icuuc, u_charType_4_2)
++AC_CHECK_LIB(icuuc, u_charType_4_3)
++AC_CHECK_LIB(icuuc, u_charType_4_4)
++AC_CHECK_LIB(icuuc, u_charType_4_5)
++AC_CHECK_LIB(icuuc, u_charType_4_6)
++AC_CHECK_LIB(icuuc, u_charType_4_7)
++AC_CHECK_LIB(icuuc, u_charType_4_8)
++AC_CHECK_LIB(icuuc, u_charType_4_9)
+
+ # Checks for header files.
+ # need to check for icu .h files as in unicode/uchar.h
