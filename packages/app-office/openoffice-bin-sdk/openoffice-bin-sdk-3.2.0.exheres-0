@@ -1,0 +1,43 @@
+# Copyright 2010 Barry Schwartz
+# Distributed under the terms of the GNU General Public License v2
+# Based in part upon 'openoffice-bin-3.2.0.exheres-0' which is:
+#     Copyright 2009 Pierre Lejeune <superheron@gmail.com>
+
+SUMMARY="OpenOffice.org Software Development Kit"
+HOMEPAGE="http://www.openoffice.org"
+
+DOWNLOADS="ftp://mirrors.ibiblio.org/pub/mirrors/openoffice/stable/${PV}/OOo-SDK_${PV}_LinuxX86-64_install_en-US_rpm.sh"
+
+LICENCES="LGPL-3"
+SLOT="0"
+PLATFORMS="~amd64"
+MYOPTIONS=""
+
+DEPENDENCIES="
+    build:
+        app-arch/rpm2targz
+    build+run:
+        app-office/openoffice-bin
+"
+
+WORK="${WORKBASE}/unpack_openofficeorg"
+
+rpm_unpack() {
+    # Pipes don't work with edo
+    echo "rpm2tar -O ${1} | tar -xf - --no-same-owner -C ${WORK}"
+    rpm2tar -O "${1}" | tar -xf - --no-same-owner -C "${WORK}" || die "Unpacking RPM failed"
+}
+
+src_unpack() {
+    echo "${WORK}" | sh ${FETCHEDDIR}/${ARCHIVES} || die "shell unpack failed"
+
+    einfo "Unpacking the RPM file"
+    edo cd "${WORK}/RPMS"
+    rpm_unpack "ooobasis3.2-sdk-${PV}-9483.x86_64.rpm"
+}
+
+src_install() {
+    edo cp -rT "${WORK}" "${IMAGE}"
+    # Empty directories
+    edo find "${IMAGE}" -type d -empty -delete
+}
