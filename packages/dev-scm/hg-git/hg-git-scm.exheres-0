@@ -18,7 +18,7 @@ DEPENDENCIES="
         !dev-scm/hg-git-brainsik
         dev-lang/python
     run:
-        dev-python/dulwich[~scm]
+        dev-python/dulwich
         dev-scm/mercurial[>=1.3]
 "
 
