@@ -1,0 +1,6 @@
+# Copyright 2010 Barry Schwartz
+# Distributed under the terms of the GNU General Public License v2
+
+require fajrovulpo-bin
+
+PLATFORMS="~amd64"

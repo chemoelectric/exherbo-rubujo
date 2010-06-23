@@ -3,11 +3,10 @@
 
 SUMMARY="Firefox in Esperanto"
 HOMEPAGE="http://www.mozilla.com/eo/"
-DOWNLOADS="http://download.mozilla.org/?product=firefox-3.6.3&os=linux&lang=eo -> ${PNV}.tar.bz2"
+DOWNLOADS="http://download.mozilla.org/?product=firefox-${PV}&os=linux&lang=eo -> ${PNV}.tar.bz2"
 
 LICENCES="MPL-1.1"
 SLOT="0"
-PLATFORMS="~amd64"
 MYOPTIONS=""
 
 # FIXME: note the dependencies.
