@@ -1,0 +1,18 @@
+# Copyright 2010 Barry Schwartz
+# Distributed under the terms of the GNU General Public License v2
+
+require sourceforge [ suffix=tar.gz ] distutils
+
+SUMMARY="FontTools is a library for manipulating fonts."
+
+SLOT="0"
+LICENCES="FontTools"
+PLATFORMS="~amd64"
+MYOPTIONS=""
+
+DEPENDENCIES="
+    build+run:
+        dev-lang/python
+        dev-python/numpy
+        dev-python/PyXML
+"
