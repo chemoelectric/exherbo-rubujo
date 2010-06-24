@@ -3,6 +3,8 @@
 # Based in part upon 'dmalloc-5.5.2-r2.ebuild.ebuild' from Gentoo, which is:
 #     Copyright 1999-2010 Gentoo Foundation
 
+require flag-o-matic
+
 SUMMARY="A Debug Malloc Library"
 HOMEPAGE="http://dmalloc.com"
 DOWNLOADS="http://dmalloc.com/releases/${PNV}.tgz"
@@ -18,6 +20,7 @@ DEFAULT_SRC_CONFIGURE_PARAMS=(
     --enable-cxx
     --enable-shlib
     --hates=docdir
+    ac_cv_prog_CXX=${CHOST}-g++
 )
 
 DEFAULT_SRC_CONFIGURE_OPTION_ENABLES=(
@@ -26,18 +29,27 @@ DEFAULT_SRC_CONFIGURE_OPTION_ENABLES=(
 
 src_prepare() {
 	expatch "${FILES}"/${PNV}-Makefile.in.patch
-	expatch "${FILES}"/${PNV}-cxx.patch
 	option threads && expatch "${FILES}"/${PNV}-threads.patch
-	eautoconf
 }
 
-src_test() {
-	emake heavy
+src_configure() {
+    append-flags -fPIC    
+    default
 }
 
 src_compile() {
-    default
+    emake -j1
+    emake -j1 shlib
+    emake -j1 cxx
+    emake -j1 cxxsl
+    option threads && emake -j1 threads
+    option threads && emake -j1 threadscxx
+    option threads && emake -j1 threadssl
 	edo cd docs && edo makeinfo dmalloc.texi
+}
+
+src_test() {
+	emake -j1 heavy
 }
 
 src_install() {
@@ -45,8 +57,7 @@ src_install() {
 
 	newdoc ChangeLog.1 ChangeLog
 	dodoc NEWS README docs/NOTES docs/TODO
-	insinto /usr/share/doc/${PF}
-	doins docs/dmalloc.pdf
+	dodoc docs/dmalloc.pdf
 	dodoc RELEASE.html docs/dmalloc.html
 	doinfo docs/dmalloc.info
 
