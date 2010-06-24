@@ -1,0 +1,58 @@
+# Copyright 2010 Barry Schwartz
+# Distributed under the terms of the GNU General Public License v2
+# Based in part upon 'dmalloc-5.5.2-r2.ebuild.ebuild' from Gentoo, which is:
+#     Copyright 1999-2010 Gentoo Foundation
+
+SUMMARY="A Debug Malloc Library"
+HOMEPAGE="http://dmalloc.com"
+DOWNLOADS="http://dmalloc.com/releases/${PNV}.tgz"
+
+LICENCES="dmalloc"
+SLOT="0"
+PLATFORMS="~amd64"
+MYOPTIONS="threads"
+
+DEPENDENCIES=""
+
+DEFAULT_SRC_CONFIGURE_PARAMS=(
+    --enable-cxx
+    --enable-shlib
+    --hates=docdir
+)
+
+DEFAULT_SRC_CONFIGURE_OPTION_ENABLES=(
+    threads
+)
+
+src_prepare() {
+	expatch "${FILES}"/${PNV}-Makefile.in.patch
+	expatch "${FILES}"/${PNV}-cxx.patch
+	option threads && expatch "${FILES}"/${PNV}-threads.patch
+	eautoconf
+}
+
+src_test() {
+	emake heavy
+}
+
+src_compile() {
+    default
+	edo cd docs && edo makeinfo dmalloc.texi
+}
+
+src_install() {
+    default
+
+	newdoc ChangeLog.1 ChangeLog
+	dodoc NEWS README docs/NOTES docs/TODO
+	insinto /usr/share/doc/${PF}
+	doins docs/dmalloc.pdf
+	dodoc RELEASE.html docs/dmalloc.html
+	doinfo docs/dmalloc.info
+
+	# add missing symlinks, lazy
+	dosym lib${PN}.so.${PV} /usr/$(get_libdir)/lib${PN}.so
+	for lib in cxx th thcxx; do
+		dosym lib${PN}${lib}.so.${PV} /usr/$(get_libdir)/lib${PN}${lib}.so
+	done
+}
