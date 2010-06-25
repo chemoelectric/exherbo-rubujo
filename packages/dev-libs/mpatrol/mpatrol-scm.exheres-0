@@ -1,0 +1,46 @@
+# Copyright 2010 Barry Schwartz
+# Distributed under the terms of the GNU General Public License v2
+# Based in part upon 'mpatrol-1.4.8-r2.ebuild' from Gentoo, which is:
+#     Copyright 1999-2009 Gentoo Foundation
+
+SCM_REPOSITORY="https://${PN}.svn.sourceforge.net/svnroot/${PN}"
+
+require sourceforge scm-svn flag-o-matic
+require autotools [ supported_autoconf=[ 2.5 ] supported_automake=[ 1.11 ] ]
+
+SUMMARY="A malloc(3) debugger"
+
+LICENCES="GPL-3 LGPL-3"
+SLOT="0"
+PLATFORMS="~amd64"
+MYOPTIONS=""
+
+DEPENDENCIES=""
+
+WORK="${WORKBASE}/${PNV}/pkg/auto"
+
+DEFAULT_SRC_CONFIGURE_PARAMS=(
+    --without-x                 # We don't yet have X working.
+    --hates=docdir
+)
+
+src_prepare()
+{
+    sh setup
+    edo rm -f configure
+    edo sed -i -e '/^AM_INIT_AUTOMAKE/aAC_CONFIG_MACRO_DIR([m4])' configure.in
+    edo sed -i -e '/^AC_PROG_CC/aAM_PROG_CC_C_O' configure.in
+    edo echo 'ACLOCAL_AMFLAGS = -I m4' >> Makefile.am
+    edo echo 'mpatrol_CFLAGS = $(AM_CFLAGS)' >> src/Makefile.am
+    edo echo 'mprof_CFLAGS = $(AM_CFLAGS)' >> src/Makefile.am
+    edo echo 'mptrace_CFLAGS = $(AM_CFLAGS)' >> src/Makefile.am
+    edo echo 'mleak_CFLAGS = $(AM_CFLAGS)' >> src/Makefile.am
+    eautoreconf
+#    expatch -p0 "${FILES}"/mpatrol-1.5.1-gcc44-glibc210.patch
+}
+
+src_configure()
+{
+    append-flags -DMP_IDENT_SUPPORT=0 -DMP_INIT_SUPPORT=0
+    default
+}

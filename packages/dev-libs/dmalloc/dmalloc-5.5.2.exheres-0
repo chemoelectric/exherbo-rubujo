@@ -1,6 +1,6 @@
 # Copyright 2010 Barry Schwartz
 # Distributed under the terms of the GNU General Public License v2
-# Based in part upon 'dmalloc-5.5.2-r2.ebuild.ebuild' from Gentoo, which is:
+# Based in part upon 'dmalloc-5.5.2-r2.ebuild' from Gentoo, which is:
 #     Copyright 1999-2010 Gentoo Foundation
 
 require flag-o-matic
