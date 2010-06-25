@@ -1,0 +1,23 @@
+# Copyright 2010 Barry Schwartz
+# Distributed under the terms of the GNU General Public License v2
+
+SUMMARY="A malloc(3) debugger"
+HOMEPAGE="http://packages.debian.org/sid/${PN}"
+DOWNLOADS="mirror://debian/pool/main/e/${PN}/${PN}_${PV}.tar.gz"
+
+LICENCES="GPL-2"
+SLOT="0"
+PLATFORMS="~amd64"
+MYOPTIONS=""
+
+DEPENDENCIES=""
+
+src_compile() {
+    emake -j1 CFLAGS=-fPIC
+}
+
+src_install() {
+    dodir /usr/${LIBDIR} /usr/share/man/man3
+    emake -j1 install LIB_INSTALL_DIR=${IMAGE}usr/${LIBDIR} MAN_INSTALL_DIR=${IMAGE}usr/share/man/man3
+    emagicdocs
+}
