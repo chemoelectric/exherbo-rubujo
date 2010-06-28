@@ -15,5 +15,7 @@ DEPENDENCIES="
         net-misc/curl[>=7.17.0]
         sys-fs/fuse
         dev-libs/glib
+
+    build:
         dev-util/pkg-config[>=0.9.0]
 "
