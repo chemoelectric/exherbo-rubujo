@@ -1,0 +1,26 @@
+# Copyright 2010 Barry Schwartz
+# Distributed under the terms of the GNU General Public License v2
+# Based in part upon 'ac-archive-2007.2005.ebuild' from Gentoo, which is:
+#   Copyright 1999-2009 Gentoo Foundation
+
+require sourceforge
+
+SUMMARY="The Autoconf Macro Archive"
+
+LICENCES="|| ( BSD GPL-2 )"
+SLOT="0"
+PLATFORMS="~amd64"
+OPTIONS=""
+
+DEPENDENCIES="
+    build+run:
+        dev-lang/perl
+    build:
+        app-spell/aspell
+"
+
+src_install() {
+	emake install DESTDIR="${IMAGE}"
+    emagicdocs
+	edo mv "${IMAGE}"/usr/share/doc/${PN} "${IMAGE}"/usr/share/doc/${PNVR}/html
+}
