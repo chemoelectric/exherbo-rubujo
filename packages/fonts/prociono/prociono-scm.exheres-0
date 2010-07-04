@@ -3,7 +3,7 @@
 
 require sortsmill-scm
 
-SUMMARY="Sorts Mill Goudy fonts"
-LICENCES="MIT"
+SUMMARY="Prociono fonts"
+LICENCES="public-domain"
 PLATFORMS="~amd64"
-WORK="${WORKBASE}/${PNV}/goudy"
+WORK="${WORKBASE}/${PNV}/prociono"

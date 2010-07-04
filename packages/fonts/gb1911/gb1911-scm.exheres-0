@@ -3,7 +3,7 @@
 
 require sortsmill-scm
 
-SUMMARY="Sorts Mill Goudy fonts"
-LICENCES="MIT"
+SUMMARY="Goudy Bookletter 1911"
+LICENCES="public-domain"
 PLATFORMS="~amd64"
-WORK="${WORKBASE}/${PNV}/goudy"
+WORK="${WORKBASE}/${PNV}/gb1911"
