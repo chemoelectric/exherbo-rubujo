@@ -1,0 +1,16 @@
+# Copyright 2010 Barry Schwartz
+# Distributed under the terms of the GNU General Public License v2
+
+HOMEPAGE="http://sortsmill.googlecode.com"
+DOWNLOADS="http://sortsmill.googlecode.com/files/${PNV}.tar.bz2"
+
+LICENCES="MIT"
+SLOT="0"
+MYOPTIONS=""
+
+DEPENDENCIES="
+    build+run:
+        dev-lang/python
+    run:
+        media-gfx/fontforge
+"

@@ -1,0 +1,8 @@
+# Copyright 2010 Barry Schwartz
+# Distributed under the terms of the GNU General Public License v2
+
+require sortsmill
+
+SUMMARY="Prociono fonts"
+LICENCES="public-domain"
+PLATFORMS="~amd64"

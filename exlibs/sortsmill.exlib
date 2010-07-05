@@ -1,17 +1,14 @@
 # Copyright 2010 Barry Schwartz
 # Distributed under the terms of the GNU General Public License v2
 
-SCM_REPOSITORY="https://sortsmill.googlecode.com/hg/"
-
-require scm-hg autotools [ supported_autoconf=[ 2.5 ] supported_automake=[ 1.11 ] ]
-
 HOMEPAGE="http://sortsmill.googlecode.com"
+DOWNLOADS="http://sortsmill.googlecode.com/files/${PNV}.tar.bz2"
 
 SLOT="0"
 MYOPTIONS=""
 DEPENDENCIES="
     build:
-        media-gfx/sortsmill-tools
+        media-gfx/sortsmill-tools        
 "
 
 DEFAULT_SRC_CONFIGURE_PARAMS=(
