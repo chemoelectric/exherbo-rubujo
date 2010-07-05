@@ -1,0 +1,24 @@
+# Copyright 2010 Barry Schwartz
+# Distributed under the terms of the GNU General Public License v2
+
+SUMMARY="American Standard Version Bible, latest html version"
+HOMEPAGE="http://ebible.org/"
+DOWNLOADS="http://ebible.org/asv/asvhtm.zip"
+LICENCES="public-domain"
+
+SLOT="0"
+PLATFORMS="~amd64"
+MYOPTIONS=""
+
+DEPENDENCIES="
+    build:
+        app-arch/zip
+"
+
+WORK="${WORKBASE}"
+
+src_install()
+{
+    insinto /usr/share/html/american-standard-version-bible
+    doins *
+}
