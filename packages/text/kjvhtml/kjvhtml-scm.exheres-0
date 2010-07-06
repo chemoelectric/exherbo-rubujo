@@ -1,9 +1,9 @@
 # Copyright 2010 Barry Schwartz
 # Distributed under the terms of the GNU General Public License v2
 
-SUMMARY="American Standard Version Bible, latest html version"
+SUMMARY="King James Version Bible, latest html version"
 HOMEPAGE="http://ebible.org/"
-DOWNLOADS="http://ebible.org/asv/${PN}.zip"
+DOWNLOADS="http://www.ebible.org/bible/kjv/${PN}.zip"
 LICENCES="public-domain"
 
 SLOT="0"
@@ -19,6 +19,6 @@ WORK="${WORKBASE}"
 
 src_install()
 {
-    insinto /usr/share/html/american-standard-version-bible
-    doins *
+    insinto /usr/share/html/king-james-version-bible
+    doins -r *
 }
