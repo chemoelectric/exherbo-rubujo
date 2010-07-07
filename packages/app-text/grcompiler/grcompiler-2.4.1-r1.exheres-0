@@ -13,5 +13,6 @@ DEFAULT_SRC_PREPARE_PATCHES=( -p1
     "${FILES}/grcompiler-r829-include-path.patch"
     "${FILES}/grcompiler-r815-xmlto.patch"
     "${FILES}/grcompiler-r976-gcc-4.4.patch"
+    "${FILES}/DWORD-64bit-patch.diff"
+    "${FILES}/os2_version4-patch.diff"
 )
-

@@ -1,0 +1,16 @@
+Index: trunk/compiler/TtfUtil.cpp
+===================================================================
+--- trunk/compiler/TtfUtil.cpp	(revision 1087)
++++ trunk/compiler/TtfUtil.cpp	(working copy)
+@@ -224,6 +224,11 @@
+ 			if (sizeof(sfnt_OS2) <= lTableSize)
+ 				return true;
+ 		}
++		else if (swapw(pOs2->Version) == 4)
++		{
++			if (sizeof(sfnt_OS2) <= lTableSize)
++				return true;
++		}
+ 		else
+ 			return false;
+ 	}

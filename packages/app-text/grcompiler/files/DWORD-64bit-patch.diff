@@ -1,0 +1,13 @@
+Index: trunk/compiler/Generic/GrMstypes.h
+===================================================================
+--- trunk/compiler/Generic/GrMstypes.h	(revision 1087)
++++ trunk/compiler/Generic/GrMstypes.h	(working copy)
+@@ -69,7 +69,7 @@
+ 
+ typedef unsigned short  WORD;
+ typedef unsigned int 	UINT;
+-typedef unsigned long 	DWORD;
++typedef unsigned int 	DWORD;
+ 
+ typedef signed long	    HRESULT;
+ typedef DWORD 			COLORREF;
