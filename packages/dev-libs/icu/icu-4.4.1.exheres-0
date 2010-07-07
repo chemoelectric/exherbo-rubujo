@@ -1,0 +1,24 @@
+# Copyright 2008 Saleem Abdulrasool <compnerd@compnerd.org>
+# Distributed under the terms of the GNU General Purpose License v2
+
+require easy-multibuild
+
+SUMMARY="International Components for Unicode"
+HOMEPAGE="http://www.${PN}-project.org"
+DOWNLOADS="http://download.${PN}-project.org/files/${PN}4c/${PV}/${PN}4c-${PV//./_}-src.tgz"
+
+REMOTE_IDS="freshmeat:internationalcomponentsforunicodecc"
+
+UPSTREAM_CHANGELOG="${HOMEPAGE}/download/$(ever range 1-2).html [[ lang = en ]]"
+
+LICENCES="BSD-3"
+SLOT="0"
+PLATFORMS="~amd64 ~x86"
+MYOPTIONS="multibuild_c: 32 64"
+
+DEPENDENCIES=""
+
+WORK="${WORKBASE}/${PN}/source"
+
+DEFAULT_SRC_CONFIGURE_PARAMS=( '--enable-static' '--with-iostream=std' )
+
