@@ -1,0 +1,45 @@
+# Copyright 2010 Barry Schwartz
+# Distributed under the terms of the GNU General Public License v2
+
+MY_PV="${PV%%_p*}"
+MY_PATCHV="${PV/_p/-}"
+
+require autotools [ supported_autoconf=[ 2.5 ] supported_automake=[ 1.11 ] ]
+
+SUMMARY="View all characters of font in all sizes"
+HOMEPAGE="http://packages.debian.org/${PN}"
+DOWNLOADS="
+    mirror://debian/pool/main/g/${PN}/${PN}_${MY_PV}.orig.tar.gz
+    mirror://debian/pool/main/g/${PN}/${PN}_${MY_PATCHV}.diff.gz
+"
+
+LICENCES="as-is"
+SLOT="0"
+PLATFORMS="~amd64"
+MYOPTIONS=""
+
+DEPENDENCIES="
+    build+run:
+        x11-libs/libXft
+        x11-libs/gtk+:2
+"
+
+WORK="${WORKBASE}/${PN}"
+
+DEFAULT_SRC_PREPARE_PATCHES=(
+    "${WORKBASE}/${PN}_${MY_PATCHV}.diff"
+)
+
+src_prepare()
+{
+    default
+    edo mkdir m4
+    edo rm configure
+    eautoreconf
+}
+
+src_install()
+{
+    default
+    doman debian/waterfall.1
+}
