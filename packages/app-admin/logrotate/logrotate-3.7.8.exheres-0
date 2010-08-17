@@ -1,0 +1,48 @@
+# Copyright 2008-2010 Wulf C. Krueger <philantrop@exherbo.org>
+# Distributed under the terms of the GNU General Public License v2
+# Based in part upon 'logrotate-3.7.2.ebuild' from Gentoo, which is:
+#       Copyright 1999-2007 Gentoo Foundation
+
+SUMMARY="Rotates, compresses and mails system logs"
+HOMEPAGE="https://fedorahosted.org/${PN}"
+DOWNLOADS="http://fedorahosted.org/releases/l/o/${PN}/${PNV}.tar.gz"
+
+LICENCES="GPL-2"
+SLOT="0"
+PLATFORMS="~amd64 ~x86"
+MYOPTIONS=""
+
+DEPENDENCIES="
+    build+run:
+        dev-libs/popt[>=1.5]
+"
+
+DEFAULT_SRC_COMPILE_PARAMS=(
+    "CC=${CC}"
+    "CPP=${CC}"
+    "WITH_SELINUX=no"
+)
+
+src_prepare() {
+    default
+
+    edo sed -e "s:CFLAGS += -g:CFLAGS += -g ${CFLAGS}:" \
+            -e "s:LDFLAGS = -g:LDFLAGS = -g ${LDFLAGS}:" \
+            -i Makefile
+}
+
+src_install() {
+    insinto /usr
+    dosbin logrotate
+    doman logrotate.8
+    dodoc examples/*
+
+    exeinto /etc/cron.daily
+    doexe ${FILES}/logrotate.cron
+
+    insinto /etc
+    doins ${FILES}/logrotate.conf
+
+    keepdir /etc/logrotate.d
+}
+
