@@ -1,0 +1,19 @@
+# Copyright 2009, 2010 Ingmar Vanhassel
+# Distributed under the terms of the GNU General Public License v2
+
+require python-build
+
+PLATFORMS="~amd64 ~ia64 ~ppc64 ~x86"
+
+src_test() {
+    # Remove failing test, failure: /usr/lib64/gcc/x86_64-pc-linux-gnu/4.4.1/../../../../x86_64-pc-linux-gnu/bin/ld: cannot find -lpython3.1
+    edo rm Lib/test/test_distutils.py
+    # socket.error: [Errno 104] Connection reset by peer
+    # This test changed completely in the py3k branch, so not worth backporting/fixing (See #6748)
+    edo rm Lib/test/test_telnetlib.py
+    # Fails under network sandboxing
+    edo rm Lib/test/test_{ftplib,httpservers,multiprocessing,socket}.py
+
+    python-build_src_test
+}
+

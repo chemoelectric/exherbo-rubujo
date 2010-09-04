@@ -1,0 +1,115 @@
+# Copyright 2007-2007 Bryan Østergaard
+# Copyright 2008 Ali Polatel
+# Copyright 2009, 2010 Ingmar Vanhassel
+# Distributed under the terms of the GNU General Public License v2
+# Based in part upon 'python-2.5.2-r4.ebuild' from Gentoo, which is:
+#  Copyright 1999-2008 Gentoo Foundation
+
+# TODO: alternatives
+require flag-o-matic multilib autotools [ supported_autoconf=[ 2.5 ] supported_automake=[ 1.11 1.10 ] ] python
+
+export_exlib_phases src_prepare src_configure src_test src_install
+
+MY_PNV="Python-${PV}"
+
+SUMMARY="Python interpreter"
+HOMEPAGE="http://www.${PN}.org/"
+DOWNLOADS="http://${PN}.org/ftp/${PN}/${PV}/${MY_PNV}.tar.bz2"
+
+UPSTREAM_DOCUMENTATION="
+http://docs.${PN}.org/$(ever range 1-2)/
+"
+UPSTREAM_CHANGELOG="${HOMEPAGE}/download/releases/${PV}/NEWS.txt"
+UPSTREAM_RELEASE_NOTES="${HOMEPAGE}/download/releases/${PV}/"
+
+LICENCES="PSF-2.2"
+SLOT="$(ever range 1-2)"
+MYOPTIONS="dbm examples ipv6 readline sqlite tk
+( berkdb gdbm ) [[ requires = dbm ]]
+dbm? ( ( berkdb gdbm ) [[ number-selected = at-least-one ]] )
+"
+
+# FIXME: Internal copy of dev-libs/expat
+DEPENDENCIES="
+    build:
+        dev-util/pkg-config
+    build+run:
+        dev-libs/libffi
+        dev-libs/openssl
+        sys-libs/zlib[>=1.1.3]
+        berkdb? ( sys-libs/db:=[>=3.3&<=4.7] )
+        gdbm? ( sys-libs/gdbm )
+        readline? ( sys-libs/readline[>=4.1] )
+        sqlite? ( dev-db/sqlite:3[>=3.0.8] )
+        tk? ( dev-lang/tk[>=8.0] )
+"
+
+WORK="${WORKBASE}/${MY_PNV}"
+DEFAULT_SRC_CONFIGURE_PARAMS=(
+    --enable-shared
+    $(ever at_least 3 || echo --enable-unicode=ucs4)
+    --with-system-ffi
+)
+DEFAULT_SRC_CONFIGURE_OPTION_ENABLES=( ipv6 )
+
+python-build_src_prepare() {
+    [[ -d ${FILES}/${PV} ]] && expatch "${FILES}/${PV}/"
+
+    edo sed -i -e "s:@@EXHERBO_LIBDIR@@:$(get_libdir):g" \
+        Lib/distutils/command/install.py \
+        Lib/distutils/sysconfig.py \
+        Lib/site.py \
+        Makefile.pre.in \
+        Modules/Setup.dist \
+        Modules/getpath.c \
+        setup.py
+
+    eautoreconf
+}
+
+python-build_src_configure() {
+    # dbm module can link to berkdb or gdbm.
+    # default to gdbm when both are enabled.
+    local disable
+
+    option berkdb   || option gdbm || disable="_dbm"
+    option berkdb   || disable="${disable} _bsddb"
+    if ever at_least 3 ; then
+        option gdbm     || disable="${disable} _gdbm"
+    else
+        option gdbm     || disable="${disable} gdbm"
+    fi
+    option readline || disable="${disable} readline"
+    option sqlite   || disable="${disable} _sqlite3"
+    option tk       || disable="${disable} _tkinter"
+    export PYTHON_DISABLE_MODULES="${disable}"
+
+    export OPT="${CFLAGS}"
+    export CPPFLAGS="$(pkg-config --cflags-only-I libffi) ${CPPFLAGS}"
+
+    default
+}
+
+python-build_src_test() {
+    unset DISPLAY
+
+    python_enable_pyc
+
+    # rerun failed tests in verbose mode (regrtest -w)
+    EXTRATESTOPTS="-w" emake test
+
+    python_disable_pyc
+}
+
+python-build_src_install() {
+    default
+
+    ! ever at_least 3.1 && edo rm "${IMAGE}"/usr/bin/smtpd.py
+    edo mv "${IMAGE}"/usr/$(get_libdir)/{${PN}${SLOT}/config,}/libpython${SLOT}.a
+
+    # NOTE regarding alternatives:
+    # python[=2*] & py3k don't collide, except for /usr/bin/2to3, which would be easy to fix.
+    # Therefore there should probably be separate alternative modules for both branches
+    # (eclectic python, eclectic py3k?)
+}
+
