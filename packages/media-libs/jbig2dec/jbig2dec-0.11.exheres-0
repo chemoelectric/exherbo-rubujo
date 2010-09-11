@@ -1,0 +1,27 @@
+# Copyright 2010 Barry Schwartz
+# Distributed under the terms of the GNU General Public License v2
+# Based in part upon 'jbig2dec-0.11.ebuild' from Gentoo, which is:
+#     Copyright 1999-2010 Gentoo Foundation.
+
+SUMMARY="A decoder implementation of the JBIG2 image compression format"
+HOMEPAGE="http://jbig2dec.sourceforge.net/"
+DOWNLOADS="http://ghostscript.com/~giles/jbig2/${PN}/${PNV}.tar.gz"
+
+LICENCES="GPL-3"
+SLOT="0"
+PLATFORMS="~amd64"
+MYOPTIONS="png static-libs"
+
+DEPENDENCIES="
+    build+run:
+        png? ( media-libs/libpng )
+"
+
+DEFAULT_SRC_CONFIGURE_PARAMS=(
+    --disable-dependency-tracking
+)
+
+DEFAULT_SRC_CONFIGURE_OPTION_ENABLES=(
+    'static-libs static'
+    'png libpng'
+)
