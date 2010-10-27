@@ -1,8 +1,0 @@
-# Copyright 2009 Wulf C. Krueger
-# Distributed under the terms of the GNU General Public License v2
-
-require libcap
-
-PLATFORMS="~amd64 ~ppc64 ~x86"
-
-DEFAULT_SRC_PREPARE_PATCHES=( "${FILES}/${PN}-2.16-cleanup-build-system.patch" )
