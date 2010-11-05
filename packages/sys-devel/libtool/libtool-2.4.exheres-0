@@ -2,7 +2,7 @@
 # Copyright 2008 Richard Brown
 # Distributed under the terms of the GNU General Public License v2
 
-require gnu [ suffix=lzma ] easy-multibuild
+require gnu [ suffix=xz ] easy-multibuild
 
 SUMMARY="Generic library support script"
 
@@ -21,10 +21,8 @@ DEPENDENCIES="
     build+run:
         sys-devel/gnuconfig"
 
-DEFAULT_SRC_PREPARE_PATCHES=(
-    "${FILES}"/libtool-2.2.6-locale.patch
-    "${FILES}"/libtool-2.2.6-zsh-path.patch
-)
+RESTRICT="test"
+
 DEFAULT_SRC_INSTALL_EXTRA_DOCS=( docs/PLATFORMS )
 
 WORK="${WORKBASE}/${PNV%a}"
