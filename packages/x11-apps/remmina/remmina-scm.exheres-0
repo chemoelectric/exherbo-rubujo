@@ -1,7 +1,7 @@
 # Copyright (c) 2010 Barry Schwartz
 # Distributed under the terms of the GNU General Public License v2
 
-SCM_REPOSITORY="https://remmina.svn.sourceforge.net/svnroot/remmina/"
+SCM_REPOSITORY="http://remmina.svn.sourceforge.net/svnroot/remmina/"
 
 require scm-svn sourceforge
 
