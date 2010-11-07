@@ -1,0 +1,179 @@
+# Copyright 2008 Saleem Abdulrasool <compnerd@compnerd.org>
+# Copyright 2010 Wulf C. Krueger <philantrop@exherbo.org>
+# Distributed under the terms of the GNU General Public License v2
+
+HOMEPAGE="http://${PN}.org"
+
+if ever is_scm; then
+    SCM_REPOSITORY="git://git.0pointer.de/avahi.git"
+    require scm-git autotools [ supported_autoconf=[ 2.5 ] supported_automake=[ 1.11 ] ]
+else
+    DOWNLOADS="${HOMEPAGE}/download/${PNV}.tar.gz"
+fi
+
+require easy-multibuild
+
+export_exlib_phases src_prepare src_install pkg_postinst
+
+REMOTE_IDS="freshmeat:${PN}"
+
+SUMMARY="mDNS discovery agent"
+DESCRIPTION="
+Avahi is a framework for Multicast DNS Service Discovery (mDNS/DNS-SD a.k.a. Zeroconf)
+on Linux. It allows programs to publish and discover services running on a local
+network with no specific configuration. For example, you can plug into a network
+and instantly find printers to print to, files to look at, and people to talk to.
+"
+LICENCES="GPL-2"
+SLOT="0"
+
+MYOPTIONS="
+    autoipd [[ description = [ Build and install the IPv4LL (RFC3927) network address configuration daemon ] ]]
+    baselayout
+    dbus
+    dns_sd [[ description = [ Libdns_sd compatibility layer for avahi ] requires = [ dbus ] ]]
+    doc
+    gdbm
+    gobject-introspection
+    gtk
+    gtk3 [[ description = [ Use the new GTK+-3 toolkit ] ]]
+    ipv6
+    qt4
+    systemd
+    multibuild_c: 32 64
+"
+
+DEPENDENCIES="
+    build:
+        dev-util/intltool[>=0.35]
+        dev-util/pkg-config[>=0.20]
+        doc? ( app-doc/doxygen )
+        gobject-introspection? ( gnome-desktop/gobject-introspection[>=0.6.7] )
+    build+run:
+        dev-libs/expat
+        dev-libs/glib:2[>=2.4]
+        dev-libs/libdaemon[>=0.14]
+        dbus? ( sys-apps/dbus[>=0.34] )
+        gdbm? ( sys-libs/gdbm )
+        gtk? ( x11-libs/gtk+:2[>=2.14] )
+        gtk3? ( x11-libs/gtk+:3.0 )
+        qt4? ( x11-libs/qt:4 )
+        group/avahi
+        group/netdev
+        user/avahi
+    run:
+        autoipd? (
+            group/avahi-autoipd
+            user/avahi-autoipd
+        )
+    recommendation:
+        net-dns/nss-mdns
+"
+# TODO Implement Exherbo specific init scripts
+configure_one_multibuild() {
+    econf --localstatedir=/var                                           \
+          --enable-glib                                                  \
+          --enable-libdaemon                                             \
+          --with-distro=$(option baselayout && echo gentoo || echo none) \
+          --with-xml=expat                                               \
+          --disable-compat-howl                                          \
+          --disable-mono                                                 \
+          --disable-monodoc                                              \
+          --disable-pygtk                                                \
+          --disable-python                                               \
+          --disable-python-dbus                                          \
+          --disable-qt3                                                  \
+          --disable-xmltoman                                             \
+          --disable-manpages                                             \
+          $(option_enable autoipd)                                       \
+          $(option_enable dns_sd compat-libdns_sd)                       \
+          $(option_enable doc doxygen-doc)                               \
+          $(option_enable dbus)                                          \
+          $(option_enable gobject-introspection introspection)           \
+          $(option_enable gtk)                                           \
+          $(option_enable gtk3)                                          \
+          $(option_enable gdbm)                                          \
+          $(option_enable qt4)                                           \
+          $(option_with systemd systemdsystemunitdir /${LIBDIR}/systemd/system)
+}
+
+DEFAULT_SRC_INSTALL_PARAMS=( py_compile=true )
+DEFAULT_SRC_INSTALL_EXTRA_PREFIXES=( docs/ )
+
+AT_M4DIR=( common )
+
+avahi_src_prepare() {
+    option ipv6 && edo sed -i -e 's/use-ipv6=no/use-ipv6=yes/' "avahi-daemon/avahi-daemon.conf"
+
+    edo sed -i -e "s:\\.\\./\\.\\./\\.\\./doc/avahi-docs/html/:../../../doc/${PNVR}/html/:" doxygen_to_devhelp.xsl
+
+    if ever is_scm; then
+        autotools_src_prepare
+        edo intltoolize --force --copy
+    fi
+}
+
+compile_one_multibuild() {
+    default
+
+    option doc && emake avahi.devhelp
+}
+
+avahi_src_install() {
+    easy-multibuild_src_install
+
+    # empty directories
+    if test -d "${IMAGE}"/var/run ; then
+        edo rmdir "${IMAGE}"/var/run
+    fi
+    if test -d "${IMAGE}"/var ; then
+        edo rmdir "${IMAGE}"/var
+    fi
+    if test -d "${IMAGE}"/usr/${LIBDIR}/avahi ; then
+        edo rmdir "${IMAGE}"/usr/${LIBDIR}/avahi
+    fi
+
+    if ! ( option dbus && option gtk ) ; then
+        edo rmdir "${IMAGE}"/usr/share/applications
+    fi
+
+    # requires python, dbus, gtk
+    edo rm -f "${IMAGE}/usr/bin/avahi-bookmarks"
+
+    if ! option dbus ; then
+        edo rmdir "${IMAGE}"/usr/share/{avahi/introspection,man/man1}
+
+        if ! option gtk; then
+            edo rmdir "${IMAGE}"/usr/bin
+        fi
+    fi
+
+    if option autoipd ; then
+        insinto /${LIBDIR}/rcscripts/net
+        doins "${FILES}/autoipd.sh"
+    fi
+
+    if option doc ; then
+        insinto /usr/share/doc/${PNV}/html
+        doins doxygen/html/*
+
+        insinto /usr/share/devhelp/books/avahi
+        doins avahi.devhelp
+    fi
+
+    # man page installation varies too much according to different combinations of options, use find
+    # to keep the exheres more maintainable
+    edo find "${IMAGE}"/usr/share -depth -type d -empty -delete
+}
+
+avahi_pkg_postinst() {
+    if option autoipd ; then
+        elog "To use avahi-autoipd to configure your interfaces with IPv4LL (RFC3927)"
+        elog "addresses, and configure your network interface to use autoipd."
+    fi
+
+    if option dbus ; then
+        elog "If this is your first install of avahi, please reload your dbus config."
+    fi
+}
+
