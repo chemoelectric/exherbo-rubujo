@@ -1,0 +1,23 @@
+Source: Elias Pipping <pipping@exherbo.org>
+Upstream: https://sourceforge.net/tracker/?func=detail&aid=2977762&group_id=151404&atid=780913
+Reason: The exit status of $(MAKE) inside src/ is not propagated
+--- Makefile.in
++++ Makefile.in
+@@ -1,13 +1,13 @@
+ CC = @CC@
+ 
+ all:
+-	cd src; \
+-	${MAKE} -f @MAKEFILE@ CC="${CC}"; \
++	cd src && \
++	${MAKE} -f scripts/gcc.mak CC="${CC}" && \
+ 	cd ..
+ 
+ install:
+-	cd src; \
+-	${MAKE} -f @MAKEFILE@ install CC="${CC}"; \
++	cd src && \
++	${MAKE} -f scripts/gcc.mak install CC="${CC}" && \
+ 	cd ..
+ 
+ uninstall:

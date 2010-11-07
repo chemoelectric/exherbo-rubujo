@@ -1,0 +1,43 @@
+Index: optipng-0.6.4/src/pngpriv.h
+===================================================================
+--- /dev/null
++++ optipng-0.6.4/src/pngpriv.h
+@@ -0,0 +1,24 @@
++#if PNG_LIBPNG_VER >= 10400
++#define PNG_FILLER              0x8000L
++#define PNG_FLAG_FILLER_AFTER   0x0080
++#define PNG_DEBUG_FILE          stderr
++#define png_debug(l,m) \
++       { \
++       int num_tabs=l; \
++       fprintf(PNG_DEBUG_FILE,"%s"m PNG_STRING_NEWLINE,(num_tabs==1 ? "\t" : \
++         (num_tabs==2 ? "\t\t":(num_tabs>2 ? "\t\t\t":"")))); \
++       }
++#define png_debug1(l,m,p1) \
++       { \
++       int num_tabs=l; \
++       fprintf(PNG_DEBUG_FILE,"%s"m PNG_STRING_NEWLINE,(num_tabs==1 ? "\t" : \
++         (num_tabs==2 ? "\t\t":(num_tabs>2 ? "\t\t\t":""))),p1); \
++       }
++#define png_debug2(l,m,p1,p2) \
++       { \
++       int num_tabs=l; \
++       fprintf(PNG_DEBUG_FILE,"%s"m PNG_STRING_NEWLINE,(num_tabs==1 ? "\t" : \
++         (num_tabs==2 ? "\t\t":(num_tabs>2 ? "\t\t\t":""))),p1,p2); \
++       }
++#endif
++
+Index: optipng-0.6.4/src/opngoptim.c
+===================================================================
+--- optipng-0.6.4.orig/src/opngoptim.c
++++ optipng-0.6.4/src/opngoptim.c
+@@ -23,6 +23,9 @@
+ #include "cexcept.h"
+ #include "cbitset.h"
+ #include "osys.h"
++#if PNG_LIBPNG_VER >= 10400
++#include "pngpriv.h"
++#endif
+ 
+ 
+ /*

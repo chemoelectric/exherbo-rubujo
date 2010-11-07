@@ -1,0 +1,45 @@
+# Copyright 2009 Ingmar Vanhassel
+# Distributed under the terms of the GNU General Public License v2
+
+SUMMARY="Advanced PNG Optimizer"
+DESCRIPTION="
+OptiPNG is a PNG optimizer that recompresses image files to a smaller size,
+without losing any information. This program also converts external formats
+(BMP, GIF, PNM and TIFF) to optimized PNG, and performs PNG integrity checks
+and corrections.
+"
+HOMEPAGE="http://${PN}.sourceforge.net/"
+DOWNLOADS="mirror://sourceforge/${PN}/${PNV}.tar.gz"
+
+UPSTREAM_DOCUMENTATION="${DOWNLOADS}/manual.html"
+UPSTREAM_RELEASE_NOTES="${DOWNLOADS}/history.txt"
+REMOTE_IDS="sourceforge:${PN}"
+
+LICENCES="ZLIB"
+SLOT="0"
+PLATFORMS="~amd64"
+MYOPTIONS=""
+
+DEPENDENCIES="
+    build+run:
+        media-libs/libpng
+"
+
+src_prepare() {
+    expatch -p0 "${FILES}"/${PNV}-makefile.patch
+    expatch -p1 "${FILES}"/optipng-libpng14.patch
+
+    edo sed \
+        -e "/^CFLAGS/s:= .*$:= ${CFLAGS}:" \
+        -e "/^LDFLAGS/s:= .*:= ${LDFLAGS}:" \
+        -i src/scripts/*.mak*
+}
+
+src_configure() {
+    edo ./configure \
+        -with-system-libpng \
+        -with-system-zlib
+}
+
+DEFAULT_SRC_INSTALL_PARAMS=( prefix=/usr mandir=/usr/share/man )
+
