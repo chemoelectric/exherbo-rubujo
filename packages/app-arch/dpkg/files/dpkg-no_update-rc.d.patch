@@ -1,0 +1,26 @@
+Upstream: No, Exherbo specific
+
+From 498b8402ddcfcda06c268ea07889e5085109ba79 Mon Sep 17 00:00:00 2001
+From: Daniel Mierswa <impulze@impulze.org>
+Date: Fri, 26 Feb 2010 13:17:27 +0100
+Subject: [PATCH] Exherbo doesn't use update-rc.d
+
+---
+ src/help.c |    1 -
+ 1 files changed, 0 insertions(+), 1 deletions(-)
+
+diff --git a/src/help.c b/src/help.c
+index 2a13647..c196723 100644
+--- a/src/help.c
++++ b/src/help.c
+@@ -91,7 +91,6 @@ void checkpath(void) {
+ #if WITH_START_STOP_DAEMON
+     "start-stop-daemon",
+ #endif    
+-    "update-rc.d",
+     NULL
+   };
+ 
+-- 
+1.7.0
+

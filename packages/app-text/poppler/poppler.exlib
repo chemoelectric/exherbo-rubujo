@@ -1,0 +1,21 @@
+# Copyright 2010 Saleem Abdulrasool <compnerd@compnerd.org>
+# Distributed under the terms of the GNU General Public License v2
+
+SUMMARY="A PDF rendering library, based on Xpdf"
+DESCRIPTION="
+Poppler is a PDF rendering library derived from xpdf. It has been enhanced to
+utilize modern libraries such as freetype and cairo for better rendering. It
+also provides basic command line utilities.
+"
+HOMEPAGE="http://poppler.freedesktop.org"
+
+# NOTE: test data tarball:
+#   git://anongit.freedesktop.org/git/poppler/test
+#   git archive --format=tar --prefix=test/ HEAD | bzip2 > ${PN}-test-${PV}.tar.bz2
+DOWNLOADS="http://poppler.freedesktop.org/${PNV}.tar.gz
+           http://dev.exherbo.org/~compnerd/distfiles/poppler-test-$(ever range 1-2).tar.bz2"
+
+LICENCES="GPL-2"
+
+REMOTE_IDS="freshmeat:poppler"
+

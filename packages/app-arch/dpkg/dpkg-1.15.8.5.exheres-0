@@ -1,0 +1,46 @@
+# Copyright 2008, 2009, 2010 Ingmar Vanhassel <ingmar@exherbo.org>
+# Distributed under the terms of the GNU General Public License v2
+# Based in part upon 'dpkg-1.14.17.ebuild' from Gentoo, which is:
+#     Copyright 1999-2008 Gentoo Foundation.
+
+require debian-upstream [ suffix=.tar.bz2 ]
+
+SUMMARY="Package maintenance system for Debian"
+HOMEPAGE="http://packages.qa.debian.org/dpkg"
+
+LICENCES="GPL-2"
+SLOT="0"
+PLATFORMS="~amd64 ~x86"
+MYOPTIONS="selinux"
+
+DEPENDENCIES="
+    build+run:
+        dev-lang/perl
+        sys-libs/ncurses
+"
+
+DEFAULT_SRC_PREPARE_PATCHES=( "${FILES}/${PN}-no_update-rc.d.patch" )
+DEFAULT_SRC_CONFIGURE_OPTION_WITHS=( selinux )
+DEFAULT_SRC_CONFIGURE_PARAMS=(
+    --with-bz2lib
+    --with-zlib
+    --without-dselect # Needs ncursesw/curses.h
+    --without-start-stop-daemon
+    --localstatedir=/var
+)
+
+# dev-perl/IO-String dev-perl/TimeDate dev-perl/Test-Pod
+RESTRICT="test"
+
+
+src_install() {
+    default
+
+    # FIXME Pass the correct arch/os for dpkg, so it installs to /usr/lib64
+    keepdir /etc/dpkg/dpkg.cfg.d
+    keepdir /var/lib/dpkg/{alternatives,info,parts,updates}/
+    touch "${IMAGE}"/var/lib/dpkg/{available,status}
+
+    find "${IMAGE}"/usr/share/man -empty -type d -delete
+}
+

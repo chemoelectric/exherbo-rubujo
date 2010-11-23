@@ -1,0 +1,92 @@
+# Copyright 2008, 2009, 2010 Ingmar Vanhassel <ingmar@exherbo.org>
+# Copyright 2008 Saleem Abdulrasool <compnerd@compnerd.org>
+# Distributed under the terms of the GNU General Public License v2
+
+require poppler
+
+SLOT="0"
+PLATFORMS="~amd64 ~ppc64 ~x86"
+MYOPTIONS="
+    abiword   [[ description = [ Build the AbiWord output backend ] ]]
+    curl      [[ description = [ Use libcurl for HTTP support ] ]]
+    doc       [[ description = [ Install API docs, requires gtk-doc ] ]]
+    encodings [[ description = [ Enable CJK, Cyrillic and other non-Latin encodings ] ]]
+    gdk       [[
+        description = [ Use GDK with the GLib wrapper ]
+        requires = glib
+    ]]
+    glib      [[
+        description = [ Build the GLib wrapper ]
+        requires = cairo
+    ]]
+    jpeg2000  [[ description = [ Enable support for the JPEG2000 codec ] ]]
+    lcms      [[ description = [ Use Little CMS for color management ] ]]
+
+    (
+      cairo [[ description = [ Build the cairo graphics backend ] ]]
+      qt4   [[ description = [ Build the Qt4 wrapper and Splash graphics backend ] ]]
+    ) [[ number-selected = at-least-one ]]
+"
+
+DEPENDENCIES="
+    build:
+        dev-util/pkg-config[>=0.20]
+        doc? ( dev-doc/gtk-doc[>=1.0] )
+
+    build+run:
+        media-libs/fontconfig[>=2.0.0]
+        media-libs/freetype:2[>=2.1.8]
+        media-libs/jpeg
+        media-libs/libpng
+        sys-libs/zlib
+
+        abiword?  ( dev-libs/libxml2 )
+        cairo?    ( x11-libs/cairo[>=1.8.4][X] )
+        curl?     ( net-misc/curl )
+        gdk?      ( x11-libs/gdk-pixbuf:2.0
+                    x11-libs/gtk+:2[>=2.21] )
+        glib?     ( dev-libs/glib[>=2.18] )
+        jpeg2000? ( media-libs/OpenJPEG )
+        lcms?     ( media-libs/lcms )
+        qt4?      ( x11-libs/qt:4[>=4.4.0] )
+
+    run:
+        encodings? ( app-text/poppler-data[>=0.4.3] )
+
+    test:
+        gdk? ( x11-libs/gtk+:2[>=2.14] )
+"
+
+DEFAULT_SRC_PREPARE_PATCHES=( "${FILES}"/${PN}-broken-test.patch )
+
+DEFAULT_SRC_CONFIGURE_PARAMS=(
+    "--disable-poppler-qt"
+    "--enable-libjpeg"
+    "--enable-libpng"
+    "--enable-poppler-cpp"
+    "--enable-utils"
+    "--enable-xpdf-headers"
+    "--enable-zlib"
+)
+
+DEFAULT_SRC_CONFIGURE_OPTION_ENABLES=(
+    "abiword abiword-output"
+    "cairo cairo-output"
+    "curl libcurl"
+    "doc gtk-doc"
+    "gdk gtk-test"
+    "gdk"
+    "glib poppler-glib"
+    "jpeg2000 libopenjpeg"
+    "lcms cms"
+    "qt4 poppler-qt4"
+    "qt4 splash-output"
+)
+
+src_prepare() {
+    default
+
+    # remove pregenerated docs
+    edo rm -r "${WORK}"/glib/reference/html/
+}
+

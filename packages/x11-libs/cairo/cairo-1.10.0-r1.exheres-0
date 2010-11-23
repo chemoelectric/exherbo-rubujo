@@ -1,0 +1,85 @@
+# Copyright (c) 2008 Alexander Færøy <ahf@exherbo.org>
+# Copyright 2008 Saleem Abdulrasool <compnerd@compnerd.org>
+# Distributed under the terms of the GNU General Public License v2
+# Based in part upon 'cairo-1.6.4.ebuild' from Gentoo which is:
+#     Copyright 1999-2008 Gentoo Foundation
+
+require cairo easy-multibuild
+
+DOWNLOADS="http://cairographics.org/releases/${PNV}.tar.gz"
+
+SLOT="0"
+PLATFORMS="~amd64 ~ppc64 ~x86"
+MYOPTIONS="X
+xcb [[ requires = X ]]
+multibuild_c: 32 64
+"
+
+DEPENDENCIES="
+    build:
+        dev-util/pkg-config[>=0.19]
+    build+run:
+        media-libs/libpng[>=1.2.8][multibuild_c:*(?)?]
+        x11-dri/mesa[multibuild_c:*(?)?]
+        media-libs/freetype[>=2.1.9][multibuild_c:*(?)?]
+        media-libs/fontconfig[>=2.2.95][multibuild_c:*(?)?]
+        x11-libs/pixman:1[>=0.18.4][multibuild_c:*(?)?]
+        dev-libs/glib:2[multibuild_c:*(?)?]
+        X? ( x11-libs/libX11[multibuild_c:*(?)?]
+             x11-libs/libXrender[>=0.6][multibuild_c:*(?)?]
+             xcb? ( x11-libs/libxcb[>=1.1.92][multibuild_c:*(?)?] ) )
+"
+
+# TODO: experimental drm support fails to build, so disable it for now.
+#   build:
+#       drm? ( x11-proto/xproto
+#               x11-proto/xextproto[>=7.0.99.1]
+#               x11-proto/renderproto )
+#   build+run:
+#       X? ( drm? ( sys-fs/udev[>=136]
+#                   x11-server/xorg-server[>=1.6] ) )
+
+#   test:
+#       app-text/ghostscript [[ note = [ required for ps ] ]]
+#       app-text/libspectre [[ note = [ required for ps ] ]]
+#       app-text/poppler[glib][>=0.13.3] [[ note = [ required for pdf ] ]]
+#       gnome-desktop/librsvg[>=2.15.0] [[ note = [ required for svg ] ]]
+
+RESTRICT="test" # known to be broken upstream
+
+DEFAULT_SRC_INSTALL_EXTRA_DOCS=( BIBLIOGRAPHY CODING_STYLE PORTING_GUIDE RELEASING ROADMAP )
+
+configure_one_multibuild() {
+#    local enable_xcb_drm='--disable-xcb-drm'
+#
+#    if option drm && option xcb ; then
+#        enable_xcb_drm='--enable-xcb-drm'
+#    fi
+
+# Disable experimental xlib/xcb support ( --disable-xlib-xcb)
+# This backend is incomplete and causes rendering problems.
+# Requires x11-libs/libX11[xcb]
+
+    econf '--enable-png'                \
+          '--enable-gl'                 \
+          '--disable-directfb'          \
+          '--disable-vg'                \
+          '--disable-egl'               \
+          '--enable-glx'                \
+          '--enable-ft'                 \
+          '--enable-fc'                 \
+          '--enable-ps'                 \
+          '--enable-pdf'                \
+          '--enable-svg'                \
+          '--enable-gobject'            \
+          '--disable-wgl'               \
+          '--disable-drm'               \
+          '--disable-drm-xr'            \
+          '--disable-xcb-drm'           \
+          '--disable-xlib-xcb'          \
+          $(option_enable xcb)          \
+          $(option_enable xcb xcb-shm)  \
+          $(option_enable X xlib)       \
+          $(option_enable X xlib-xrender)
+}
+

@@ -1,0 +1,61 @@
+Source: Ingmar Vanhassel <ingmar@exherbo.org>
+Upstream: No
+Reason:
+
+From e0f12178b8a0fad0b16950b4aecf76c5cd66201a Mon Sep 17 00:00:00 2001
+From: Ingmar Vanhassel <ingmar@exherbo.org>
+Date: Tue, 29 Jul 2008 03:01:15 +0200
+Subject: [PATCH] Disable a test that fails under the C locale (See `LC_ALL=C make check`).
+
+---
+ qt4/tests/Makefile.am |   13 +------------
+ 1 files changed, 1 insertions(+), 12 deletions(-)
+
+diff --git a/qt4/tests/Makefile.am b/qt4/tests/Makefile.am
+index 99c35ef..4b3ac8e 100644
+--- a/qt4/tests/Makefile.am
++++ b/qt4/tests/Makefile.am
+@@ -18,7 +18,7 @@ SUFFIXES: .moc
+ 	$(MOCQT4) -i $< -o $@
+ 
+ noinst_PROGRAMS = test-poppler-qt4 stress-poppler-qt4 \
+-	poppler-fonts test-password-qt4 stress-poppler-dir \
++	poppler-fonts stress-poppler-dir \
+ 	poppler-attachments
+ 
+ 
+@@ -28,12 +28,6 @@ test_poppler_qt4_SOURCES =			\
+ test_poppler_qt4_LDADD = $(LDADDS)
+ 
+ 
+-test_password_qt4_SOURCES =			\
+-       test-password-qt4.cpp
+-
+-test_password_qt4_LDADD = $(LDADDS)
+-
+-
+ poppler_fonts_SOURCES =			\
+        poppler-fonts.cpp
+ 
+@@ -68,7 +62,6 @@ TESTS = \
+ 	check_optcontent	\
+ 	check_permissions      	\
+ 	check_pagemode    	\
+-	check_password    	\
+ 	check_pagelayout	\
+ 	check_search
+ 
+@@ -110,10 +103,6 @@ check_pagelayout_SOURCES = check_pagelayout.cpp
+ check_pagelayout.$(OBJEXT): check_pagelayout.moc
+ check_pagelayout_LDADD = $(LDADDS) $(POPPLER_QT4_TEST_LIBS)
+ 
+-check_password_SOURCES = check_password.cpp
+-check_password.$(OBJEXT): check_password.moc
+-check_password_LDADD = $(LDADDS) $(POPPLER_QT4_TEST_LIBS)
+-
+ check_search_SOURCES = check_search.cpp
+ check_search.$(OBJEXT): check_search.moc
+ check_search_LDADD = $(LDADDS) $(POPPLER_QT4_TEST_LIBS)
+-- 
+1.6.0.5
+
