@@ -31,9 +31,7 @@ DEFAULT_SRC_CONFIGURE_OPTION_WITHS=( 'jpeg2000 libjasper' )
 DEFAULT_SRC_CONFIGURE_OPTION_ENABLES=( 'gobject-introspection introspection' 'man-pages man' )
 
 install_one_multibuild() {
-
     default
-
     if option platform:amd64 ; then
         edo mv "${IMAGE}"/usr/bin/gdk-pixbuf-query-loaders{,-${MULTIBUILD_TARGET}}
     fi
