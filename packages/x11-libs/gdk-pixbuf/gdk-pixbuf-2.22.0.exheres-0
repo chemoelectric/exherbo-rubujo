@@ -36,9 +36,17 @@ install_one_multibuild() {
 
     if option platform:amd64 ; then
         edo mv "${IMAGE}"/usr/bin/gdk-pixbuf-query-loaders{,-${MULTIBUILD_TARGET}}
-        if [[ "${MULTIBUILD_TARGET}" == "${MULTIBUILD_C_DEFAULT_TARGET}" ]] ; then
-            dosym gdk-pixbuf-query-loaders-${MULTIBUILD_TARGET} /usr/bin/gdk-pixbuf-query-loaders
-        fi
+    fi
+}
+
+src_install() {
+    easy-multibuild_src_install
+    if option platform:amd64 ; then
+        for multibuild_c_target in ${MULTIBUILD_C_TARGETS} ; do
+            if [[ "${multibuild_c_target}" == "${MULTIBUILD_C_DEFAULT_TARGET}" ]] ; then
+                dosym gdk-pixbuf-query-loaders-${multibuild_c_target} /usr/bin/gdk-pixbuf-query-loaders
+            fi
+        done
     fi
 }
 
