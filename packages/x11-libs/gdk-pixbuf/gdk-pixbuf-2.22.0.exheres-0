@@ -38,6 +38,8 @@ install_one_multibuild() {
 }
 
 src_install() {
+    local multibuild_c_target
+
     easy-multibuild_src_install
     if option platform:amd64 ; then
         for multibuild_c_target in ${MULTIBUILD_C_TARGETS} ; do
@@ -49,6 +51,8 @@ src_install() {
 }
 
 gdk_pixbuf_cache_loaders() {
+    local multibuild_c_target
+
     echo "Generating pixbuf list ..."
 
     if option platform:amd64 ; then

@@ -1,0 +1,63 @@
+--- gtk+-2.22.0/gtk/gtkrc.c	2010-11-28 11:45:01.733620591 +0000
++++ gtk+-2.22.0.PATCHED/gtk/gtkrc.c	2010-11-28 11:45:25.561901092 +0000
+@@ -450,7 +450,7 @@
+       if (im_module_file)
+ 	result = g_strdup (im_module_file);
+       else
+-	result = g_build_filename (GTK_SYSCONFDIR, "gtk-2.0", "gtk.immodules", NULL);
++	result = g_build_filename (GTK_SYSCONFDIR, "gtk-2.0/MULTILIB_TARGET", "gtk.immodules", NULL);
+     }
+ 
+   return result;
+--- gtk+-2.22.0/modules/input/Makefile.am	2010-11-28 11:45:01.734620591 +0000
++++ gtk+-2.22.0.PATCHED/modules/input/Makefile.am	2010-11-28 11:45:25.562901592 +0000
+@@ -187,10 +187,10 @@
+ # after the libraries are installed in their final locations.
+ install-data-hook:
+ 	@if $(RUN_QUERY_IMMODULES_TEST) ; then \
+-	  echo $(mkinstalldirs) $(DESTDIR)$(sysconfdir)/gtk-2.0 ; \
+-	  $(mkinstalldirs) $(DESTDIR)$(sysconfdir)/gtk-2.0 ; \
+-	  echo "$(top_builddir)/gtk/gtk-query-immodules-2.0 > $(DESTDIR)$(sysconfdir)/gtk-2.0/gtk.immodules" ; \
+-	  $(top_builddir)/gtk/gtk-query-immodules-2.0 > $(DESTDIR)$(sysconfdir)/gtk-2.0/gtk.immodules ; \
++	  echo $(mkinstalldirs) $(DESTDIR)$(sysconfdir)/gtk-2.0/MULTILIB_TARGET ; \
++	  $(mkinstalldirs) $(DESTDIR)$(sysconfdir)/gtk-2.0/MULTILIB_TARGET ; \
++	  echo "$(top_builddir)/gtk/gtk-query-immodules-2.0 > $(DESTDIR)$(sysconfdir)/gtk-2.0/MULTILIB_TARGET/gtk.immodules" ; \
++	  $(top_builddir)/gtk/gtk-query-immodules-2.0 > $(DESTDIR)$(sysconfdir)/gtk-2.0/MULTILIB_TARGET/gtk.immodules ; \
+ 	else \
+ 	  echo "***" ; \
+ 	  echo "*** Warning: gtk.immodules not built" ; \
+@@ -201,7 +201,7 @@
+         fi
+ 
+ uninstall-local:
+-	rm -f $(DESTDIR)$(sysconfdir)/gtk-2.0/gtk.immodules
++	rm -f $(DESTDIR)$(sysconfdir)/gtk-2.0/MULTILIB_TARGET/gtk.immodules
+ 
+ if BUILD_DYNAMIC_MODULES
+ 
+--- gtk+-2.22.0/modules/input/Makefile.in	2010-11-28 11:45:01.735620591 +0000
++++ gtk+-2.22.0.PATCHED/modules/input/Makefile.in	2010-11-28 11:45:25.562901592 +0000
+@@ -1233,10 +1233,10 @@
+ # after the libraries are installed in their final locations.
+ install-data-hook:
+ 	@if $(RUN_QUERY_IMMODULES_TEST) ; then \
+-	  echo $(mkinstalldirs) $(DESTDIR)$(sysconfdir)/gtk-2.0 ; \
+-	  $(mkinstalldirs) $(DESTDIR)$(sysconfdir)/gtk-2.0 ; \
+-	  echo "$(top_builddir)/gtk/gtk-query-immodules-2.0 > $(DESTDIR)$(sysconfdir)/gtk-2.0/gtk.immodules" ; \
+-	  $(top_builddir)/gtk/gtk-query-immodules-2.0 > $(DESTDIR)$(sysconfdir)/gtk-2.0/gtk.immodules ; \
++	  echo $(mkinstalldirs) $(DESTDIR)$(sysconfdir)/gtk-2.0/MULTILIB_TARGET ; \
++	  $(mkinstalldirs) $(DESTDIR)$(sysconfdir)/gtk-2.0/MULTILIB_TARGET ; \
++	  echo "$(top_builddir)/gtk/gtk-query-immodules-2.0 > $(DESTDIR)$(sysconfdir)/gtk-2.0/MULTILIB_TARGET/gtk.immodules" ; \
++	  $(top_builddir)/gtk/gtk-query-immodules-2.0 > $(DESTDIR)$(sysconfdir)/gtk-2.0/MULTILIB_TARGET/gtk.immodules ; \
+ 	else \
+ 	  echo "***" ; \
+ 	  echo "*** Warning: gtk.immodules not built" ; \
+@@ -1247,7 +1247,7 @@
+         fi
+ 
+ uninstall-local:
+-	rm -f $(DESTDIR)$(sysconfdir)/gtk-2.0/gtk.immodules
++	rm -f $(DESTDIR)$(sysconfdir)/gtk-2.0/MULTILIB_TARGET/gtk.immodules
+ 
+ included-modules: $(noinst_LTLIBRARIES)
+ 
