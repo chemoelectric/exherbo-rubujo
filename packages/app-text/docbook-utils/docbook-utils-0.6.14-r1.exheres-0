@@ -36,6 +36,7 @@ DEPENDENCIES="
 #        app-text/docbook-xml-simple-dtd:1.0
 #        app-text/docbook-xml-simple-dtd:4.1.2.4
 
+DEFAULT_SRC_PREPARE_PATCHES=( "${FILES}"/${PNV}-grep-2.7.patch )
 DEFAULT_SRC_CONFIGURE_PARAMS=( --hates=docdir )
 DEFAULT_SRC_INSTALL_PARAMS=( htmldir="/usr/share/doc/${PNVR}/html" )
 
