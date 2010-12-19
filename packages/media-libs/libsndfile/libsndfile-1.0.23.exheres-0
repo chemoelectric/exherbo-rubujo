@@ -1,0 +1,73 @@
+# Copyright 2008 Daniel Mierswa <impulze@impulze.org>
+# Distributed under the terms of the GNU General Public License v2
+
+require easy-multibuild autotools [ supported_autoconf=[ 2.5 ] supported_automake=[ 1.11 1.10 ] ]
+
+SUMMARY="A library for reading and writing sound files."
+DESCRIPTION="A C library for reading and writing files containing sampled sound (such as MS Windows WAV and the Apple/SGI AIFF format) through one standard library interface."
+HOMEPAGE="http://www.mega-nerd.com/${PN}"
+DOWNLOADS="${HOMEPAGE}/files/${PNV}.tar.gz"
+
+REMOTE_IDS="freshmeat:${PN}"
+UPSTREAM_DOCUMENTATION="${HOMEPAGE}/api.html"
+UPSTREAM_RELEASE_NOTES="${HOMEPAGE}/NEWS"
+UPSTREAM_CHANGELOG="${HOMEPAGE}/ChangeLog"
+
+LICENCES="|| ( LGPL-2.1 LGPL-3 )"
+SLOT="0"
+PLATFORMS="~amd64 ~x86"
+MYOPTIONS="
+alsa doc flac octave sqlite vorbis
+
+alsa   [[ description = [ Use ALSA in example programs ] ]]
+flac   [[ description = [ Support FLAC codec in OGG containers. ] ]]
+octave [[ description = [ Build the octave libsndfile module ] ]]
+vorbis [[ description = [ Support Vorbis codec in OGG containers. ] ]]
+
+vorbis [[ requires = [ flac ] ]]
+flac [[ requires = [ vorbis ] ]]
+
+multibuild_c: 32 64
+"
+
+DEPENDENCIES="
+    build:
+        dev-util/pkg-config
+    build+run:
+        alsa? ( sys-sound/alsa-lib[multibuild_c:*(?)?] )
+        flac? (
+            media-libs/flac[multibuild_c:*(?)?][>=1.2.1]
+            media-libs/libogg[multibuild_c:*(?)?][>=1.1.3]
+        )
+        octave? ( sci-apps/octave[=3.0*] )
+        sqlite? ( dev-db/sqlite:3[multibuild_c:*(?)?][>=3.2] )
+        vorbis? (
+            media-libs/libvorbis[multibuild_c:*(?)?][>=1.2.0]
+            media-libs/libogg[multibuild_c:*(?)?][>=1.1.3]
+        )
+"
+
+src_prepare() {
+    sed -e "s:libsndfile1-dev:${PNVR}:" \
+        -i configure.ac || die "sed configure.ac failed"
+
+    AT_M4DIR="M4"
+    autotools_src_prepare
+}
+
+configure_one_multibuild() {
+    if option !flac || option !vorbis ; then
+        myconf+=( --disable-external-libs )
+    fi
+
+    myconf+=(
+        --disable-shave
+        $(option_enable alsa)
+        $(option_enable doc bow-docs)
+        $(option_enable octave)
+        $(option_enable sqlite)
+    )
+
+    econf ${myconf[@]}
+}
+

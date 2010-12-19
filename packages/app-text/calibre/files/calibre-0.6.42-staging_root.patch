@@ -1,0 +1,25 @@
+From a49d724757a195aed02eb7748551c2ab48c37bce Mon Sep 17 00:00:00 2001
+From: Wulf C. Krueger <philantrop@exherbo.org>
+Date: Sat, 13 Feb 2010 13:40:33 +0100
+Subject: [PATCH] The calibre env module needs to be installed to staging-root/usr.
+
+---
+ calibre/setup/install.py |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+diff --git a/calibre/setup/install.py b/calibre/setup/install.py
+index 8424280..b0658e3 100644
+--- a/calibre/setup/install.py
++++ b/calibre/setup/install.py
+@@ -142,7 +142,7 @@ class Develop(Command):
+ 
+     def install_env_module(self):
+         import distutils.sysconfig as s
+-        libdir = s.get_python_lib(prefix=self.opts.staging_root)
++        libdir = s.get_python_lib(prefix=self.opts.staging_root+"/usr")
+         if os.path.exists(libdir):
+             path = os.path.join(libdir, 'init_calibre.py')
+             self.info('Installing calibre environment module: '+path)
+-- 
+1.6.6.2
+

@@ -33,6 +33,7 @@ dbm? ( ( berkdb gdbm ) [[ number-selected = at-least-one ]] )
 DEPENDENCIES="
     build:
         dev-util/pkg-config
+        sys-devel/libtool
     build+run:
         dev-libs/libffi
         dev-libs/openssl
@@ -49,6 +50,7 @@ DEFAULT_SRC_CONFIGURE_PARAMS=(
     --enable-shared
     $(ever at_least 3 || echo --enable-unicode=ucs4)
     --with-system-ffi
+    --with-dbmliborder=gdbm:bdb:ndbm
 )
 DEFAULT_SRC_CONFIGURE_OPTION_ENABLES=( ipv6 )
 
@@ -65,6 +67,7 @@ python-build_src_prepare() {
         setup.py
 
     eautoreconf
+    edo libtoolize --force --copy --install
 }
 
 python-build_src_configure() {

@@ -1,0 +1,12 @@
+diff -Naur Python-2.7.1.ORIG/configure.in Python-2.7.1/configure.in
+--- Python-2.7.1.ORIG/configure.in	2010-12-18 05:59:11.961049397 +0000
++++ Python-2.7.1/configure.in	2010-12-18 06:17:42.645493397 +0000
+@@ -12,7 +12,7 @@
+        [],
+        [m4_fatal([Autoconf version $1 is required for Python], 63)])
+ ])
+-version_required(2.65)
++version_required(2.68)
+ 
+ AC_REVISION($Revision: 86076 $)
+ AC_INIT(python, PYTHON_VERSION, http://bugs.python.org/)

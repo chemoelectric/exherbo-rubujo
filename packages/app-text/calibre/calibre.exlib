@@ -1,0 +1,182 @@
+# Copyright 2010 Wulf C. Krueger <philantrop@exherbo.org>
+# Distributed under the terms of the GNU General Public License v2
+
+require distutils [ python_dep=2.6 ] freedesktop-desktop freedesktop-mime multilib bash-completion
+
+export_exlib_phases src_prepare src_compile src_install pkg_postinst
+
+SUMMARY="Calibre is *the* eBook library management application."
+DESCRIPTION="
+Formerly known as libprs500, Calibre is an e-book library management application.
+It can view, convert and catalog e-books in most of the major e-book formats. It
+can also talk to many e-book reader devices. It can go out to the internet and
+fetch metadata for your books. It can download newspapers and convert them into
+e-books for convenient reading.
+Calibre is free, open source and cross-platform in design and works on Linux,
+OS X and Windows.
+"
+HOMEPAGE="http://${PN}-ebook.com"
+DOWNLOADS="
+    http://${PN}-ebook.googlecode.com/files/${PNV}.tar.gz
+    mirror://sourceforge/${PN}/${PNV}.tar.gz
+    ${HOMEPAGE}/downloads/${PNV}.tar.gz
+"
+
+BUGS_TO="philantrop@exherbo.org"
+REMOTE_IDS="sourceforge:${PN}"
+
+UPSTREAM_CHANGELOG="http://bazaar.launchpad.net/~kovid/${PN}/trunk/annotate/head:/Changelog.yaml"
+UPSTREAM_DOCUMENTATION="${HOMEPAGE}/user_manual/ [[ lang = en ]]"
+UPSTREAM_RELEASE_NOTES="${HOMEPAGE}/whats-new"
+
+LICENCES="GPL-3"
+SLOT="0"
+MYOPTIONS=""
+
+DEPENDENCIES="
+    build:
+        dev-python/setuptools[>=0.6_rc5]
+    build+run:
+        app-text/podofo[>=0.8.2]
+        app-text/poppler[>=0.12.0][qt4(+)]
+        dev-lang/python[sqlite]
+        dev-python/BeautifulSoup[>=3.0.5]
+        dev-python/CherryPy[>=3.1.2-r1]
+        dev-python/cssutils[>=0.9.7_alpha3]
+        dev-python/dnspython[>=1.6.0]
+        dev-python/python-dateutil[>=1.4.1]
+        dev-python/dbus-python[>=0.82.2]
+        dev-python/Imaging[>=1.1.6]
+        dev-python/lxml[>=2.2.1]
+        dev-python/mechanize[>=0.1.11]
+        dev-python/PyQt4[>=4.7][webkit]
+        media-gfx/ImageMagick[>=6.5.9]
+        media-libs/chmlib[>=0.40]
+        media-libs/libwmf[>=0.2.8.4]
+        x11-apps/xdg-utils[>=1.0.2]
+        x11-libs/qt:4[>=4.7.0]
+    suggestion:
+        app-arch/unrar [[ description = [ for unpacking compressed ebooks ] ]]
+        app-arch/unzip [[ description = [ for unpacking compressed ebooks ] ]]
+"
+
+# Calibre bundles a few libs and some of those are rather heavily patched because
+# their respective upstreams are unresponsive. As of Feb, 07th 2010 patched ones
+# are:
+#
+# odf -> odfpy: http://forge.osor.eu/plugins/scmsvn/viewcvs.php/trunk/?root=odfpy
+# Upstream unresponsive according to Kovid.
+# "pypdf and odfpy you shoud just be able to do a diff against upstream trunk to
+# generate the patches"
+#
+# pypdf -> git://github.com/mfenniak/pyPdf.git
+# Upstream unresponsive according to Kovid. Will have to provide Calibre's patches
+# myself.
+#
+# genshi: based upon Genshi-0.5, patched, upstream is active, patches look
+# upstreamable. Refused by upstream because they don't want to make UTF-8 the
+# default. Will have to make that optional.
+#
+# Potentially bundled stuff:
+# lzxcomp -> liblzxcomp
+# openclit -> convertlit
+
+DEFAULT_SRC_PREPARE_PATCHES=( -p2 "${FILES}"/${PN}-0.6.42-staging_root.patch )
+
+WORK=${WORKBASE}/${PN}
+
+prefix="/usr"
+bindir="${prefix}/bin"
+sharedir="${prefix}/share"
+libdir="${prefix}/$(get_libdir)"
+
+DISTUTILS_SRC_INSTALL_PARAMS=(
+    --prefix="${prefix}"
+    --bindir="${bindir}"
+    --libdir="${libdir}"
+    --sharedir="${sharedir}"
+    --root="${IMAGE}"
+    --staging-bindir="${IMAGE}${bindir}"
+    --staging-libdir="${IMAGE}${libdir}"
+    --staging-sharedir="${IMAGE}${sharedir}"
+)
+
+calibre_src_prepare() {
+    # Remove bundled libs - we're using the system's.
+    edo rm -r \
+        "${WORK}"/src/cherrypy
+
+    # Don't try deleting the old udev rules from the live fs.
+    edo sed -i -e "s:\(old_udev = '\).*:\1':" "${WORK}"/src/calibre/linux.py
+
+    # Install the udev rules to the real libdir.
+    edo sed -i -e "s:\(base = \)\(.*\)lib\(.*\):\1\2$(get_libdir)\3:" "${WORK}"/src/calibre/linux.py
+
+    # Kovid generated the tarball before he updated the version.
+    if [[ ${PV} == 0.7.2 ]]; then
+        edo sed -i -e "s:0\.7\.1:${PV}:" src/calibre/constants.py
+        edo sed -i -e "s:0\.7\.1:${PV}:" src/calibre/translations/calibre.pot
+    fi
+
+    distutils_src_prepare
+}
+
+calibre_src_compile() {
+    distutils_src_compile
+
+    # We don't want the gui compilation to be done in src_install so we do it here.
+    edo ${PYTHON} -B setup.py gui
+}
+
+calibre_src_install() {
+    local old_XDG="${XDG_DATA_DIRS}"
+
+    # We have to create these directories before installing because xdg-* needs
+    # to see them even if it doesn't use them...
+    dodir \
+        /etc/xdg/menus \
+        /usr/share/applications \
+        /usr/share/applnk \
+        /usr/share/desktop-directories \
+        /usr/share/icons/hicolor \
+        /usr/share/mime/packages
+
+    unset SUDO_UID SUDO_GID SUDO_USER
+
+    export \
+        KDEDIRS="${IMAGE}${prefix}" \
+        XDG_DATA_DIRS="${IMAGE}${sharedir}" \
+        XDG_UTILS_INSTALL_MODE="system" \
+        DESTDIR="${IMAGE}"
+
+    distutils_src_install
+
+    export XDG_DATA_DIRS="${old_XDG}"
+
+    dodir /usr/share/man/man1
+    edo mv "${IMAGE}${sharedir}"/calibre/man/man1/* "${IMAGE}${sharedir}"/man/man1/
+
+    dobashcompletion "${IMAGE}"/etc/bash_completion.d/calibre
+
+    # Removing junk.
+    edo rm -r \
+        "${IMAGE}"/etc/bash_completion.d \
+        "${IMAGE}"${sharedir}/applications/{defaults.list,mimeinfo.cache} \
+        "${IMAGE}"${sharedir}/mime/{subclasses,XMLnamespaces,globs{,2},mime.cache,{tree,}magic,aliases,{generic-,}icons,types} \
+        "${IMAGE}"${sharedir}/{applnk,desktop-directories} \
+        "${IMAGE}"/usr/bin/calibre-uninstall
+    edo find "${IMAGE}"/ -type d -empty -delete
+}
+
+calibre_pkg_postinst() {
+    local cruft=( /etc/udev/rules.d/95-calibre.rules /etc/bash_completion.d/calibre )
+    for file in ${cruft[@]}; do
+        if test -f "${file}" ; then
+            nonfatal edo rm "${file}" || ewarn "removing ${file} failed"
+        fi
+    done
+
+    freedesktop-desktop_update_desktop_database
+    freedesktop-mime_update_mime_database
+}
+
