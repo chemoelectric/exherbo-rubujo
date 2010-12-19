@@ -5,7 +5,7 @@ require distutils
 
 SUMMARY="ReportLab Toolkit, a PDF library"
 HOMEPAGE="http://www.reportlab.com/software/opensource/rl-toolkit/"
-DOWNLOADS="http://www.reportlab.com/ftp/${PN}_${PV/\./_}.tar.gz"
+DOWNLOADS="http://www.reportlab.com/ftp/${PN,,*}-${PV}.tar.gz"
 
 SLOT="0"
 LICENCES="BSD-3"
@@ -14,7 +14,7 @@ MYOPTIONS=""
 
 DEPENDENCIES="
     build+run:
-        dev-python/Imaging    
+        dev-python/Imaging
 "
 
-WORK="${WORKBASE}/${PN}_${PV/\./_}"
+WORK="${WORKBASE}/${PN,,*}-${PV}"
