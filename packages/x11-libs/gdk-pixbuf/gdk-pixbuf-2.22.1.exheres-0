@@ -1,0 +1,77 @@
+# Copyright 2010 Saleem Abdulrasool <compnerd@compnerd.org>
+# Distributed under the terms of the GNU General Purpose License v2
+
+require gnome.org easy-multibuild
+
+SUMMARY="An image loading library"
+HOMEPAGE="http://www.gnome.org/"
+LICENCES="LGPL-2"
+
+SLOT="2.0"
+PLATFORMS="~amd64 ~x86"
+MYOPTIONS="gobject-introspection
+jpeg2000 [[ description = [ Support for JPEG 2000 Part-1 images using libjasper ] ]]
+man-pages [[ description = [ Build and install man pages for the GTK+ API ] ]]
+platform: amd64
+multibuild_c: 32 64"
+
+DEPENDENCIES="
+    build:
+        gobject-introspection? ( gnome-desktop/gobject-introspection[>=0.9.3][multibuild_c:*(?)?] )
+        man-pages? ( dev-libs/libxslt[multibuild_c:*(?)?] )
+    build+run:
+        dev-libs/glib:2[>=2.25.9][multibuild_c:*(?)?]
+        media-libs/libpng[multibuild_c:*(?)?]
+        media-libs/jpeg[multibuild_c:*(?)?]
+        media-libs/tiff[multibuild_c:*(?)?]
+        jpeg2000? ( media-libs/jasper[multibuild_c:*(?)?] )
+"
+
+DEFAULT_SRC_CONFIGURE_OPTION_WITHS=( 'jpeg2000 libjasper' )
+DEFAULT_SRC_CONFIGURE_OPTION_ENABLES=( 'gobject-introspection introspection' 'man-pages man' )
+
+install_one_multibuild() {
+    default
+    if option platform:amd64 ; then
+        edo mv "${IMAGE}"/usr/bin/gdk-pixbuf-query-loaders{,-${MULTIBUILD_TARGET}}
+    fi
+}
+
+src_install() {
+    local multibuild_c_target
+
+    easy-multibuild_src_install
+    if option platform:amd64 ; then
+        for multibuild_c_target in ${MULTIBUILD_C_TARGETS} ; do
+            if [[ "${multibuild_c_target}" == "${MULTIBUILD_C_DEFAULT_TARGET}" ]] ; then
+                dosym gdk-pixbuf-query-loaders-${multibuild_c_target} /usr/bin/gdk-pixbuf-query-loaders
+            fi
+        done
+    fi
+}
+
+gdk_pixbuf_cache_loaders() {
+    local multibuild_c_target
+
+    echo "Generating pixbuf list ..."
+
+    if option platform:amd64 ; then
+        for multibuild_c_target in ${MULTIBUILD_C_TARGETS} ; do
+            echo "gdk-pixbuf-query-loaders-${multibuild_c_target} > /usr/lib${multibuild_c_target}/gdk-pixbuf-2.0/2.10.0/loaders.cache"
+            gdk-pixbuf-query-loaders-${multibuild_c_target} > "${ROOT}/usr/lib${multibuild_c_target}/gdk-pixbuf-2.0/2.10.0/loaders.cache"
+        done
+    else
+        echo "/usr/bin/gdk-pixbuf-query-loaders > /usr/${LIBDIR}/gdk-pixbuf-2.0/2.10.0/loaders.cache"
+        gdk-pixbuf-query-loaders > "${ROOT}usr/${LIBDIR}/gdk-pixbuf-2.0/2.10.0/loaders.cache"
+    fi
+}
+
+pkg_postinst() {
+    default
+    gdk_pixbuf_cache_loaders
+}
+
+pkg_postrm() {
+    default
+    gdk_pixbuf_cache_loaders
+}
