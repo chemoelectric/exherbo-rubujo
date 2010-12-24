@@ -1,0 +1,32 @@
+# Copyright 2008 Richard Brown
+# Copyright 2010 Barry Schwartz
+# Distributed under the terms of the GNU General Public License v2
+# Based in part upon 'libid3tag-0.15.1b-r2.ebuild' from Gentoo, which is:
+#     Copyright 1999-2008 Gentoo Foundation.
+
+SUMMARY="ID3 tag manipulation library"
+HOMEPAGE="http://www.underbit.com/products/mad/"
+DOWNLOADS="mirror://sourceforge/mad/${PNV}.tar.gz"
+
+LICENCES="GPL-2"
+SLOT="0"
+PLATFORMS="~amd64 ~x86"
+MYOPTIONS=""
+
+DEPENDENCIES="
+    build+run:
+        sys-libs/zlib
+"
+
+DEFAULT_SRC_CONFIGURE_PARAMS=( --hates=docdir )
+
+src_install() {
+    default
+
+    # This file must be updated with every version update
+    insinto /usr/${LIBDIR}/pkgconfig
+    doins "${FILES}/id3tag.pc"
+    sed -i -e "s:libdir=\${exec_prefix}/lib:libdir=/usr/${LIBDIR}:" \
+        -e "s:0.15.0b:${PV}:" \
+        "${IMAGE}/usr/${LIBDIR}/pkgconfig/id3tag.pc"
+}
