@@ -12,6 +12,8 @@ MYOPTIONS=""
 # FIXME: note the dependencies.
 DEPENDENCIES=""
 
+RESTRICT="strip"
+
 WORK="${WORKBASE}"
 
 src_configure()
@@ -33,4 +35,9 @@ src_install()
     echo >> fajrovulpo-bin
     echo 'exec /opt/fajrovulpo-bin/firefox ${1+"$@"}' >> fajrovulpo-bin
     dobin fajrovulpo-bin
+
+    insinto /etc/revdep-rebuild
+    hereins ${PN} <<EOF
+SEARCH_DIRS_MASK=/opt/fajrovulpo-bin
+EOF
 }
