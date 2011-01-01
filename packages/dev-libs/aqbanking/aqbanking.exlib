@@ -1,0 +1,26 @@
+# Copyright 2010 Bernhard Frauendienst
+# Distributed under the terms of the GNU General Public License v2
+
+myexparam package=03
+myexparam release
+myexparam file=01
+myexparam suffix=tar.gz
+
+MY_PNV="${PNV//_/}"
+MY_FILENAME="${MY_PNV}.$(exparam suffix)"
+
+SLOT="0"
+DOWNLOADS="http://www.aquamaniac.de/sites/download/download.php?package=$(exparam package)&release=$(exparam release)&file=$(exparam file)&dummy=${MY_FILENAME} -> ${MY_FILENAME}"
+HOMEPAGE="http://www.aquamaniac.de/aqbanking"
+LICENCES="GPL-2"
+SUMMARY="Free Online Banking library"
+
+DEPENDENCIES="
+    build+run:
+        finance/ktoblzcheck[>=1.10]
+"
+
+REMOTE_IDS="freshmeat:AqBanking"
+
+WORK="${WORKBASE}/${MY_PNV}"
+

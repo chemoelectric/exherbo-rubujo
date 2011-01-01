@@ -1,0 +1,22 @@
+# Copyright 2010 Bernhard Frauendienst
+# Distributed under the terms of the GNU General Public License v2
+
+require sourceforge [ suffix="tar.gz" ]
+
+SUMMARY="A library to check bank account numbers and bank codes (BLZ) of German Banks"
+HOMEPAGE="http://ktoblzcheck.sourceforge.net/"
+
+LICENCES="LGPL-2.1"
+SLOT="0"
+PLATFORMS="~amd64 ~x86"
+MYOPTIONS="python"
+
+DEPENDENCIES="
+    build+run:
+        python? ( dev-lang/python:=[>=2.5] )
+"
+
+#BUGS_TO="exherbo@nospam.obeliks.de"
+
+DEFAULT_SRC_CONFIGURE_OPTION_ENABLES=( "python" )
+

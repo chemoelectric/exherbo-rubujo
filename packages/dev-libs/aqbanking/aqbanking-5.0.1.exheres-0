@@ -1,0 +1,37 @@
+# Copyright 2010 Bernhard Frauendienst
+# Distributed under the terms of the GNU General Public License v2
+# Parts based on 'aqbanking-4.2.4.ebuild" from Gentoo, which is:
+#     Copyright 1999-2010 Gentoo Foundation 
+
+require aqbanking [ release=74 ] multilib
+
+PLATFORMS="~amd64 ~x86"
+
+DEPENDENCIES="
+    build:
+        dev-util/pkg-config
+    build+run:
+        sys-libs/gwenhywfar[>=4.0.2]
+        ofx? ( finance/libofx[>=0.9.1] )
+        qt4? ( x11-libs/qt:4[qt3support] )
+"
+
+MYOPTIONS="
+    debug 
+    ofx [[ description = [ Enable backend for OFX (Open Financial eXchange) Direct Connect ] ]]
+"
+
+# parallel make fails
+DEFAULT_SRC_COMPILE_PARAMS=( -j1 )
+
+src_configure() {
+    local backends="aqhbci aqnone"
+    option ofx && backends+=" aqofxconnect"
+
+    econf \
+        PKG_CONFIG="pkg-config" \
+        --with-docpath=/usr/share/doc/${PNVR}/apidoc \
+        --with-backends="${backends}" \
+        $(option_enable debug) \
+        ${myconf}
+}

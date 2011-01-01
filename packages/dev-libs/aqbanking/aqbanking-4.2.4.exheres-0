@@ -1,0 +1,61 @@
+# Copyright 2010 Bernhard Frauendienst
+# Distributed under the terms of the GNU General Public License v2
+# Parts based on 'aqbanking-4.2.4.ebuild" from Gentoo, which is:
+#     Copyright 1999-2010 Gentoo Foundation 
+
+require aqbanking [ release=50 ] autotools [ supported_autoconf=[ 2.5 ] supported_automake=[ 1.11 ] ] multilib
+
+PLATFORMS="~amd64 ~x86"
+
+DEPENDENCIES="
+    build+run:
+        sys-libs/gwenhywfar[>=3.11.3]
+        ofx? ( finance/libofx[>=0.9.1] )
+        qt4? ( x11-libs/qt:4[qt3support] )
+"
+
+MYOPTIONS="
+    debug 
+    ofx [[ description = [ Enable backend for OFX (Open Financial eXchange) Direct Connect ] ]]
+    qt4
+"
+
+# parallel make fails
+DEFAULT_SRC_COMPILE_PARAMS=( -j1 )
+
+src_prepare() {
+    expatch "${FILES}/${PNV}-gcc_detection.patch"
+
+    AT_M4DIR="m4" eautoreconf
+}
+
+src_configure() {
+    local backends="aqhbci aqnone"
+    option ofx && backends+=" aqofxconnect"
+
+    local frontends="" qt3_libs="" qt3_includes="" myconf
+    if option qt4; then
+        frontends="${frontends} qbanking q4banking"
+        qt3_libs="$(pkg-config QtCore QtGui Qt3Support --libs)"
+        qt3_includes="$(pkg-config QtCore QtGui Qt3Support --cflags-only-I)"
+        myconf="--enable-qt3=yes --enable-qt4=yes --with-qt4-moc=/usr/bin/moc --with-qt4-uic=/usr/bin/uic"
+    else
+        myconf="--enable-qt3=no --enable-qt4=no"
+    fi
+
+    econf \
+        QTDIR="/usr/$(get_libdir)/qt4" \
+        QT3TO4="/usr/bin/qt3to4" \
+        qt3_libs="${qt3_libs}" \
+        qt3_includes="${qt3_includes}" \
+        --with-docpath=/usr/share/doc/${PNVR}/apidoc \
+        --with-backends="${backends}" \
+        --with-frontends="${frontends}" \
+        $(option_enable debug) \
+        ${myconf}
+}
+
+src_compile() {
+    option qt4 && emake qt4-port
+    default
+}

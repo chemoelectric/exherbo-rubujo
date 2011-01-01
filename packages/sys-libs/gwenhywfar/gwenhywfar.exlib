@@ -1,0 +1,43 @@
+# Copyright 2010 Bernhard Frauendienst
+# Distributed under the terms of the GNU General Public License v2
+
+myexparam package=01
+myexparam release
+myexparam file=01
+myexparam suffix=tar.gz
+
+MY_PNV="${PNV//_/}"
+MY_FILENAME="${MY_PNV}.$(exparam suffix)"
+
+SLOT="0"
+DOWNLOADS="http://www.aquamaniac.de/sites/download/download.php?package=$(exparam package)&release=$(exparam release)&file=$(exparam file)&dummy=${MY_FILENAME} -> ${MY_FILENAME}"
+
+HOMEPAGE="http://www.aquamaniac.de/aqbanking"
+LICENCES="LGPL-2.1"
+SUMMARY="a multi-platform helper library for networking and security applications and libraries"
+
+DEPENDENCIES="
+    build+run:
+        dev-libs/gnutls[>=2.0.1]
+        dev-libs/libgcrypt[>=1.2.0]
+"
+
+REMOTE_IDS="freshmeat:Gwenhywfar"
+
+WORK="${WORKBASE}/${MY_PNV}"
+
+DEFAULT_SRC_CONFIGURE_PARAMS=( 
+    "--with-docpath=/usr/share/doc/${PNVR}/apidoc" 
+)
+
+src_compile() {
+    default
+
+    option doc && emake srcdoc
+}
+
+src_install() {
+    default
+
+    option doc && emake DESTDIR="${IMAGE}" install-srcdoc
+}
