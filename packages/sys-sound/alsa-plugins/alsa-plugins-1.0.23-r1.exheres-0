@@ -14,7 +14,7 @@ DOWNLOADS="mirror://alsaproject/${PN#alsa-}/${PNV}.tar.bz2"
 LICENCES="GPL-2"
 SLOT="0"
 PLATFORMS="~amd64 ~x86"
-MYOPTIONS="ffmpeg pulseaudio jack samplerate speex multibuild_c: 32 64"
+MYOPTIONS="ffmpeg pulseaudio jack libsamplerate speex multibuild_c: 32 64"
 
 DEPENDENCIES="
     build+run:
@@ -22,7 +22,7 @@ DEPENDENCIES="
         ffmpeg? ( media/ffmpeg )
         pulseaudio? ( media-sound/pulseaudio[multibuild_c:*(?)?][>=0.9.11] )
         jack? ( media-sound/jack-audio-connection-kit[>=0.98] )
-        samplerate? ( media-libs/libsamplerate[multibuild_c:*(?)?] )
+        libsamplerate? ( media-libs/libsamplerate[multibuild_c:*(?)?] )
         speex? ( media-libs/speex[multibuild_c:*(?)?][>=1.2_rc] )
 "
 
@@ -37,14 +37,14 @@ configure_one_multibuild() {
         econf $(option_enable ffmpeg avcodec) \
             $(option_enable pulseaudio) \
             $(option_enable jack) \
-            $(option_enable samplerate) \
+            $(option_enable libsamplerate samplerate) \
             --with-speex=$(option speex && echo lib || echo no)
     else
         # TODO: ffmpeg support for 32-bit.
         econf --disable-avcodec \
             $(option_enable pulseaudio) \
             $(option_enable jack) \
-            $(option_enable samplerate) \
+            $(option_enable libsamplerate samplerate) \
             --with-speex=$(option speex && echo lib || echo no)
     fi
 }
@@ -58,7 +58,7 @@ install_one_multibuild() {
         option ffmpeg && dodoc a52.txt lavcrate.txt
         option jack && dodoc README-jack
         option pulseaudio && dodoc README-pulse
-        option samplerate && dodoc samplerate.txt
+        option libsamplerate && dodoc samplerate.txt
         option speex && dodoc speexdsp.txt speexrate.txt
     fi
 }
