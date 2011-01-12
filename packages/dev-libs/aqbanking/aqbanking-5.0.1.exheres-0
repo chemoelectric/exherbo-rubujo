@@ -13,7 +13,6 @@ DEPENDENCIES="
     build+run:
         sys-libs/gwenhywfar[>=4.0.2]
         ofx? ( finance/libofx[>=0.9.1] )
-        qt4? ( x11-libs/qt:4[qt3support] )
 "
 
 MYOPTIONS="

@@ -1,0 +1,109 @@
+# Copyright 2009 Saleem Abdulrasool <compnerd@compnerd.org>
+# Distributed under the terms of the GnU General Public License v2
+
+require easy-multibuild
+
+SUMMARY="A sound server for POSIX and Win32 systems"
+HOMEPAGE="http://www.pulseaudio.org/"
+DOWNLOADS="http://0pointer.de/lennart/projects/pulseaudio/${PNV}.tar.gz"
+
+LICENCES="GPL-2"
+SLOT="0"
+PLATFORMS="~amd64 ~x86"
+MYOPTIONS="alsa avahi bluetooth [[ requires = [ dbus ] ]] caps consolekit dbus gtk ipv6 libsamplerate multibuild_c: 32 64"
+
+DEPENDENCIES="
+    build:
+        dev-util/pkg-config[>=0.20]
+        dev-util/intltool[>=0.35.0]
+    build+run:
+        media-libs/libsndfile[multibuild_c:*(?)?][>=1.0.20]
+        media-libs/speex[multibuild_c:*(?)?][>=1.2_beta]
+        dev-libs/glib:2[multibuild_c:*(?)?][>=2.4]
+        sys-libs/gdbm[multibuild_c:*(?)?]
+        sys-fs/udev[multibuild_c:*(?)?][>=143][sound]
+        dev-libs/openssl[multibuild_c:*(?)?][>=0.9]
+        alsa? ( sys-sound/alsa-lib[multibuild_c:*(?)?][>=1.0.19] )
+        avahi? ( net-dns/avahi[>=0.6.0][dbus] )
+        bluetooth? ( net-wireless/bluez[>=3.0] )
+        caps? ( sys-libs/libcap )
+        consolekit? ( sys-auth/ConsoleKit )
+        dbus? ( sys-apps/dbus[multibuild_c:*(?)?][>=1.0] )
+        gtk? ( x11-libs/gtk+:2[multibuild_c:*(?)?][>=2.4] )
+        libsamplerate? ( media-libs/libsamplerate[multibuild_c:*(?)?][>=0.1] )
+
+        group/audio
+        group/pulse
+        group/pulse-rt
+        group/pulse-access
+        user/pulse
+    recommendation:
+        alsa? ( sys-sound/alsa-plugins[pulseaudio] )
+"
+
+RESTRICT="test"
+
+DEFAULT_SRC_CONFIGURE_PARAMS=(
+--disable-oss-output
+--disable-oss-wrapper
+--disable-solaris
+
+--localstatedir=/var
+--with-database=gdbm
+
+--disable-per-user-esound-socket
+
+--disable-gconf
+--disable-hal
+
+--enable-glib2
+--enable-udev
+--enable-manpages
+
+--enable-openssl
+
+# breaks sound output
+--disable-x11
+
+# unpackaged dependencies
+--disable-asyncns
+--disable-jack
+--disable-lirc
+--disable-tcpwrap
+)
+
+DEFAULT_SRC_CONFIGURE_OPTION_WITHS=( caps )
+DEFAULT_SRC_CONFIGURE_OPTION_ENABLES=(
+    alsa
+    avahi
+    'bluetooth bluez'
+    dbus
+    'gtk gtk2'
+    ipv6
+    'libsamplerate samplerate'
+)
+
+install_one_multibuild() {
+    default
+
+    if [[ "${MULTIBUILD_TARGET}" == "${MULTIBUILD_C_DEFAULT_TARGET}" ]] ; then
+
+        insinto /etc/security/limits.d/
+        doins "${FILES}/pulse-rt.conf"
+
+        keepdir /usr/libexec/pulse
+        diropts -o pulse -g pulse -m0755 ; keepdir /var/run/pulse
+
+        option avahi && edo sed -i -e '/module-zeroconf-publish/{ /^#/{ s/^#// } }' "${IMAGE}/etc/pulse/default.pa"
+        option !consolekit && edo sed -i -e '/module-console-kit/{ /^#/!{ s/^/#/ } }' "${IMAGE}/etc/pulse/default.pa"
+
+        # X session integration breaks pulseaudio, patches to fix it welcome
+        edo rmdir "${IMAGE}"/etc/xdg/{autostart,}
+        edo rm "${IMAGE}"/usr/bin/start-pulseaudio-x11
+
+        if ! option alsa ; then
+            edo rmdir "${IMAGE}"/usr/share/pulseaudio/{alsa-mixer/{paths,profile-sets,},}
+            edo rmdir "${IMAGE}"/lib/{udev/{rules.d,},}
+        fi
+    fi
+}
