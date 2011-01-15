@@ -1,0 +1,50 @@
+# Copyright 2007 Alexander Færøy <ahf@exherbo.org>
+# Copyright 2010 Bo Ørsted Andresen <zlin@exherbo.org>
+# Copyright 2011 Barry Schwartz
+# Distributed under the terms of the GNU General Public License v2
+# Based in part upon 'freetype-2.3.7.ebuild' from Gentoo, which is:
+#     Copyright 1999-2008 Gentoo Foundation
+
+SCM_REPOSITORY="http://git.savannah.gnu.org/cgit/freetype/freetype2.git"
+
+require easy-multibuild scm-git
+
+SUMMARY="A portable font engine"
+HOMEPAGE="http://www.freetype.org"
+
+REMOTE_IDS="freshmeat:${PN} sourceforge:${PN}"
+
+LICENCES="FTL GPL-2"
+SLOT="2"
+PLATFORMS="~amd64"
+MYOPTIONS="multibuild_c: 32 64"
+
+DEPENDENCIES=""
+
+src_prepare() {
+    default
+
+    /bin/sh autogen.sh
+
+    enable_option() {
+        edo sed -i -e "/#define ${1}/a #define ${1}" include/freetype/config/ftoption.h
+    }
+    disable_option() {
+        edo sed -i -e "/#define ${1}/ { s:^:/*:; s:$:*/: }" include/freetype/config/ftoption.h
+    }
+
+    enable_option FT_CONFIG_OPTION_INCREMENTAL
+    disable_option FT_CONFIG_OPTION_OLD_INTERNALS
+
+    # See http://freetype.org/patents.html about potential patent infringement issues
+    enable_option FT_CONFIG_OPTION_SUBPIXEL_RENDERING
+}
+
+src_configure() {
+    easy-multibuild_src_configure
+
+    if option multibuild_c:32; then
+        # hack to make freetype link, patches to fix this properly welcome
+        edo sed -i -e 's,CC="\(.*\)"$,CC="\1 -m32",' "${WORKBASE}"/C/32/libtool
+    fi
+}
