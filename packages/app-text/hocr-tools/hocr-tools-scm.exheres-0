@@ -1,0 +1,38 @@
+# Copyright 2011 Barry Schwartz
+# Distributed under the terms of the GNU General Public License v2
+
+SCM_REPOSITORY="https://${PN}.googlecode.com/hg/"
+
+require scm-hg
+
+SUMMARY="Tools for manipulating and evaluating the hOCR format for representing multi-lingual OCR results by embedding them into HTML."
+HOMEPAGE="http://code.google.com/p/${PN}/"
+LICENCES="Apache-2.0"
+
+SLOT="0"
+PLATFORMS="~amd64"
+MYOPTIONS=""
+
+DEPENDENCIES="
+    run:
+        dev-lang/python:=[>=2.4&<3]
+"
+
+MY_BINS=(
+    hocr-check
+    hocr-combine
+    hocr-eval
+    hocr-eval-geom
+    hocr-eval-lines
+    hocr-extract-g1000
+    hocr-extract-images
+    hocr-lines
+    hocr-merge-dc
+    hocr-split
+)
+
+src_install()
+{
+    dobin ${MY_BINS[@]}
+    dodoc README sample.txt sample.html dcsample.xml dcsample2.xml
+}
