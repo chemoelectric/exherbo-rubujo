@@ -27,8 +27,8 @@ DEPENDENCIES="
 "
 
 SCONS_SRC_CONFIGURE_PARAMS=(
-    destdir="${IMAGE}usr"
-    prefix="/"
+    destdir="${IMAGE}"
+    prefix="/usr"
     iulib="/usr"
     leptonica="/usr"
     gsl=yes
