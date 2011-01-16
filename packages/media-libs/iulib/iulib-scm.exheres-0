@@ -1,0 +1,35 @@
+# Copyright 2011 Barry Schwartz
+# Distributed under the terms of the GNU General Public License v2
+
+SCM_REPOSITORY="https://${PN}.googlecode.com/hg/"
+
+require googlecode scons scm-hg
+
+SUMMARY=""
+LICENCES="Apache-2.0"
+
+SLOT="0"
+PLATFORMS="~amd64"
+MYOPTIONS=""
+
+DEPENDENCIES="
+    build+run:
+        media-libs/libpng[>=1.2]
+        media-libs/jpeg[>=6b]
+        media-libs/tiff[>=3.9]
+        media/ffmpeg[>=0.6.1]
+        media-libs/SDL_gfx[>=2.0.20]
+        media-libs/SDL_image[>=1.2]
+"
+
+SCONS_SRC_INSTALL_PARAMS=(
+    prefix="${IMAGE}/usr"
+)
+SCONS_SRC_CONFIGURE_PARAMS=( "${SCONS_SRC_INSTALL_PARAMS[@]}" )
+SCONS_SRC_COMPILE_PARAMS=( "${SCONS_SRC_INSTALL_PARAMS[@]}" )
+
+src_prepare() {
+    default
+
+    sed -i -e 's#"/lib"#"/'"${LIBDIR}"'"#g' SConstruct
+}

@@ -3,10 +3,9 @@
 
 SCM_REPOSITORY="https://${PN}.googlecode.com/hg/"
 
-require scm-hg
+require googlecode scm-hg
 
 SUMMARY="Tools for manipulating and evaluating the hOCR format for representing multi-lingual OCR results by embedding them into HTML."
-HOMEPAGE="http://code.google.com/p/${PN}/"
 LICENCES="Apache-2.0"
 
 SLOT="0"
