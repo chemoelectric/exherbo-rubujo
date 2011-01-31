@@ -1,0 +1,126 @@
+--- gmic-1.4.8.0/configure.ORIG	2011-01-31 20:44:32.693635423 +0000
++++ gmic-1.4.8.0/configure	2011-01-31 23:23:30.724922180 +0000
+@@ -4433,58 +4433,6 @@
+ 
+ # Checks for mandatory libraries.
+ 
+-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for InitializeMagick in -lMagick++" >&5
+-$as_echo_n "checking for InitializeMagick in -lMagick++... " >&6; }
+-if test "${ac_cv_lib_Magickpp_InitializeMagick+set}" = set; then :
+-  $as_echo_n "(cached) " >&6
+-else
+-  ac_check_lib_save_LIBS=$LIBS
+-LIBS="-lMagick++  $LIBS"
+-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+-/* end confdefs.h.  */
+-
+-/* Override any GCC internal prototype to avoid an error.
+-   Use char because int might match the return type of a GCC
+-   builtin and then its argument prototype would still apply.  */
+-#ifdef __cplusplus
+-extern "C"
+-#endif
+-char InitializeMagick ();
+-int
+-main ()
+-{
+-return InitializeMagick ();
+-  ;
+-  return 0;
+-}
+-_ACEOF
+-if ac_fn_c_try_link "$LINENO"; then :
+-  ac_cv_lib_Magickpp_InitializeMagick=yes
+-else
+-  ac_cv_lib_Magickpp_InitializeMagick=no
+-fi
+-rm -f core conftest.err conftest.$ac_objext \
+-    conftest$ac_exeext conftest.$ac_ext
+-LIBS=$ac_check_lib_save_LIBS
+-fi
+-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_Magickpp_InitializeMagick" >&5
+-$as_echo "$ac_cv_lib_Magickpp_InitializeMagick" >&6; }
+-if test "x$ac_cv_lib_Magickpp_InitializeMagick" = x""yes; then :
+-  cat >>confdefs.h <<_ACEOF
+-#define HAVE_LIBMAGICK__ 1
+-_ACEOF
+-
+-  LIBS="-lMagick++ $LIBS"
+-
+-else
+-
+-    echo "***"
+-    echo "** Fatal Error : Header or library files for 'libMagick++' are missing but are mandatory to compile G'MIC. **"
+-    echo "***"
+-    exit -1
+-
+-fi
+-
+ { $as_echo "$as_me:${as_lineno-$LINENO}: checking for main in -lXext" >&5
+ $as_echo_n "checking for main in -lXext... " >&6; }
+ if test "${ac_cv_lib_Xext_main+set}" = set; then :
+@@ -5233,13 +5181,13 @@
+ 
+ fi
+ 
+-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for cvSobel in -lcv" >&5
+-$as_echo_n "checking for cvSobel in -lcv... " >&6; }
++{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for cvSobel in -lopencv_imgproc" >&5
++$as_echo_n "checking for cvSobel in -lopencv_imgproc... " >&6; }
+ if test "${ac_cv_lib_cv_cvSobel+set}" = set; then :
+   $as_echo_n "(cached) " >&6
+ else
+   ac_check_lib_save_LIBS=$LIBS
+-LIBS="-lcv  $LIBS"
++LIBS="-lopencv_imgproc  $LIBS"
+ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+ /* end confdefs.h.  */
+ 
+@@ -5274,7 +5222,7 @@
+ #define HAVE_LIBCV 1
+ _ACEOF
+ 
+-  LIBS="-lcv $LIBS"
++  LIBS="-lopencv_imgproc $LIBS"
+ 
+ else
+ 
+@@ -5285,13 +5233,13 @@
+ 
+ fi
+ 
+-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for main in -lhighgui" >&5
+-$as_echo_n "checking for main in -lhighgui... " >&6; }
++{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for main in -lopencv_highgui" >&5
++$as_echo_n "checking for main in -lopencv_highgui... " >&6; }
+ if test "${ac_cv_lib_highgui_main+set}" = set; then :
+   $as_echo_n "(cached) " >&6
+ else
+   ac_check_lib_save_LIBS=$LIBS
+-LIBS="-lhighgui  $LIBS"
++LIBS="-lopencv_highgui  $LIBS"
+ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+ /* end confdefs.h.  */
+ 
+@@ -5320,7 +5268,7 @@
+ #define HAVE_LIBHIGHGUI 1
+ _ACEOF
+ 
+-  LIBS="-lhighgui $LIBS"
++  LIBS="-lopencv_highgui $LIBS"
+ 
+ else
+ 
+--- gmic-1.4.8.0/src/Makefile.ORIG	2011-01-31 22:10:17.527697115 +0000
++++ gmic-1.4.8.0/src/Makefile	2011-01-31 22:32:22.762827348 +0000
+@@ -132,8 +132,8 @@
+ ifeq ($(OS),Darwin)
+ OPENCV_LDFLAGS = -lopencv_core -lopencv_highgui   # Use this for OpenCV 2.2.0 !
+ else
+-OPENCV_LDFLAGS = -lcv -lhighgui
+-# OPENCV_LDFLAGS = -lopencv_core -lopencv_highgui   # Use this for OpenCV 2.2.0 !
++#OPENCV_LDFLAGS = -lcv -lhighgui
++OPENCV_LDFLAGS = -lopencv_core -lopencv_highgui   # Use this for OpenCV 2.2.0 !
+ endif
+ 
+ # Flags to enable native support of most classical image file formats, using the GraphicsMagick++ library.
