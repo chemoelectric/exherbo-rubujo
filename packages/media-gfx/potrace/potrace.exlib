@@ -1,0 +1,32 @@
+# Copyright 2011 Barry Schwartz
+# Distributed under the terms of the GNU General Public License v2
+# Based in part on 'potrace-1.9.ebuild' from Gentoo which is:
+#    Copyright 1999-2011 Gentoo Foundation
+
+require sourceforge [ suffix=tar.gz ]
+
+SUMMARY="Transforming bitmaps into vector graphics"
+
+REMOTE_IDS="freshmeat:${PN} sourceforge:${PN}"
+
+SLOT="0"
+LICENCES="GPL-2"
+
+MYOPTIONS="
+    metric [[ description = [ Use metric units (cm) and A4 paper by default ] ]]
+"
+
+DEPENDENCIES="
+    build+run:
+        sys-libs/zlib
+"
+
+DEFAULT_SRC_CONFIGURE_PARAMS=(
+    --enable-zlib
+    --with-libpotrace
+)
+
+DEFAULT_SRC_CONFIGURE_OPTION_ENABLES=(
+    metric
+    "metric a4"
+)

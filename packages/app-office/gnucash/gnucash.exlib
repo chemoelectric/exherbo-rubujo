@@ -1,0 +1,109 @@
+# Copyright 2009, 2010 Wulf C. Krueger <philantrop@exherbo.org>
+# Distributed under the terms of the GNU General Public License v2
+
+require gnome-2
+
+export_exlib_phases src_configure src_test src_install
+
+SUMMARY="GnuCash is personal and small-business financial-accounting software"
+DESCRIPTION="
+GnuCash allows you to track bank accounts, stocks, income, and expenses. As quick
+and intuitive to use as a checkbook register, it is based on professional accounting
+principles to ensure balanced books and accurate reports. It is backed by an active
+development community and is blossoming into a full-fledged accounting system.
+"
+HOMEPAGE="http://${PN}.org"
+DOWNLOADS="mirror://sourceforge/${PN}/${PNV}.tar.bz2"
+
+BUGS_TO="philantrop@exherbo.org"
+REMOTE_IDS="freshmeat:${PN} sourceforge:${PN}"
+
+UPSTREAM_CHANGELOG="http://svn.${PN}.org/trac/browser/${PN}/tags/${PV}/NEWS"
+UPSTREAM_DOCUMENTATION="${HOMEPAGE}/docs.phtml [[ lang = en ]]"
+
+SLOT="0"
+LICENCES="GPL-2"
+
+MYOPTIONS="debug examples ofx
+    chipcard [[ description = [ Enable support for chipcard reading and processing ] ]]
+    hbci     [[ description = [ Enable HBCI/AqBanking support, for connecting to some internet banks ] ]]
+"
+
+DEPENDENCIES="
+    build:
+        dev-util/pkg-config
+        dev-util/intltool
+    build+run:
+        dev-lang/guile:1.8[>=1.8.6]
+        dev-libs/glib[>=2.20.0]
+        dev-libs/gtkhtml:3.14
+        dev-libs/libxml2[>=2.6.32]
+        dev-libs/popt[>=1.14]
+        dev-scheme/slib[>=3.2.1]
+        gnome-platform/GConf:2
+        gnome-platform/libart_lgpl[>=2.3.20]
+        gnome-platform/libglade[>=2.6.3]
+        gnome-platform/libgnomeui[>=2.24.0]
+        office-libs/goffice[>=0.8.1][gconf]
+        office-libs/libgsf[>=1.14.11]
+        x11-libs/gtk+[>=2.16.0]
+        x11-libs/pango[>=1.24.0]
+        hbci? (
+            dev-libs/aqbanking[>=3.8.2] [[ description = [ qt3 support must be enabled ] ]]
+            chipcard? ( dev-libs/libchipcard[>=4.2.7] )
+        )
+        ofx? ( finance/libofx[>=0.7.0] )
+"
+
+# The tests don't respect the configuration choices but try to test even stuff
+# that's been explicitly disabled.
+RESTRICT="test"
+
+DEFAULT_SRC_CONFIGURE_PARAMS=(
+    --enable-gui
+    --enable-locale-specific-tax
+    --enable-nls
+    --disable-dbi
+    --disable-dot
+    --disable-doxygen
+    --disable-efence
+    --disable-error-on-warning
+    --disable-html-docs
+    --disable-latex-docs
+    --disable-python-bindings
+    --disable-schemas-install
+)
+
+DEFAULT_SRC_CONFIGURE_OPTION_ENABLES=(
+    debug
+    hbci
+    ofx
+)
+
+DEFAULT_SRC_INSTALL_PARAMS=(
+    GNC_DOC_INSTALL_DIR=/usr/share/doc/${PNVR}
+)
+
+gnucash_src_configure() {
+    export CPPFLAGS=${CXXFLAGS}
+
+    default
+}
+
+gnucash_src_test() {
+    GUILE_WARN_DEPRECATED=no \
+    GNC_DOT_DIR="${TEMP}"/.gnucash \
+    emake -j1 check
+}
+
+gnucash_src_install() {
+    gnome-2_src_install
+    keepdir /usr/share/gnucash/guile-modules/srfi
+
+    # Clean up
+    edo rm "${IMAGE}"/usr/share/doc/${PNVR}/{COPYING,INSTALL,LICENSE,*win32-bin.txt}
+    if ! option examples ; then
+        edo rm -r "${IMAGE}"/usr/share/doc/${PNVR}/examples
+    fi
+}
+

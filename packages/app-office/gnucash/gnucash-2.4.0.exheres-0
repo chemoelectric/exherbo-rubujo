@@ -1,0 +1,7 @@
+# Copyright 2009, 2010 Wulf C. Krueger <philantrop@exherbo.org>
+# Distributed under the terms of the GNU General Public License v2
+
+require gnucash
+
+PLATFORMS="~amd64 ~x86"
+
