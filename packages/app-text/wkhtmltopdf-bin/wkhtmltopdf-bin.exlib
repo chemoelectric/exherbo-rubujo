@@ -3,7 +3,7 @@
 
 require googlecode
 
-export_exlib_phases src_prepare src_install
+export_exlib_phases src_install
 
 SUMMARY="Convert html to pdf using webkit (qtwebkit)"
 
@@ -20,12 +20,19 @@ DEPENDENCIES=""
 
 WORK="${WORKBASE}"
 
-wkhtmltopdf-bin_src_prepare() {
-    if option platform:amd64 ; then
-        edo mv ${MY_PN}-amd64 ${MY_PN}
-    fi
-}
 wkhtmltopdf-bin_src_install() {
-    dobin ${MY_PN}
+    local program bindir
+
+    bindir=/opt/bin
+
+    if option platform:amd64 ; then
+        program="${MY_PN}-amd64"
+    else
+        die "internal error in the exheres"
+    fi
+    
+    dodir "${bindir}"
+    exeinto "${bindir}"
+    newexe "${program}" "${MY_PN}"
 }
 
