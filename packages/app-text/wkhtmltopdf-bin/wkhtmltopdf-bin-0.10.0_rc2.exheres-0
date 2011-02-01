@@ -1,0 +1,6 @@
+# Copyright 2011 Barry Schwartz
+# Distributed under the terms of the GNU General Public License v2
+
+require wkhtmltopdf-bin
+
+PLATFORMS="~amd64"
