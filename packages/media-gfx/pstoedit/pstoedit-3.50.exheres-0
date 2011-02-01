@@ -1,0 +1,39 @@
+# Copyright 2009 Ingmar Vanhassel
+# Distributed under the terms of the GNU General Public License v2
+
+SUMMARY="Pstoedit translates PostScript and PDF graphics into other vector formats"
+HOMEPAGE="http://www.pstoedit.net/"
+DOWNLOADS="mirror://sourceforge/${PN}/${PNV}.tar.gz"
+
+LICENCES="GPL-2"
+SLOT="0"
+PLATFORMS="~amd64 ~x86"
+MYOPTIONS=""
+
+DEPENDENCIES="
+    build:
+        dev-util/pkg-config
+    build+run:
+        app-text/ghostscript
+        media-gfx/ImageMagick[>=1.0.6][cxx]
+        media-libs/gd
+        media-libs/libpng
+        media-libs/plotutils[>=2.3]
+"
+
+DEFAULT_SRC_PREPARE_PATCHES=(
+    -p0 "${FILES}/${PNV}-parallel.patch"
+    -p0 "${FILES}/${PNV}-plugin-close.patch"
+	-p0 "${FILES}/${PNV}-swf.patch"
+)
+
+DEFAULT_SRC_CONFIGURE_PARAMS=(
+    --without-emf
+    --with-libplot
+    --without-swf
+)
+
+src_compile() {
+    # FIXME libtool: link: cannot find the library `libpstoedit.la'
+    emake -j1
+}
