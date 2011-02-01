@@ -1,0 +1,38 @@
+# Copyright 2011 Barry Schwartz
+# Distributed under the terms of the GNU General Public License v2
+
+export_exlib_phases src_install
+
+SUMMARY="Convert html to an image, using webkit (qtwebkit)"
+
+MY_PROJECT="wkhtmltopdf"
+MY_PN="${PN/-bin/}"
+MY_PNV="${MY_PN}-${PV}"
+
+SLOT="0"
+LICENCES="LGPL-3"
+HOMEPAGE="http://code.google.com/p/${MY_PROJECT}/"
+DOWNLOADS="platform:amd64? ( http://${MY_PROJECT}.googlecode.com/files/${MY_PNV}-static-amd64.tar.bz2 )"
+
+MYOPTIONS="platform: amd64"
+
+DEPENDENCIES=""
+
+WORK="${WORKBASE}"
+
+wkhtmltoimage-bin_src_install() {
+    local program bindir
+
+    bindir=/opt/bin
+
+    if option platform:amd64 ; then
+        program="${MY_PN}-amd64"
+    else
+        die "internal error in the exheres"
+    fi
+    
+    dodir "${bindir}"
+    exeinto "${bindir}"
+    newexe "${program}" "${MY_PN}"
+}
+
