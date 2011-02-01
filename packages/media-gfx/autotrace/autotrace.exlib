@@ -1,0 +1,63 @@
+# Copyright 2011 Barry Schwartz
+# Distributed under the terms of the GNU General Public License v2
+# Based in part on 'autotrace-0.31.1-r6.ebuild' from Gentoo which is:
+#    Copyright 1999-2010 Gentoo Foundation
+
+require autotools [ supported_autoconf=[ 2.5 ] supported_automake=[ 1.11 1.10 ] ]
+
+export_exlib_phases src_prepare
+
+DEBIAN_PATCHLEVEL=15
+
+SUMMARY="A program for converting bitmaps to vector graphics"
+HOMEPAGE="
+    http://packages.qa.debian.org/a/autotrace.html
+    http://autotrace.sourceforge.net/
+"
+DOWNLOADS="
+    mirror://debian/pool/main/a/${PN}/${PN}_${PV}.orig.tar.gz
+    mirror://debian/pool/main/a/${PN}/${PN}_${PV}-${DEBIAN_PATCHLEVEL}.diff.gz
+"
+
+LICENCES="GPL-2 LGPL-2.1"
+SLOT="0"
+MYOPTIONS="
+    imagemagick
+    metatype [[ description = [ Enables a patch for support for Metatype (font development) ] ]]
+"
+
+DEPENDENCIES="
+    build:
+        dev-util/pkg-config
+    build+run:
+        media-libs/libexif
+        media-libs/libpng[>=1.4.3]
+        media-gfx/pstoedit[>=3.50]
+        imagemagick? ( media-gfx/ImageMagick )
+"
+#        swf? ( media-libs/ming[>=0.4.2] )
+
+autotrace_src_prepare() {
+    cd "${WORK}"
+
+    expatch \
+        -p1 "${WORKBASE}/${PN}_${PV}-${DEBIAN_PATCHLEVEL}.diff" \
+        -p0 "${FILES}/${PNV}-m4.patch" \
+        -p0 "${FILES}/${PNV}-libpng14.patch" \
+        -p0 "${FILES}/${PNV}-pkgconfig.patch" \
+        -p0 "${FILES}/${PNV}-swf-output.patch" \
+        -p0 "${FILES}/${PNV}-GetOnePixel.patch"
+
+    option metatype && expatch -p1 "${FILES}/autotrace.pch"
+
+    eautoreconf
+}
+
+DEFAULT_SRC_CONFIGURE_PARAMS=(
+    --with-pstoedit
+    --without-ming
+)
+
+DEFAULT_SRC_CONFIGURE_OPTION_WITHS=(
+    'imagemagick magick'
+)
