@@ -1,0 +1,105 @@
+# Copyright 2010 Johannes Nixdorf <mixi@user-helfen-usern.de>
+# Distributed under the terms of the GNU General Purpose License v2
+# Based in part upon 'netpbm-10.49.00.ebuild' from Gentoo, which is:
+#     Copyright 1999-2010 Gentoo Foundation
+
+require multilib
+
+export_exlib_phases src_configure src_compile src_install
+
+myexparam branch
+myexparam rev=
+
+if [ "$(exparam branch)" = "super_stable" ]; then
+    require sourceforge [ pnv="super_stable/${PV}/${PNV}" suffix=tgz ]
+else
+    # sourceforge.exlib only checks for is_scm
+    HOMEPAGE="http://${PN}.sourceforge.net/"
+    REMOTE_IDS="sourceforge:${PN}"
+
+    SCM_CHECKOUT_TO="${PNV}"
+    SCM_REVISION="$(exparam rev)"
+
+    SCM_REPOSITORY="http://${PN}.svn.sourceforge.net/svnroot/${PN}/$(exparam branch)"
+    SCM_SVN_RAW_URI=1
+
+    require scm-svn
+fi
+
+SUMMARY="A whole bunch of utilities for primitive manipulation of graphic images."
+
+LICENCES="GPL-2"
+MYOPTIONS="X jpeg png tiff"
+
+UPSTREAM_DOCUMENTATION="${HOMEPAGE}/doc/ [[ lang = en ]]"
+
+DEPENDENCIES="
+    build:
+        sys-devel/flex
+    build+run:
+        sys-libs/zlib
+        X? ( x11-libs/libX11 )
+        jpeg? ( media-libs/jpeg )
+        png? ( media-libs/libpng )
+        tiff? ( media-libs/tiff )
+"
+
+netpbm_src_configure() {
+    if ever at_least 10.47.19; then
+        config=config.mk
+    else
+        config=Makefile.config
+    fi
+    CONFIG=$(<${config}.in)
+
+    CONFIG+="
+    CC = ${CC}
+    CFLAGS = ${CFLAGS}
+    LDFLAGS = ${LDFLAGS}
+    NETPBMLIBTYPE = unixshared
+    NETPBMLIBSUFFIX = so
+    LDRELOC = ld --reloc
+    LINKER_CAN_DO_EXPLICIT_LIBRARY = N
+    CFLAGS_SHLIB = ${CFLAGS} -fPIC
+    ZLIB = libz.so
+    LINKERISCOMPILER = Y
+    STRIPFLAG =
+    SYMLINK = ln -sf
+    "
+
+    echo "$CONFIG" > ${config}
+}
+
+netpbm_src_compile() {
+    JPEGLIB="NONE"; PNGLIB="NONE"; TIFFLIB="NONE"; X11LIB="NONE"
+    option jpeg && JPEGLIB="libjpeg.so"
+    option png && PNGLIB="libpng.so"
+    option tiff && TIFFLIB="libtiff.so"
+    option X && X11LIB="libX11.so"
+
+    emake -j1 JPEGLIB=${JPEGLIB} PNGLIB=${PNGLIB} TIFFLIB=${TIFFLIB} X11LIB=${X11LIB}
+}
+
+netpbm_src_install() {
+    local libname
+
+    emake -j1 package pkgdir="${IMAGE}/usr"
+
+    edo rm -f "${IMAGE}/usr/bin/"{doc.url,manweb}
+    edo rm -r "${IMAGE}/usr/man/web"
+    edo rm -r "${IMAGE}/usr/link"
+    edo rm -r "${IMAGE}/usr/"{README,VERSION,config_template,pkginfo}
+    dodir /usr/share
+    edo mv "${IMAGE}/usr/man" "${IMAGE}/usr/share/"
+    edo mv "${IMAGE}/usr/misc" "${IMAGE}/usr/share/${PN}"
+    [[ $(get_libdir) != "lib" ]] && edo mv "${IMAGE}/usr/lib" "${IMAGE}/usr/$(get_libdir)"
+
+    # An ugly hack to make the *.so symlink.
+    pushd lib
+    libname=$(ls lib${PN}.so.*.*)
+    edo ln -s "${libname}" "${IMAGE}/usr/$(get_libdir)/lib${PN}.so"
+    popd
+
+    emagicdocs
+}
+

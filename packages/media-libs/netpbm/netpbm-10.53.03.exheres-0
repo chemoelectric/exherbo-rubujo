@@ -1,0 +1,8 @@
+# Copyright 2010 Johannes Nixdorf <mixi@user-helfen-usern.de>
+# Distributed under the terms of the GNU General Purpose License v2
+
+require netpbm [ branch=advanced rev=1399 ]
+
+SLOT="0"
+PLATFORMS="~amd64"
+
