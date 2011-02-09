@@ -1,0 +1,15 @@
+Source: Gentoo
+Upstream: This is a config option
+Reason: Makes --enable-new-dtags the default. Added so that DT_RUNPATH is 
+added as well as DT_RPATH, which is useful as RPATH on it's own has 
+precedence over LD_LIBRARY_PATH.
+--- binutils/ld/ldmain.c
++++ binutils/ld/ldmain.c
+@@ -296,6 +296,7 @@ main (int argc, char **argv)
+ 
+   link_info.allow_undefined_version = TRUE;
+   link_info.keep_memory = TRUE;
++  link_info.new_dtags = TRUE;
+   link_info.combreloc = TRUE;
+   link_info.strip_discarded = TRUE;
+   link_info.callbacks = &link_callbacks;

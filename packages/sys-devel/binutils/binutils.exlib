@@ -1,0 +1,84 @@
+# Copyright 2007 Bryan Østergaard
+# Distributed under the terms of the GNU General Public License v2
+
+require multilib gnu alternatives
+
+export_exlib_phases src_unpack src_prepare src_test_expensive src_install
+
+SUMMARY="Collection of binary tools including ld and as"
+
+LICENCES="GPL-2"
+SLOT="0"
+MYOPTIONS=""
+
+RESTRICT="test"
+
+DEPENDENCIES="
+    test-expensive:
+        dev-tcl/expect
+        sys-apps/bc
+"
+
+ECONF_SOURCE="${WORKBASE}/${PNV}"
+WORK=${WORKBASE}/build
+
+DEFAULT_SRC_PREPARE_PATCHES=( "${FILES}/76_all_use-new-ld-dtags.patch" )
+DEFAULT_SRC_CONFIGURE_PARAMS=(
+    --disable-werror
+    --enable-plugins
+    --enable-threads
+    # Install gold as ld.gold, ld as ld.bfd
+    --enable-ld
+    --enable-gold
+    --enable-lto
+)
+
+binutils_src_unpack() {
+    default
+    edo mkdir "${WORK}"
+}
+
+binutils_src_prepare() {
+    edo cd "${WORKBASE}/${PNV}"
+    default
+}
+
+binutils_src_test_expensive() {
+    emake -j1 check
+}
+
+# FIXME: Make this the default behavior for dosym
+dosymv() { echo dosym $@; dosym $@; }
+
+binutils_src_install() {
+    local alternatives=() bin e ec=(
+        # Managed by eclectic
+        /usr/${CHOST}/bin/ld
+        /usr/bin/${CHOST}-ld
+        /usr/bin/ld
+    ) f ld priority target name
+
+    emake -j1 DESTDIR="${IMAGE}" install
+
+    for f in "${IMAGE}"/usr/${CHOST}/bin/* ; do
+        target=${f#${IMAGE}}
+        name=${f##*/}
+
+        dosymv ${target} /usr/bin/${CHOST}-${name}
+        dosymv ${target} /usr/bin/${name}
+    done
+
+    for e in ${ec[@]}; do edo rm -f "${IMAGE}"/${e}; done
+
+    for ld in bfd gold; do
+        case ${ld} in
+            bfd)  priority=100;;
+            gold) priority=10;;
+        esac
+
+        alternatives=( ld ${ld} ${priority} )
+        for e in ${ec[@]}; do alternatives+=( ${e} /usr/${CHOST}/bin/ld.${ld} ); done
+        alternatives_for "${alternatives[@]}"
+    done
+}
+
