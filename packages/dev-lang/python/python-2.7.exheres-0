@@ -1,0 +1,24 @@
+# Copyright 2009, 2010 Ingmar Vanhassel
+# Distributed under the terms of the GNU General Public License v2
+
+require python-build
+
+PLATFORMS="~amd64 ~arm ~ia64 ~ppc64 ~x86"
+
+src_test() {
+    # Fails under network sandboxing
+    edo rm Lib/test/test_{ftplib,httpservers,multiprocessing,socket,urllib2}.py
+    # Fails for fresh installs
+    edo rm Lib/distutils/tests/test_build_ext.py
+
+    python-build_src_test
+}
+
+src_install() {
+    python-build_src_install
+
+    # Installs empty directory.
+    edo rmdir "${IMAGE}"/usr/$(get_libdir)/${PN}${SLOT}/test/data
+    edo rmdir "${IMAGE}"/usr/$(get_libdir)/${PN}${SLOT}/lib-old
+}
+
