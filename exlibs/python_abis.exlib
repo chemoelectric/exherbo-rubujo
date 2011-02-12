@@ -8,7 +8,7 @@
 
 
 # FIXME/TODO: COMPUTE THIS RATHER THAN HARDCODE IT ************************************
-PYTHON_ABIS=( 2.6 3.1 )
+PYTHON_ABIS=( 2.6 2.7 3.1 )
 #**************************************************************************************
 
 require distutils python
