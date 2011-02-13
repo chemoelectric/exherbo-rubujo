@@ -47,7 +47,7 @@ DEPENDENCIES="
         dev-libs/libusb:0.1[>=0.1.10a]
         dev-libs/dbus-glib:1[>=0.61]
         sys-apps/pciutils[>=2.2.7]
-        sys-apps/util-linux-ng[>=2.15]
+        || ( sys-apps/util-linux-ng[>=2.15] sys-apps/util-linux[>=2.19] )
         sys-kernel/linux-headers[>=2.6.22]
         partition-data? ( sys-fs/parted[>=1.8] )
         platform:amd64? ( sys-apps/dmidecode[>=2.7] )
