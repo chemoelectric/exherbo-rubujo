@@ -1,0 +1,9 @@
+# Copyright 2011 Barry Schwartz
+# Distributed under the terms of the GNU General Public License v2
+
+require libspiro
+
+PLATFORMS="~amd64"
+
+DEFAULT_SRC_PREPARE_PATCHES=( "${FILES}/libspiro-inkscape.diff" )
+DEFAULT_SRC_CONFIGURE_PARAMS=( --hates=docdir )

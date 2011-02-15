@@ -1,0 +1,9 @@
+# Copyright 2011 Barry Schwartz
+# Distributed under the terms of the GNU General Public License v2
+
+require sourceforge
+
+SUMMARY="Clothoid to bezier conversion"
+DOWNLOADS="mirror://sourceforge/${PN}/${PN}_src-${PV}.tar.bz2"
+LICENCES="GPL-2"
+SLOT="0"
