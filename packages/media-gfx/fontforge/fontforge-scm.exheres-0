@@ -2,9 +2,8 @@
 # Copyright 2010 Barry Schwartz
 # Distributed under the terms of the GNU General Public License v2
 
-SCM_REPOSITORY=":pserver:anonymous@fontforge.cvs.sourceforge.net:/cvsroot/${PN}"
-
-require sourceforge scm-cvs
+SCM_REPOSITORY="git://${PN}.git.sourceforge.net/gitroot/${PN}/${PN}"
+require sourceforge scm-git
 
 SUMMARY="FontForge - An Outline Font Editor"
 DESCRIPTION="FontForge -- An outline font editor that lets you create your own postscript, truetype, opentype,
@@ -17,7 +16,7 @@ DESCRIPTION="FontForge -- An outline font editor that lets you create your own p
 LICENCES="BSD-3"
 SLOT="0"
 PLATFORMS="~amd64"
-MYOPTIONS="X cairo pango python truetype type3"
+MYOPTIONS="X cairo pango python spiro truetype type3"
 
 DEPENDENCIES="
     build:
@@ -46,6 +45,7 @@ DEPENDENCIES="
             x11-libs/pango[X]
         )
         python? ( dev-lang/python:=[>=2.3] )
+        spiro? ( media-libs/libspiro )
         truetype? ( media-libs/freetype:2 )
 "
 
