@@ -3,7 +3,7 @@
 # Based in part upon 'mpatrol-1.4.8-r2.ebuild' from Gentoo, which is:
 #     Copyright 1999-2009 Gentoo Foundation
 
-SCM_REPOSITORY="https://${PN}.svn.sourceforge.net/svnroot/${PN}"
+SCM_REPOSITORY="http://${PN}.svn.sourceforge.net/svnroot/${PN}"
 
 require sourceforge scm-svn flag-o-matic
 require autotools [ supported_autoconf=[ 2.5 ] supported_automake=[ 1.11 ] ]
