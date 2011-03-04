@@ -1,0 +1,22 @@
+--- metapost-1.212/source/texk/web2c/mplibdir/am/libmplib.am.ORIG	2011-03-04 21:09:28.566179266 +0000
++++ metapost-1.212/source/texk/web2c/mplibdir/am/libmplib.am	2011-03-04 21:55:15.386683386 +0000
+@@ -6,13 +6,19 @@
+ ## libmplib.a, used by MetaPost and luaTeX
+ ##
+ EXTRA_LIBRARIES += libmplib.a
++lib_LTLIBRARIES = libmplib.la
+ 
+ libmplib_a_CPPFLAGS = -I$(srcdir)/mplibdir
+ libmplib_a_CFLAGS = $(WARNING_CFLAGS)
+ 
++libmplib_la_CPPFLAGS = -I$(srcdir)/mplibdir
++libmplib_la_CFLAGS = $(WARNING_CFLAGS)
++
+ ## libmplib C sources
+ libmplib_a_SOURCES = mplibdir/avl.h mplibdir/avl.c
++libmplib_la_SOURCES = mplibdir/avl.h mplibdir/avl.c
+ nodist_libmplib_a_SOURCES = $(memio_c_h) $(mp_c_h) $(psout_c_h) $(svgout_c_h) $(tfmin_c_h)
++nodist_libmplib_la_SOURCES = $(memio_c_h) $(mp_c_h) $(psout_c_h) $(svgout_c_h) $(tfmin_c_h)
+ memio_c_h = memio.c mpmemio.h
+ mp_c_h =  mp.c mplib.h mpmp.h
+ psout_c_h = mppsout.h psout.c mplibps.h
