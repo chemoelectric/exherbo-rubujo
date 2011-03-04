@@ -10,37 +10,65 @@ SLOT="0"
 
 MYOPTIONS=""
 
-# FIXME: write dependencies.
-DEPENDENCIES=""
+# FIXME: ACTUALLY analyze the dependencies. Note also that at the
+# Rubujo we are likely to create a build for kpathsea apart from
+# TeXLive (so we can use only the binary distribution of TeXLive but
+# still have a system kpathsea to link with ANT and kompostilo).
+DEPENDENCIES="
+    build:
+        sys-devel/autoconf
+        sys-devel/automake
+        sys-devel/libtool
+    build+run:
+        app-text/texlive
+"
 
 WORK="${WORKBASE}/metapost-${PV}"
 
+src_prepare() {
+    expatch "${FILES}"/libmplib-shared.patch
+    cd source
+    edo autoreconf
+}
+
 src_configure() {
+
+    # The MetaPost build system is not fully designed for shared
+    # library builds, and so we might do some silly-seeming stuff
+    # here.
+
     pushd source/texk/kpathsea
     econf
     popd
     pushd source/texk/web2c
-    econf
+    econf --disable-{omfonts,tex,aleph,pdftex,luatex,xetex,mf,web-progs,mp} --enable-shared --enable-static --with-system-kpathsea
     popd
 }
 
 src_compile() {
+
+    # The MetaPost build system is not fully designed for shared
+    # library builds, and so we might do some silly-seeming stuff
+    # here.
+
     pushd source/texk/kpathsea
     emake
     popd
     pushd source/texk/web2c
-    emake -j1 libmplib.a
+    emake -j1 libmplib.a mpxout.h libmplib.la
     popd
 }
 
 src_install() {
     default
-    dolib source/texk/web2c/${PN}.a
     dodoc manual/mplibapi.pdf
 
-#    dodir /usr/include/mpost
-#    insinto /usr/include/mpost
-    insinto /usr/include
-    doins source/texk/web2c/mplib.h
+    dodir /usr/include/mpost
+    insinto /usr/include/mpost
+    doins source/texk/web2c/mp*.h
+
+    pushd source/texk/web2c
+    emake install-libLTLIBRARIES DESTDIR="${IMAGE}"
+    popd
 }
 
