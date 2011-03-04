@@ -1,0 +1,46 @@
+# Copyright 2011 Barry Schwartz
+# Distributed under the terms of the GNU General Purpose License v2
+
+SUMMARY="MetaPost library"
+HOMEPAGE="http://foundry.supelec.fr/gf/project/metapost/"
+DOWNLOADS="http://foundry.supelec.fr/gf/download/frsrelease/${DOWNLOAD_N1}/${DOWNLOAD_N2}/metapost-${PV}-src.tar.bz2"
+
+LICENCES="LGPL-3"
+SLOT="0"
+
+MYOPTIONS=""
+
+# FIXME: write dependencies.
+DEPENDENCIES=""
+
+WORK="${WORKBASE}/metapost-${PV}"
+
+src_configure() {
+    pushd source/texk/kpathsea
+    econf
+    popd
+    pushd source/texk/web2c
+    econf
+    popd
+}
+
+src_compile() {
+    pushd source/texk/kpathsea
+    emake
+    popd
+    pushd source/texk/web2c
+    emake -j1 libmplib.a
+    popd
+}
+
+src_install() {
+    default
+    dolib source/texk/web2c/${PN}.a
+    dodoc manual/mplibapi.pdf
+
+#    dodir /usr/include/mpost
+#    insinto /usr/include/mpost
+    insinto /usr/include
+    doins source/texk/web2c/mplib.h
+}
+
