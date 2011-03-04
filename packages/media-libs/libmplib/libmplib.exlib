@@ -26,7 +26,7 @@ DEPENDENCIES="
 WORK="${WORKBASE}/metapost-${PV}"
 
 src_prepare() {
-    expatch "${FILES}"/libmplib-shared.patch
+    expatch "${FILES}"/libmplib-libtool.patch
     cd source
     edo autoreconf
 }
