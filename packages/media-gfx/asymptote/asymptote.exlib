@@ -1,0 +1,43 @@
+# Copyright 2011 Barry Schwartz
+# Distributed under the terms of the GNU General Public License v2
+
+require sourceforge [ suffix=src.tgz ]
+
+SUMMARY="A vector graphics language for technical drawing"
+DESCRIPTION="Asymptote is a powerful descriptive vector graphics
+language for technical drawing, inspired by MetaPost but with an
+improved C++-like syntax. Asymptote provides for figures the same
+high-quality typesetting that LaTeX does for scientific text."
+
+SLOT="0"
+MYOPTIONS=""
+LICENCES="LGPL-3"
+
+DEPENDENCIES="
+    build+run:
+        dev-libs/boehm-gc
+        sci-libs/fftw
+        sci-libs/gsl
+        sys-libs/ncurses
+        sys-libs/readline
+        sys-libs/zlib
+        x11-dri/freeglut
+"
+
+DEFAULT_SRC_CONFIGURE_PARAMS=(
+    --enable-gc=system
+    --enable-readline
+    --enable-gsl
+    --enable-fftw
+    --enable-gl
+)
+
+src_compile() {
+    emake
+    (cd doc && emake)
+}
+
+src_install() {
+    default
+    find "${IMAGE}" -depth -type d -empty -exec rmdir {} \;
+}
