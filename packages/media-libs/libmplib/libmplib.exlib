@@ -61,7 +61,13 @@ src_compile() {
 
 src_install() {
     default
-    dodoc manual/mplibapi.pdf
+
+    # For version 1.211, you can make the manual with
+    # "texexec mplibapi.tex"
+    dodoc manual/mplibapi.tex
+    if [ ${PV} -ge 1.212 ] ; then
+        dodoc manual/mplibapi.pdf
+    fi
 
     dodir /usr/include/mpost
     insinto /usr/include/mpost

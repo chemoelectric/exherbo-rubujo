@@ -1,0 +1,9 @@
+# Copyright 2011 Barry Schwartz
+# Distributed under the terms of the GNU General Purpose License v2
+
+DOWNLOAD_N1=370
+DOWNLOAD_N2=1446
+
+require libmplib
+
+PLATFORMS="~amd64"
