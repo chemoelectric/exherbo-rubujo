@@ -19,7 +19,8 @@ hi hr hu hy ia id io is it ja ka kn ko ku li lt lv mai mi mk ml mn mr ms nb ne
 nl nn nso oc or pa pl ps pt pt_BR ro ru rw si sk sl sq sr sr@latin sr@ije sv ta
 te th tk tr tt uk ur uz uz@cyrillic vi wa xh yi zh_CN zh_HK zh_TW"
 
-MYOPTIONS="cups doc
+MYOPTIONS="cups
+gtk-doc
 gobject-introspection
 man-pages [[ description = [ Build and install man pages for the GTK+ API ] ]]
 xinerama
@@ -38,7 +39,7 @@ DEPENDENCIES="
         man-pages? ( dev-libs/libxslt
                      app-text/docbook-xml-dtd:4.1.2
                      app-text/docbook-xsl-stylesheets )
-        doc? ( dev-doc/gtk-doc[>=1.11] )
+        gtk-doc? ( dev-doc/gtk-doc[>=1.11] )
         gobject-introspection? ( gnome-desktop/gobject-introspection[>=0.9.3] )
         xinerama? ( x11-proto/xineramaproto )
     build+run:
@@ -70,7 +71,7 @@ RESTRICT="test"
 
 DEFAULT_SRC_CONFIGURE_PARAMS=( '--with-xinput' '--with-gdktarget=x11'
                                '--with-libpng' '--with-libjpeg' '--with-libtiff' )
-DEFAULT_SRC_CONFIGURE_OPTION_ENABLES=( 'cups' 'doc gtk-doc' 'gobject-introspection introspection' 'man-pages man' xinerama )
+DEFAULT_SRC_CONFIGURE_OPTION_ENABLES=( 'cups' gtk-doc 'gobject-introspection introspection' 'man-pages man' xinerama )
 
 install_one_multibuild() {
     default

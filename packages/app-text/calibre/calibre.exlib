@@ -1,7 +1,7 @@
-# Copyright 2010 Wulf C. Krueger <philantrop@exherbo.org>
+# Copyright 2008-2011 Wulf C. Krueger <philantrop@exherbo.org>
 # Distributed under the terms of the GNU General Public License v2
 
-require distutils [ python_dep=2.6 ] freedesktop-desktop freedesktop-mime multilib bash-completion
+require distutils [ python_dep=2.7 ] freedesktop-desktop freedesktop-mime multilib bash-completion systemd-service [ systemd_files=[ calibre-server.service ] ]
 
 export_exlib_phases src_prepare src_compile src_install pkg_postinst
 
@@ -17,8 +17,8 @@ OS X and Windows.
 "
 HOMEPAGE="http://${PN}-ebook.com"
 DOWNLOADS="
-    http://${PN}-ebook.googlecode.com/files/${PNV}.tar.gz
     mirror://sourceforge/${PN}/${PNV}.tar.gz
+    http://${PN}-ebook.googlecode.com/files/${PNV}.tar.gz
     ${HOMEPAGE}/downloads/${PNV}.tar.gz
 "
 
@@ -40,6 +40,7 @@ DEPENDENCIES="
         app-text/podofo[>=0.8.2]
         app-text/poppler[>=0.12.0][qt4(+)]
         dev-lang/python[sqlite]
+        dev-libs/icu[>=4.4]
         dev-python/BeautifulSoup[>=3.0.5]
         dev-python/CherryPy[>=3.1.2-r1]
         dev-python/cssutils[>=0.9.7_alpha3]
@@ -50,6 +51,7 @@ DEPENDENCIES="
         dev-python/lxml[>=2.2.1]
         dev-python/mechanize[>=0.1.11]
         dev-python/PyQt4[>=4.7][webkit]
+        dev-python/sip[>=4.12.0]
         media-gfx/ImageMagick[>=6.5.9]
         media-libs/chmlib[>=0.40]
         media-libs/libwmf[>=0.2.8.4]
@@ -130,6 +132,12 @@ calibre_src_compile() {
 
 calibre_src_install() {
     local old_XDG="${XDG_DATA_DIRS}"
+
+    install_systemd_files
+    if option systemd; then
+        insinto /etc/conf.d
+        doins "${FILES}"/systemd/calibre-server.conf
+    fi
 
     # We have to create these directories before installing because xdg-* needs
     # to see them even if it doesn't use them...

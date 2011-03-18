@@ -39,5 +39,6 @@ src_compile() {
 
 src_install() {
     default
-    find "${IMAGE}" -depth -type d -empty -exec rmdir {} \;
+    edo mv "${IMAGE}/usr/share/doc/${PN}"/* "${IMAGE}/usr/share/doc/${PNV}/"
+    edo find "${IMAGE}" -depth -type d -empty -exec rmdir {} \;
 }

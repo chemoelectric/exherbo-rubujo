@@ -22,7 +22,7 @@ DEPENDENCIES="
         gtk? ( x11-libs/gtk+:2[>=2.20.0][multibuild_c:*(?)?]
                dev-libs/glib:2[multibuild_c:*(?)?]
                gnome-platform/GConf:2 )
-        gtk3? ( x11-libs/gtk+:3.0
+        gtk3? ( x11-libs/gtk+:3
                 dev-libs/glib:2
                 gnome-platform/GConf:2 )
         gstreamer? ( media-libs/gstreamer:0.10[>=0.10.15]
