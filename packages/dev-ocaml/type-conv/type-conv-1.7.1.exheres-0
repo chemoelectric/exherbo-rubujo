@@ -1,0 +1,11 @@
+# Copyright 2010 Barry Schwartz
+# Distributed under the terms of the GNU General Public License v2
+
+require janestreet
+
+SUMMARY="Type-conv, a support library for preprocessor type conversions"
+DOWNLOADS="mirror://gentoo/${PNV}.tar.gz"
+LICENCES="LGPL-2.1-with-linking-exception BSD-3"
+PLATFORMS="~amd64"
+#WORK="${WORKBASE}/${PN}-release-${PV}"
+WORK="${WORKBASE}/${PNV}"

@@ -1,0 +1,126 @@
+Index: CHANGES
+===================================================================
+retrieving revision 6.36
+retrieving revision 6.38
+diff -c -r6.36 -r6.38
+*** CHANGES	15 Mar 2011 12:36:08 -0000	6.36
+--- CHANGES	16 Mar 2011 16:52:42 -0000	6.38
+***************
+*** 1,3 ****
+--- 1,11 ----
++ Camlp5 Version 6.02.3:
++ ----------------------
++ 
++ * [16 Mar 11] Fixed bug: incorrect compilation of label patterns of the
++   form ~a:b (or ~{a = b} in revised syntax) in class declarations.
++ * [16 Mar 11] Fixed bug: error while printing label patterns ~a:b with
++   pr_o.cmo (error message "labels not pretty printed (in patt)").
++ 
+  Camlp5 Version 6.02.2:
+  ----------------------
+  
+Index: etc/pr_o.ml
+===================================================================
+retrieving revision 6.51
+diff -c -r6.51 pr_o.ml
+*** etc/pr_o.ml	15 Mar 2011 13:49:10 -0000	6.51
+--- etc/pr_o.ml	16 Mar 2011 15:18:58 -0000
+***************
+*** 1363,1369 ****
+        | <:patt< _ >> -> pprintf pc "_"
+        | <:patt:< ?{$_$} >> | <:patt:< ?{$_$ = $_$} >> | <:patt:< ?{$_$} >> |
+          <:patt:< ?{$_$ = ?{$_$ = $_$}} >> | <:patt:< ?{$_$ = $_$} >> |
+!         <:patt:< ~{$_$} >> | <:patt:< ~{$_$ = $_$} >> ->
+            error loc "labels not pretty printed (in patt)"
+        | <:patt< `$s$ >> ->
+            failwith "polymorphic variants not pretty printed; add pr_ro.cmo"
+--- 1363,1369 ----
+        | <:patt< _ >> -> pprintf pc "_"
+        | <:patt:< ?{$_$} >> | <:patt:< ?{$_$ = $_$} >> | <:patt:< ?{$_$} >> |
+          <:patt:< ?{$_$ = ?{$_$ = $_$}} >> | <:patt:< ?{$_$ = $_$} >> |
+!         <:patt:< ~{$list:_$} >> ->
+            error loc "labels not pretty printed (in patt)"
+        | <:patt< `$s$ >> ->
+            failwith "polymorphic variants not pretty printed; add pr_ro.cmo"
+Index: main/ast2pt.ml
+===================================================================
+retrieving revision 6.32
+diff -c -r6.32 ast2pt.ml
+*** main/ast2pt.ml	15 Mar 2011 12:36:08 -0000	6.32
+--- main/ast2pt.ml	16 Mar 2011 15:57:40 -0000
+***************
+*** 1326,1341 ****
+        [ Some pcl_fun ->
+            match uv lppo with
+            [ [(p, po)] -> do {
+-               let _ =
+-                 match uv po with
+-                 [ Some _ -> error loc "label not implemented in that case 1"
+-                 | None -> None ]
+-               in
+                let lab =
+                  match p with
+                  [ PaLid _ s -> uv s
+                  | p -> error loc "label not implemented in that case 2" ]
+                in
+                mkpcl loc (pcl_fun lab None (patt p) (class_expr ce))
+            }
+          | [] | [_ :: _] -> error ploc "case class multi lab not yet impl" ]
+--- 1326,1341 ----
+        [ Some pcl_fun ->
+            match uv lppo with
+            [ [(p, po)] -> do {
+                let lab =
+                  match p with
+                  [ PaLid _ s -> uv s
+                  | p -> error loc "label not implemented in that case 2" ]
+                in
++               let p =
++                 match uv po with
++                 [ Some p -> p
++                 | None -> p ]
++               in
+                mkpcl loc (pcl_fun lab None (patt p) (class_expr ce))
+            }
+          | [] | [_ :: _] -> error ploc "case class multi lab not yet impl" ]
+Index: ocaml_src/main/ast2pt.ml
+===================================================================
+retrieving revision 6.32
+diff -c -r6.32 ast2pt.ml
+*** ocaml_src/main/ast2pt.ml	15 Mar 2011 12:36:09 -0000	6.32
+--- ocaml_src/main/ast2pt.ml	16 Mar 2011 16:05:41 -0000
+***************
+*** 1522,1537 ****
+          Some pcl_fun ->
+            begin match uv lppo with
+              [p, po] ->
+-               let _ =
+-                 match uv po with
+-                   Some _ -> error loc "label not implemented in that case 1"
+-                 | None -> None
+-               in
+                let lab =
+                  match p with
+                    PaLid (_, s) -> uv s
+                  | p -> error loc "label not implemented in that case 2"
+                in
+                mkpcl loc (pcl_fun lab None (patt p) (class_expr ce))
+            | [] | _ :: _ -> error ploc "case class multi lab not yet impl"
+            end
+--- 1522,1537 ----
+          Some pcl_fun ->
+            begin match uv lppo with
+              [p, po] ->
+                let lab =
+                  match p with
+                    PaLid (_, s) -> uv s
+                  | p -> error loc "label not implemented in that case 2"
+                in
++               let p =
++                 match uv po with
++                   Some p -> p
++                 | None -> p
++               in
+                mkpcl loc (pcl_fun lab None (patt p) (class_expr ce))
+            | [] | _ :: _ -> error ploc "case class multi lab not yet impl"
+            end

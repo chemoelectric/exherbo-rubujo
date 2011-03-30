@@ -1,0 +1,41 @@
+Index: CHANGES
+===================================================================
+retrieving revision 6.38
+diff -c -r6.38 CHANGES
+*** CHANGES	16 Mar 2011 16:52:42 -0000	6.38
+--- CHANGES	24 Mar 2011 15:22:59 -0000
+***************
+*** 1,6 ****
+--- 1,7 ----
+  Camlp5 Version 6.02.3:
+  ----------------------
+  
++ * [24 Mar 11] Fixed bug: M.(a+b) was refused in normal syntax.
+  * [16 Mar 11] Fixed bug: incorrect compilation of label patterns of the
+    form ~a:b (or ~{a = b} in revised syntax) in class declarations.
+  * [16 Mar 11] Fixed bug: error while printing label patterns ~a:b with
+Index: etc/pa_o.ml
+===================================================================
+retrieving revision 6.34
+diff -c -r6.34 pa_o.ml
+*** etc/pa_o.ml	15 Mar 2011 13:49:08 -0000	6.34
+--- etc/pa_o.ml	24 Mar 2011 15:19:05 -0000
+***************
+*** 720,726 ****
+            in
+            loop <:expr< $_uid:i$ >> j
+        | i = V UIDENT; "."; "("; j = operator_rparen ->
+!           <:expr< $_uid:i$ . $lid:j$ >> ] ]
+    ;
+    (* Patterns *)
+    patt:
+--- 720,728 ----
+            in
+            loop <:expr< $_uid:i$ >> j
+        | i = V UIDENT; "."; "("; j = operator_rparen ->
+!           <:expr< $_uid:i$ . $lid:j$ >>
+!       | i = V UIDENT; "."; "("; e = expr; ")" ->
+!           <:expr< $_uid:i$ . ( $e$ ) >> ] ]
+    ;
+    (* Patterns *)
+    patt:

@@ -9,23 +9,24 @@ DOWNLOADS="http://pauillac.inria.fr/~ddr/camlp5/distrib/src/${PNV}.tgz"
 LICENCES="BSD-3"
 SLOT="0"
 PLATFORMS="~amd64 ~x86"
-MYOPTIONS="
-    strict [[ description = [ new syntax tree - breaks compatibility with older syntax tree ] ]]
-"
+MYOPTIONS=""
 
 DEPENDENCIES="
     build+run:
-        dev-lang/ocaml[>=3.08.0&<3.12.0]
+        dev-lang/ocaml[>=3.08.0&<=3.13.0]
 "
 
-#BUGS_TO="fauxmight@nosocomia.com"
+DEFAULT_SRC_PREPARE_PATCHES=(
+    -p0 ${FILES}/patch-${PV}-1
+    -p0 ${FILES}/patch-${PV}-2
+    -p0 ${FILES}/patch-${PV}-3
+)
 
 # This OCaml specific configure file behaves very unlike
 # 'normal' (read autotools) configure files. Options are in the
 # form "--option value" rather than "--option=value" 
 # (' ' instead of '=')
 src_configure() {
-    option strict && CAMLP5_MODE="--strict" || CAMLP5_MODE="--transitional"
     ./configure \
         --prefix /usr \
         --bindir /usr/bin \

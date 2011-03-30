@@ -3,6 +3,9 @@
 
 require janestreet ocaml.info
 
+MY_PN=ocaml-${PN}
+
 SUMMARY="Res, a library for automatically resizing contiguous memory (arrays and strings)"
+DOWNLOADS="mirror://debian/pool/main/o/${MY_PN}/${MY_PN}_${PV}.orig.tar.gz"
 LICENCES="LGPL-2.1-with-linking-exception"
 PLATFORMS="~amd64"

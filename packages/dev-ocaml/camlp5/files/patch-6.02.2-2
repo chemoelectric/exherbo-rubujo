@@ -1,0 +1,216 @@
+Index: main/ast2pt.ml
+===================================================================
+retrieving revision 6.33
+diff -c -r6.33 ast2pt.ml
+*** main/ast2pt.ml	16 Mar 2011 16:52:42 -0000	6.33
+--- main/ast2pt.ml	17 Mar 2011 16:55:32 -0000
+***************
+*** 725,730 ****
+--- 725,737 ----
+      | t -> t ]
+  ;
+  
++ value label_of_patt =
++   fun
++   [ PaLid _ s -> uv s
++   | PaTyc _ (PaLid _ s) _ -> uv s
++   | p -> error (MLast.loc_of_patt p) "label_of_patt; case not impl" ]
++ ;
++ 
+  value rec expr =
+    fun
+    [ ExAcc loc x <:expr< val >> ->
+***************
+*** 856,867 ****
+        [ [(PaLab ploc lppo, w, e)] ->
+            List.fold_right
+              (fun (p, po) e -> do {
+!                let lab =
+!                  match p with
+!                  [ PaLid _ lab -> uv lab
+!                  | PaTyc _ (PaLid _ lab) _ -> uv lab
+!                  | _ -> error loc "not impl label for that patt 1" ]
+!                in
+                 let p =
+                   match uv po with
+                   [ Some p -> p
+--- 863,869 ----
+        [ [(PaLab ploc lppo, w, e)] ->
+            List.fold_right
+              (fun (p, po) e -> do {
+!                let lab = label_of_patt p in
+                 let p =
+                   match uv po with
+                   [ Some p -> p
+***************
+*** 878,889 ****
+                | None -> mkexp loc (newtype (uv s) (expr e)) ]
+            | None -> error loc "(type ..) not in this ocaml version" ]
+        | [(PaOlb loc p eo, w, e)] ->
+!           let lab =
+!             match p with
+!             [ PaLid _ lab -> uv lab
+!             | PaTyc _ (PaLid _ lab) _ -> uv lab
+!             | _ -> error loc "not impl label for that patt 2" ]
+!           in
+            let (p, eo) =
+              match uv eo with
+              [ Some (ExOlb _ p eo) -> (p, eo)
+--- 880,886 ----
+                | None -> mkexp loc (newtype (uv s) (expr e)) ]
+            | None -> error loc "(type ..) not in this ocaml version" ]
+        | [(PaOlb loc p eo, w, e)] ->
+!           let lab = label_of_patt p in
+            let (p, eo) =
+              match uv eo with
+              [ Some (ExOlb _ p eo) -> (p, eo)
+***************
+*** 1326,1336 ****
+        [ Some pcl_fun ->
+            match uv lppo with
+            [ [(p, po)] -> do {
+!               let lab =
+!                 match p with
+!                 [ PaLid _ s -> uv s
+!                 | p -> error loc "label not implemented in that case 2" ]
+!               in
+                let p =
+                  match uv po with
+                  [ Some p -> p
+--- 1323,1329 ----
+        [ Some pcl_fun ->
+            match uv lppo with
+            [ [(p, po)] -> do {
+!               let lab = label_of_patt p in
+                let p =
+                  match uv po with
+                  [ Some p -> p
+***************
+*** 1343,1353 ****
+    | CeFun loc (PaOlb _ p eo) ce ->
+        match ocaml_pcl_fun with
+        [ Some pcl_fun ->
+!           let lab =
+!             match p with
+!             [ PaLid _ s -> uv s
+!             | p -> error loc "label not implemented in that case 4" ]
+!           in
+            let (p, eo) =
+              match uv eo with
+              [ Some (ExOlb _ p eo) -> (p, eo)
+--- 1336,1342 ----
+    | CeFun loc (PaOlb _ p eo) ce ->
+        match ocaml_pcl_fun with
+        [ Some pcl_fun ->
+!           let lab = label_of_patt p in
+            let (p, eo) =
+              match uv eo with
+              [ Some (ExOlb _ p eo) -> (p, eo)
+Index: ocaml_src/main/ast2pt.ml
+===================================================================
+retrieving revision 6.33
+diff -c -r6.33 ast2pt.ml
+*** ocaml_src/main/ast2pt.ml	16 Mar 2011 16:52:42 -0000	6.33
+--- ocaml_src/main/ast2pt.ml	17 Mar 2011 16:56:42 -0000
+***************
+*** 881,886 ****
+--- 881,893 ----
+    loop
+  ;;
+  
++ let label_of_patt =
++   function
++     PaLid (_, s) -> uv s
++   | PaTyc (_, PaLid (_, s), _) -> uv s
++   | p -> error (MLast.loc_of_patt p) "label_of_patt; case not impl"
++ ;;
++ 
+  let rec expr =
+    function
+      ExAcc (loc, x, MLast.ExLid (_, "val")) ->
+***************
+*** 1015,1026 ****
+          [PaLab (ploc, lppo), w, e] ->
+            List.fold_right
+              (fun (p, po) e ->
+!                let lab =
+!                  match p with
+!                    PaLid (_, lab) -> uv lab
+!                  | PaTyc (_, PaLid (_, lab), _) -> uv lab
+!                  | _ -> error loc "not impl label for that patt 1"
+!                in
+                 let p =
+                   match uv po with
+                     Some p -> p
+--- 1022,1028 ----
+          [PaLab (ploc, lppo), w, e] ->
+            List.fold_right
+              (fun (p, po) e ->
+!                let lab = label_of_patt p in
+                 let p =
+                   match uv po with
+                     Some p -> p
+***************
+*** 1038,1049 ****
+            | None -> error loc "(type ..) not in this ocaml version"
+            end
+        | [PaOlb (loc, p, eo), w, e] ->
+!           let lab =
+!             match p with
+!               PaLid (_, lab) -> uv lab
+!             | PaTyc (_, PaLid (_, lab), _) -> uv lab
+!             | _ -> error loc "not impl label for that patt 2"
+!           in
+            let (p, eo) =
+              match uv eo with
+                Some (ExOlb (_, p, eo)) -> p, eo
+--- 1040,1046 ----
+            | None -> error loc "(type ..) not in this ocaml version"
+            end
+        | [PaOlb (loc, p, eo), w, e] ->
+!           let lab = label_of_patt p in
+            let (p, eo) =
+              match uv eo with
+                Some (ExOlb (_, p, eo)) -> p, eo
+***************
+*** 1522,1532 ****
+          Some pcl_fun ->
+            begin match uv lppo with
+              [p, po] ->
+!               let lab =
+!                 match p with
+!                   PaLid (_, s) -> uv s
+!                 | p -> error loc "label not implemented in that case 2"
+!               in
+                let p =
+                  match uv po with
+                    Some p -> p
+--- 1519,1525 ----
+          Some pcl_fun ->
+            begin match uv lppo with
+              [p, po] ->
+!               let lab = label_of_patt p in
+                let p =
+                  match uv po with
+                    Some p -> p
+***************
+*** 1540,1550 ****
+    | CeFun (loc, PaOlb (_, p, eo), ce) ->
+        begin match ocaml_pcl_fun with
+          Some pcl_fun ->
+!           let lab =
+!             match p with
+!               PaLid (_, s) -> uv s
+!             | p -> error loc "label not implemented in that case 4"
+!           in
+            let (p, eo) =
+              match uv eo with
+                Some (ExOlb (_, p, eo)) -> p, eo
+--- 1533,1539 ----
+    | CeFun (loc, PaOlb (_, p, eo), ce) ->
+        begin match ocaml_pcl_fun with
+          Some pcl_fun ->
+!           let lab = label_of_patt p in
+            let (p, eo) =
+              match uv eo with
+                Some (ExOlb (_, p, eo)) -> p, eo

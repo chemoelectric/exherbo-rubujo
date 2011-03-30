@@ -120,6 +120,11 @@ calibre_src_prepare() {
         edo sed -i -e "s:0\.7\.1:${PV}:" src/calibre/translations/calibre.pot
     fi
 
+    # We don't have python2, it's called python.
+    edo sed -i -e "s:\(python\)2:\1:" setup/install.py
+    edo sed -i -e "s:\(python\)2:\1:" recipes/nrc-nl-epub.recipe
+    edo sed -i -e "s:\(python\)2:\1:" src/calibre/trac/bzr_commit_plugin.py
+
     distutils_src_prepare
 }
 
