@@ -1,7 +1,24 @@
-diff -Naur Python-2.7.1.ORIG/Lib/distutils/command/install.py Python-2.7.1/Lib/distutils/command/install.py
---- Python-2.7.1.ORIG/Lib/distutils/command/install.py	2010-12-18 05:43:19.493314897 +0000
-+++ Python-2.7.1/Lib/distutils/command/install.py	2010-12-18 05:43:50.237679397 +0000
-@@ -41,8 +41,8 @@
+Source: written by unknown, Organization: Gentoo
+Upstream: no
+Subject: Replace lib with @@EXHERBO_LIBDIR@@ for multilib.
+
+---
+ Lib/distutils/command/install.py |    4 ++--
+ Lib/distutils/sysconfig.py       |    2 +-
+ Lib/site.py                      |    4 ++--
+ Lib/sysconfig.py                 |   16 ++++++++--------
+ Lib/test/test_site.py            |    4 ++--
+ Makefile.pre.in                  |    2 +-
+ Modules/Setup.dist               |    2 +-
+ Modules/getpath.c                |    6 +++---
+ setup.py                         |    4 ++--
+ 9 files changed, 22 insertions(+), 22 deletions(-)
+
+diff --git a/Lib/distutils/command/install.py b/Lib/distutils/command/install.py
+index 956e2fe..9c75d49 100644
+--- a/Lib/distutils/command/install.py
++++ b/Lib/distutils/command/install.py
+@@ -41,8 +41,8 @@ else:
  
  INSTALL_SCHEMES = {
      'unix_prefix': {
@@ -12,23 +29,24 @@ diff -Naur Python-2.7.1.ORIG/Lib/distutils/command/install.py Python-2.7.1/Lib/d
          'headers': '$base/include/python$py_version_short/$dist_name',
          'scripts': '$base/bin',
          'data'   : '$base',
-diff -Naur Python-2.7.1.ORIG/Lib/distutils/sysconfig.py Python-2.7.1/Lib/distutils/sysconfig.py
---- Python-2.7.1.ORIG/Lib/distutils/sysconfig.py	2010-12-18 05:43:19.496316397 +0000
-+++ Python-2.7.1/Lib/distutils/sysconfig.py	2010-12-18 05:43:50.237679397 +0000
-@@ -115,7 +115,8 @@
+diff --git a/Lib/distutils/sysconfig.py b/Lib/distutils/sysconfig.py
+index ba48173..dce2844 100644
+--- a/Lib/distutils/sysconfig.py
++++ b/Lib/distutils/sysconfig.py
+@@ -115,7 +115,7 @@ def get_python_lib(plat_specific=0, standard_lib=0, prefix=None):
  
      if os.name == "posix":
          libpython = os.path.join(prefix,
 -                                 "lib", "python" + get_python_version())
-+                                "@@EXHERBO_LIBDIR@@",
-+                                "python" + get_python_version())
++                                 "@@EXHERBO_LIBDIR@@", "python" + get_python_version())
          if standard_lib:
              return libpython
          else:
-diff -Naur Python-2.7.1.ORIG/Lib/site.py Python-2.7.1/Lib/site.py
---- Python-2.7.1.ORIG/Lib/site.py	2010-12-18 05:43:19.738437397 +0000
-+++ Python-2.7.1/Lib/site.py	2010-12-18 05:46:52.657049397 +0000
-@@ -290,10 +290,10 @@
+diff --git a/Lib/site.py b/Lib/site.py
+index f22e1d1..44544dc 100644
+--- a/Lib/site.py
++++ b/Lib/site.py
+@@ -290,10 +290,10 @@ def getsitepackages():
          if sys.platform in ('os2emx', 'riscos'):
              sitepackages.append(os.path.join(prefix, "Lib", "site-packages"))
          elif os.sep == '/':
@@ -41,10 +59,62 @@ diff -Naur Python-2.7.1.ORIG/Lib/site.py Python-2.7.1/Lib/site.py
          else:
              sitepackages.append(prefix)
              sitepackages.append(os.path.join(prefix, "lib", "site-packages"))
-diff -Naur Python-2.7.1.ORIG/Makefile.pre.in Python-2.7.1/Makefile.pre.in
---- Python-2.7.1.ORIG/Makefile.pre.in	2010-12-18 05:43:20.060598398 +0000
-+++ Python-2.7.1/Makefile.pre.in	2010-12-18 05:43:50.238679897 +0000
-@@ -94,7 +94,7 @@
+diff --git a/Lib/sysconfig.py b/Lib/sysconfig.py
+index 33b2791..f5e8508 100644
+--- a/Lib/sysconfig.py
++++ b/Lib/sysconfig.py
+@@ -7,10 +7,10 @@ from os.path import pardir, realpath
+ 
+ _INSTALL_SCHEMES = {
+     'posix_prefix': {
+-        'stdlib': '{base}/lib/python{py_version_short}',
+-        'platstdlib': '{platbase}/lib/python{py_version_short}',
+-        'purelib': '{base}/lib/python{py_version_short}/site-packages',
+-        'platlib': '{platbase}/lib/python{py_version_short}/site-packages',
++        'stdlib': '{base}/@@EXHERBO_LIBDIR@@/python{py_version_short}',
++        'platstdlib': '{platbase}/@@EXHERBO_LIBDIR@@/python{py_version_short}',
++        'purelib': '{base}/@@EXHERBO_LIBDIR@@/python{py_version_short}/site-packages',
++        'platlib': '{platbase}/@@EXHERBO_LIBDIR@@/python{py_version_short}/site-packages',
+         'include': '{base}/include/python{py_version_short}',
+         'platinclude': '{platbase}/include/python{py_version_short}',
+         'scripts': '{base}/bin',
+@@ -65,10 +65,10 @@ _INSTALL_SCHEMES = {
+         'data'   : '{userbase}',
+         },
+     'posix_user': {
+-        'stdlib': '{userbase}/lib/python{py_version_short}',
+-        'platstdlib': '{userbase}/lib/python{py_version_short}',
+-        'purelib': '{userbase}/lib/python{py_version_short}/site-packages',
+-        'platlib': '{userbase}/lib/python{py_version_short}/site-packages',
++        'stdlib': '{userbase}/@@EXHERBO_LIBDIR@@/python{py_version_short}',
++        'platstdlib': '{userbase}/@@EXHERBO_LIBDIR@@/python{py_version_short}',
++        'purelib': '{userbase}/@@EXHERBO_LIBDIR@@/python{py_version_short}/site-packages',
++        'platlib': '{userbase}/@@EXHERBO_LIBDIR@@/python{py_version_short}/site-packages',
+         'include': '{userbase}/include/python{py_version_short}',
+         'scripts': '{userbase}/bin',
+         'data'   : '{userbase}',
+diff --git a/Lib/test/test_site.py b/Lib/test/test_site.py
+index 4e801e9..1a84dff 100644
+--- a/Lib/test/test_site.py
++++ b/Lib/test/test_site.py
+@@ -170,10 +170,10 @@ class HelperFunctionsTests(unittest.TestCase):
+             self.assertEqual(dirs[0], wanted)
+         elif os.sep == '/':
+             self.assertEqual(len(dirs), 2)
+-            wanted = os.path.join('xoxo', 'lib', 'python' + sys.version[:3],
++            wanted = os.path.join('xoxo', '@@EXHERBO_LIBDIR@@', 'python' + sys.version[:3],
+                                   'site-packages')
+             self.assertEqual(dirs[0], wanted)
+-            wanted = os.path.join('xoxo', 'lib', 'site-python')
++            wanted = os.path.join('xoxo', '@@EXHERBO_LIBDIR@@', 'site-python')
+             self.assertEqual(dirs[1], wanted)
+         else:
+             self.assertEqual(len(dirs), 2)
+diff --git a/Makefile.pre.in b/Makefile.pre.in
+index 9bcbdab..8378071 100644
+--- a/Makefile.pre.in
++++ b/Makefile.pre.in
+@@ -94,7 +94,7 @@ LIBDIR=		@libdir@
  MANDIR=		@mandir@
  INCLUDEDIR=	@includedir@
  CONFINCLUDEDIR=	$(exec_prefix)/include
@@ -53,10 +123,11 @@ diff -Naur Python-2.7.1.ORIG/Makefile.pre.in Python-2.7.1/Makefile.pre.in
  
  # Detailed destination directories
  BINLIBDEST=	$(LIBDIR)/python$(VERSION)
-diff -Naur Python-2.7.1.ORIG/Modules/Setup.dist Python-2.7.1/Modules/Setup.dist
---- Python-2.7.1.ORIG/Modules/Setup.dist	2010-12-18 05:43:20.064600398 +0000
-+++ Python-2.7.1/Modules/Setup.dist	2010-12-18 05:43:50.238679897 +0000
-@@ -460,7 +460,7 @@
+diff --git a/Modules/Setup.dist b/Modules/Setup.dist
+index e02fd77..b267e85 100644
+--- a/Modules/Setup.dist
++++ b/Modules/Setup.dist
+@@ -460,7 +460,7 @@ GLHACK=-Dclear=__GLclear
  # Andrew Kuchling's zlib module.
  # This require zlib 1.1.3 (or later).
  # See http://www.gzip.org/zlib/
@@ -65,10 +136,11 @@ diff -Naur Python-2.7.1.ORIG/Modules/Setup.dist Python-2.7.1/Modules/Setup.dist
  
  # Interface to the Expat XML parser
  #
-diff -Naur Python-2.7.1.ORIG/Modules/getpath.c Python-2.7.1/Modules/getpath.c
---- Python-2.7.1.ORIG/Modules/getpath.c	2010-12-18 05:43:20.146641398 +0000
-+++ Python-2.7.1/Modules/getpath.c	2010-12-18 05:43:50.239680397 +0000
-@@ -129,7 +129,7 @@
+diff --git a/Modules/getpath.c b/Modules/getpath.c
+index 9faafa3..7de9127 100644
+--- a/Modules/getpath.c
++++ b/Modules/getpath.c
+@@ -129,7 +129,7 @@ static char prefix[MAXPATHLEN+1];
  static char exec_prefix[MAXPATHLEN+1];
  static char progpath[MAXPATHLEN+1];
  static char *module_search_path = NULL;
@@ -77,7 +149,7 @@ diff -Naur Python-2.7.1.ORIG/Modules/getpath.c Python-2.7.1/Modules/getpath.c
  
  static void
  reduce(char *dir)
-@@ -528,7 +528,7 @@
+@@ -528,7 +528,7 @@ calculate_path(void)
      }
      else
          strncpy(zip_path, PREFIX, MAXPATHLEN);
@@ -86,7 +158,7 @@ diff -Naur Python-2.7.1.ORIG/Modules/getpath.c Python-2.7.1/Modules/getpath.c
      bufsz = strlen(zip_path);   /* Replace "00" with version */
      zip_path[bufsz - 6] = VERSION[0];
      zip_path[bufsz - 5] = VERSION[2];
-@@ -538,7 +538,7 @@
+@@ -538,7 +538,7 @@ calculate_path(void)
              fprintf(stderr,
                  "Could not find platform dependent libraries <exec_prefix>\n");
          strncpy(exec_prefix, EXEC_PREFIX, MAXPATHLEN);
@@ -95,10 +167,11 @@ diff -Naur Python-2.7.1.ORIG/Modules/getpath.c Python-2.7.1/Modules/getpath.c
      }
      /* If we found EXEC_PREFIX do *not* reduce it!  (Yet.) */
  
-diff -Naur Python-2.7.1.ORIG/setup.py Python-2.7.1/setup.py
---- Python-2.7.1.ORIG/setup.py	2010-12-18 05:43:20.420778397 +0000
-+++ Python-2.7.1/setup.py	2010-12-18 05:48:35.079049396 +0000
-@@ -658,11 +658,11 @@
+diff --git a/setup.py b/setup.py
+index 6c512a5..fa68eda 100644
+--- a/setup.py
++++ b/setup.py
+@@ -654,11 +654,11 @@ class PyBuildExt(build_ext):
              elif curses_library:
                  readline_libs.append(curses_library)
              elif self.compiler.find_library_file(lib_dirs +
@@ -112,3 +185,6 @@ diff -Naur Python-2.7.1.ORIG/setup.py Python-2.7.1/setup.py
                                     extra_link_args=readline_extra_link_args,
                                     libraries=readline_libs) )
          else:
+-- 
+1.7.3.2
+

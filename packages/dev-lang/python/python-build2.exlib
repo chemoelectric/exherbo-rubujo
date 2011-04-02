@@ -1,0 +1,183 @@
+# Copyright 2007-2007 Bryan Østergaard
+# Copyright 2008 Ali Polatel
+# Copyright 2009, 2010 Ingmar Vanhassel
+# Distributed under the terms of the GNU General Public License v2
+# Based in part upon 'python-2.5.2-r4.ebuild' from Gentoo, which is:
+#  Copyright 1999-2008 Gentoo Foundation
+
+MY_PNV="Python-${PV}"
+
+require alternatives autotools [ supported_autoconf=[ 2.5 ] supported_automake=[ 1.11 1.10 ] ]
+require easy-multibuild [ work=${MY_PNV} ] flag-o-matic python
+
+#export_exlib_phases src_unpack src_prepare src_install
+export_exlib_phases src_unpack prepare_one_multibuild src_install
+
+SUMMARY="Python interpreter"
+HOMEPAGE="http://www.${PN}.org/"
+DOWNLOADS="http://${PN}.org/ftp/${PN}/${PV}/${MY_PNV}.tar.bz2"
+
+UPSTREAM_DOCUMENTATION="
+http://docs.${PN}.org/$(ever range 1-2)/
+"
+UPSTREAM_CHANGELOG="${HOMEPAGE}/download/releases/${PV}/NEWS.txt"
+UPSTREAM_RELEASE_NOTES="${HOMEPAGE}/download/releases/${PV}/"
+
+LICENCES="PSF-2.2"
+SLOT="$(ever range 1-2)"
+MYOPTIONS="dbm examples ipv6 readline sqlite tk
+    ( berkdb gdbm ) [[ requires = dbm ]]
+    dbm? ( ( berkdb gdbm ) [[ number-selected = at-least-one ]] )
+    multibuild_c: ( 32 64 )
+"
+
+# FIXME: Internal copy of dev-libs/expat
+DEPENDENCIES="
+    build:
+        dev-util/pkg-config
+    build+run:
+        dev-libs/libffi[multibuild_c:*(?)?]
+        dev-libs/openssl[multibuild_c:*(?)?]
+        sys-libs/zlib[>=1.1.3][multibuild_c:*(?)?]
+        berkdb? ( sys-libs/db:=[>=3.3&<=4.7][multibuild_c:*(?)?] )
+        gdbm? ( sys-libs/gdbm[multibuild_c:*(?)?] )
+        readline? ( sys-libs/readline[>=4.1][multibuild_c:*(?)?] )
+        sqlite? ( dev-db/sqlite:3[>=3.0.8][multibuild_c:*(?)?] )
+        tk? ( dev-lang/tk[>=8.0][multibuild_c:*(?)?] )
+"
+
+WORK="${WORKBASE}"
+
+DEFAULT_SRC_CONFIGURE_PARAMS=(
+    --enable-shared
+    $(ever at_least 3 || echo --enable-unicode=ucs4)
+    --with-system-ffi
+)
+DEFAULT_SRC_CONFIGURE_OPTION_ENABLES=( ipv6 )
+
+unpack_prepare_one_multibuild() {
+    edo mkdir -p "${WORKBASE}/${MULTIBUILD_CLASS}/${MULTIBUILD_TARGET}"
+}
+
+python-build_src_unpack() {
+    easy-multibuild_run_phase
+}
+
+prepare_one_multibuild() {
+    [[ -d ${FILES}/${PV} ]] && expatch "${FILES}/${PV}/"
+
+    edo sed -i -e "s:@@EXHERBO_LIBDIR@@:${LIBDIR}:g" \
+        Lib/distutils/command/install.py \
+        Lib/distutils/sysconfig.py \
+        Lib/site.py \
+        Makefile.pre.in \
+        Modules/Setup.dist \
+        Modules/getpath.c \
+        setup.py
+
+    edo cp "${FILES}"/"${PN}"-config.py .
+
+    edo sed -i -e "s:@@SLOT@@:${SLOT}:g" \
+               -e "s:@@PKG_CONFIG_PATH@@:${PKG_CONFIG_PATH%%:*}:g" \
+        "${PN}"-config.py
+
+    local prefix='/usr'
+    multibuild_default_target C || prefix="/usr/${CHOST}"
+    edo sed -i -e "s:@prefix@:${prefix}:g" Misc/"${PN}".pc.in
+
+    eautoreconf
+}
+
+python-build_src_prepare() {
+    easy-multibuild_run_phase
+}
+
+configure_prepare_one_multibuild() { :; }
+
+configure_one_multibuild() {
+    # dbm module can link to berkdb or gdbm.
+    # default to gdbm when both are enabled.
+    local disable
+
+    option dbm || disable="_dbm"
+    option berkdb   || disable="${disable} _bsddb"
+    if ever at_least 3 ; then
+        option gdbm     || disable="${disable} _gdbm"
+    else
+        option gdbm     || disable="${disable} gdbm"
+    fi
+    option readline || disable="${disable} readline"
+    option sqlite   || disable="${disable} _sqlite3"
+    option tk       || disable="${disable} _tkinter"
+    export PYTHON_DISABLE_MODULES="${disable}"
+
+    export OPT="${CFLAGS}"
+    export CPPFLAGS="$(pkg-config --cflags-only-I libffi) $(multibuild_get_var C ${MULTIBUILD_TARGET} CPPFLAGS)"
+    export LDFLAGS="${CFLAGS} -L/usr/${LIBDIR}"
+
+    local dbmliborder
+    if ever at_least 2.7 && option dbm; then
+        option gdbm && dbmliborder="${dbmliborder:+:}gdbm"
+        option berkdb && dbmliborder="${dbmliborder:+:}bdb"
+    fi
+    econf ${DEFAULT_SRC_CONFIGURE_PARAMS[@]} --with-dbmliborder="${dbmliborder}"
+}
+
+test_one_multibuild() {
+    unset DISPLAY
+
+    python_enable_pyc
+
+    # rerun failed tests in verbose mode (regrtest -w)
+    EXTRATESTOPTS="-w" emake test
+
+    python_disable_pyc
+}
+
+install_one_multibuild() {
+    default
+
+    ! ever at_least 3.1 && edo rm "${IMAGE}"/usr/bin/smtpd.py
+    ! ever at_least 3.1 && edo rmdir "${IMAGE}"/usr/${LIBDIR}/${PN}${SLOT}/lib-old
+    ever at_least 3 && edo mv "${IMAGE}"/usr/bin/2to3 "${IMAGE}"/usr/bin/2to3-3
+    edo mv "${IMAGE}"/usr/${LIBDIR}/{${PN}${SLOT}/config,}/libpython${SLOT}.a
+
+    # alternatives handling
+    local PYTHON_MAJOR="$(ever at_least 3 && echo 3)"
+    edo rm "${IMAGE}/usr/bin/python${SLOT}"
+    edo rm "${IMAGE}/usr/bin/python${SLOT}-config"
+
+    # pyconfig.h contains PLATFORMS specific bits
+    local prefix='/usr'
+    if ! multibuild_default_target C; then
+        prefix="/usr/${CHOST}"
+        dodir "${prefix}"/{bin,include/"${PN}${SLOT}"}
+        edo mv "${IMAGE}"/usr/bin/"${PN}"{${PYTHON_MAJOR}-config,${PYTHON_MAJOR}} "${IMAGE}${prefix}"/bin
+        edo mv "${IMAGE}"/usr/include/"${PN}${SLOT}"/*.h "${IMAGE}${prefix}"/include/"${PN}${SLOT}"
+        alternatives+=(
+            /usr/${CHOST}/bin/python${PYTHON_MAJOR} python${SLOT}
+            /usr/${CHOST}/bin/python${PYTHON_MAJOR}-config python${SLOT}-config
+        )
+    fi
+    into "${prefix}"
+    newbin "${WORKBASE}"/"${MULTIBUILD_CLASS}"/"${MULTIBUILD_TARGET}"/"${MY_PNV}"/"${PN}"-config.py "${PN}${PYTHON_MAJOR}"-config
+}
+
+python-build_src_install() {
+    # alternatives handling
+    local PYTHON_MAJOR="$(ever at_least 3 && echo 3)"
+    alternatives=("${PN}$(ever major)" "${SLOT}" "${SLOT}")
+
+    easy-multibuild_src_install
+
+    alternatives+=(
+        /usr/bin/2to3$(ever at_least 3 && echo "-")${PYTHON_MAJOR} 2to3${SLOT}
+        /usr/bin/idle${PYTHON_MAJOR} idle${SLOT}
+        /usr/bin/pydoc${PYTHON_MAJOR} pydoc${SLOT}
+        /usr/bin/python${PYTHON_MAJOR} python${SLOT}
+        /usr/bin/python${PYTHON_MAJOR}-config python${SLOT}-config
+    )
+
+    alternatives_for "${alternatives[@]}"
+}
+
