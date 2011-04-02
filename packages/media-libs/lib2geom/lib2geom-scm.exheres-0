@@ -1,0 +1,20 @@
+# Copyright 2011 Barry Schwartz
+# Distributed under the terms of the GNU General Public License v2
+
+SCM_REPOSITORY="http://${PN}.svn.sourceforge.net/svnroot/${PN}/${PN}"
+
+require sourceforge cmake scm-svn
+
+LICENCES="LGPL-2.1 MPL-1.1"
+SLOT="0"
+PLATFORMS="~amd64"
+
+DEPENDENCIES="
+    build+run:
+        x11-libs/gtk+:2
+        gnome-bindings/gtkmm:2.4
+        x11-libs/cairo
+        dev-cpp/cairomm:1.0
+        sci-libs/gsl
+        dev-libs/boost
+"
