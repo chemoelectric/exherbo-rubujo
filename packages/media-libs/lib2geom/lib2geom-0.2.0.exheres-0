@@ -17,7 +17,7 @@ DEPENDENCIES="
         dev-libs/boost
 "
 
-src_prepare() {
+src_install() {
     default
     dodoc -r doc
     (cd src/2geom && dodoc -r toys)
