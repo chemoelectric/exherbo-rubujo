@@ -1,0 +1,51 @@
+# Copyright 2008, 2009, 2010 Ingmar Vanhassel <ingmar@exherbo.org>
+# Distributed under the terms of the GNU General Public License v2
+# Based in part upon 'swig-1.3.35.ebuild' from Gentoo, which is:
+#     Copyright 1999-2008 Gentoo Foundation.
+
+require sourceforge [ suffix=tar.gz ]
+
+SUMMARY="Simplified Wrapper and Interface Generator"
+HOMEPAGE="http://www.swig.org/"
+
+LICENCES="GPL-3 as-is"
+SLOT="0"
+PLATFORMS="~amd64 ~ppc64 ~x86"
+MYOPTIONS="doc lua ocaml perl python python3 ruby"
+
+DEPENDENCIES="
+    test-expensive:
+        dev-libs/boost
+    build+run:
+        lua? ( dev-lang/lua:= )
+        perl? ( dev-lang/perl:=[=5*] )
+        python? ( dev-lang/python:=[=2*] )
+        ruby? ( dev-lang/ruby:= )
+        ocaml? ( dev-lang/ocaml:= )
+        python3? ( dev-lang/python:=[=3*] )"
+
+RESTRICT="test"
+
+DEFAULT_SRC_CONFIGURE_PARAMS=(
+    --without-{allegrocl,chicken,clisp,csharp,gcj,guile,java,mono,mzscheme,octave,php,pike,r,tcl,tk}
+    --without-doc
+    # Breaks tests
+    --disable-ccache
+)
+DEFAULT_SRC_CONFIGURE_OPTION_WITHS=( lua "perl perl5" python python3 ruby ocaml )
+DEFAULT_SRC_INSTALL_EXTRA_DOCS=( NEW FUTURE )
+
+src_test_expensive() {
+    emake check
+}
+
+src_install() {
+    default
+
+    if option doc; then
+        dodir /usr/share/doc/${PNVR}
+        insinto /usr/share/doc/${PNVR}
+        doins -r Doc/{Devel,Manual}
+    fi
+}
+
