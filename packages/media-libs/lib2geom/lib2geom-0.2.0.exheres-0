@@ -18,7 +18,7 @@ DEPENDENCIES="
 "
 
 src_install() {
-    default
+    cmake_src_install
     dodoc -r doc
     (cd src/2geom && dodoc -r toys)
 }
