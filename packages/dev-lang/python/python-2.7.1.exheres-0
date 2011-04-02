@@ -14,20 +14,6 @@ DEPENDENCIES+="
 
 DEFAULT_SRC_CONFIGURE_PARAMS+=( '--with-system-expat' )
 
-prepare_prepare_one_multibuild() {
-    edo cd "${WORKBASE}/${MULTIBUILD_CLASS}/${MULTIBUILD_TARGET}/Python-${PV}"
-
-#    # support autoconf versions other than 2.65
-#    edo sed -ie '8,14d' configure.in
-
-    python-build2_prepare_one_multibuild
-
-    # replace still to be done libdir variables
-    edo sed -ie "s:@@EXHERBO_LIBDIR@@:$(get_libdir):g" \
-        Lib/sysconfig.py \
-        Lib/test/test_site.py
-}
-
 test_prepare_one_multibuild() {
     edo cd "${WORKBASE}/${MULTIBUILD_CLASS}/${MULTIBUILD_TARGET}/Python-${PV}"
 

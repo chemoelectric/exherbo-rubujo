@@ -10,8 +10,8 @@ MY_PNV="Python-${PV}"
 require alternatives autotools [ supported_autoconf=[ 2.5 ] supported_automake=[ 1.11 1.10 ] ]
 require easy-multibuild [ work=${MY_PNV} ] flag-o-matic python
 
-#export_exlib_phases src_unpack src_prepare src_install
-export_exlib_phases src_unpack prepare_one_multibuild src_install
+export_exlib_phases src_unpack src_prepare src_install
+#export_exlib_phases src_unpack prepare_one_multibuild src_install
 
 SUMMARY="Python interpreter"
 HOMEPAGE="http://www.${PN}.org/"
@@ -59,7 +59,7 @@ unpack_prepare_one_multibuild() {
     edo mkdir -p "${WORKBASE}/${MULTIBUILD_CLASS}/${MULTIBUILD_TARGET}"
 }
 
-python-build_src_unpack() {
+python-build2_src_unpack() {
     easy-multibuild_run_phase
 }
 
@@ -73,7 +73,9 @@ prepare_one_multibuild() {
         Makefile.pre.in \
         Modules/Setup.dist \
         Modules/getpath.c \
-        setup.py
+        setup.py \
+        Lib/sysconfig.py \
+        Lib/test/test_site.py
 
     edo cp "${FILES}"/"${PN}"-config.py .
 
@@ -88,7 +90,7 @@ prepare_one_multibuild() {
     eautoreconf
 }
 
-python-build_src_prepare() {
+python-build2_src_prepare() {
     easy-multibuild_run_phase
 }
 
@@ -163,7 +165,7 @@ install_one_multibuild() {
     newbin "${WORKBASE}"/"${MULTIBUILD_CLASS}"/"${MULTIBUILD_TARGET}"/"${MY_PNV}"/"${PN}"-config.py "${PN}${PYTHON_MAJOR}"-config
 }
 
-python-build_src_install() {
+python-build2_src_install() {
     # alternatives handling
     local PYTHON_MAJOR="$(ever at_least 3 && echo 3)"
     alternatives=("${PN}$(ever major)" "${SLOT}" "${SLOT}")
