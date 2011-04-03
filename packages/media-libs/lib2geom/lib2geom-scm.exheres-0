@@ -18,3 +18,32 @@ DEPENDENCIES="
         sci-libs/gsl
         dev-libs/boost
 "
+
+src_install() {
+    local config_h
+
+    if /bin/false ; then        # It's likely better to let the user
+                                # put -DHAVE_SINCOS=1 in the cc
+                                # command line, and keep config.h
+                                # information strictly internal.
+
+        # Insert the contents of config.h into header files that otherwise would include it.
+        config_h="${ECMAKE_BUILD_DIR}"/config.h
+        edo sed -i -e '/#include "config\.h"/ {
+            r '"${config_h}"'
+            d
+        }' src/2geom/*.h
+
+    else
+
+        # Sanitize headers by removing includes of config.h.
+        edo sed -i -e '/#include "config\.h"/d' src/2geom/*.h
+
+    fi
+
+    cmake_src_install
+
+    (cd doc && edo make manual.pdf)
+    dodoc -r doc
+    (cd src/2geom && dodoc -r toys)
+}
