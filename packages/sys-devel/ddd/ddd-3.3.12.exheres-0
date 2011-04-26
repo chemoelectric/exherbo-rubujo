@@ -6,13 +6,11 @@
 require gnu [ suffix=gz ]
 
 SUMMARY="GNU DDD is a graphical front-end for command-line debuggers"
-#HOMEPAGE="http://developer.berlios.de/projects/smake/"
-#DOWNLOADS="ftp://ftp.berlios.de/pub/smake/${PNV}.tar.bz2"
 
 LICENCES="GPL-3 LGPL-3 FDL-1.1"
-#SLOT="0"
+SLOT="0"
 PLATFORMS="~amd64"
-#MYOPTIONS=""
+MYOPTIONS=""
 
 DEPENDENCIES="
     build+run:
