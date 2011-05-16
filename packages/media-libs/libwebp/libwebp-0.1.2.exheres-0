@@ -1,0 +1,19 @@
+# Copyright 2010 Barry Schwartz
+# Distributed under the terms of the GNU General Public License v2
+
+require googlecode [ suffix=tar.gz ]
+
+SUMMARY="WebP image format"
+DOWNLOADS="http://webp.googlecode.com/files/${PNV}.tar.gz"
+
+LICENCES="BSD-3"
+SLOT="0"
+PLATFORMS="~amd64"
+MYOPTIONS=""
+
+DEPENDENCIES="
+"
+
+src_prepare() {
+    ./autogen.sh
+}
