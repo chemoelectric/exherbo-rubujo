@@ -1,0 +1,74 @@
+Source:   Backported from upstream git master
+Upstream: Yes, will be in udev-167 release
+Reason:   Fix build with recent kernel headers which don't provide v4l1 anymore.
+
+From 4ace8a43ac2cbbd4d6f5c29fc461c3caa8f8545b Mon Sep 17 00:00:00 2001
+From: Kay Sievers <kay.sievers@vrfy.org>
+Date: Tue, 15 Feb 2011 17:24:32 +0100
+Subject: [PATCH 1/2] v4l_id: kill the v4l1 ioctl
+
+Recent kernels do not have v4l1 anymore.
+---
+ extras/v4l_id/v4l_id.c |   14 --------------
+ 1 files changed, 0 insertions(+), 14 deletions(-)
+
+diff --git a/extras/v4l_id/v4l_id.c b/extras/v4l_id/v4l_id.c
+index d530a6d..f3fc648 100644
+--- a/extras/v4l_id/v4l_id.c
++++ b/extras/v4l_id/v4l_id.c
+@@ -28,7 +28,6 @@
+ #include <sys/types.h>
+ #include <sys/time.h>
+ #include <sys/ioctl.h>
+-#include <linux/videodev.h>
+ #include <linux/videodev2.h>
+ 
+ int main (int argc, char *argv[])
+@@ -82,19 +81,6 @@ int main (int argc, char *argv[])
+ 		if ((v2cap.capabilities & V4L2_CAP_RADIO) > 0)
+ 			printf("radio:");
+ 		printf("\n");
+-	} else if (ioctl (fd, VIDIOCGCAP, &v1cap) == 0) {
+-		printf("ID_V4L_VERSION=1\n");
+-		printf("ID_V4L_PRODUCT=%s\n", v1cap.name);
+-		printf("ID_V4L_CAPABILITIES=:");
+-		if ((v1cap.type & VID_TYPE_CAPTURE) > 0)
+-			printf("capture:");
+-		if ((v1cap.type & VID_TYPE_OVERLAY) > 0)
+-			printf("video_overlay:");
+-		if (v1cap.audios > 0)
+-			printf("audio:");
+-		if ((v1cap.type & VID_TYPE_TUNER) > 0)
+-			printf("tuner:");
+-		printf("\n");
+ 	}
+ 
+ 	close (fd);
+-- 
+1.7.4.1
+
+
+From 89284ddac413d376fc3b56f742daaf1b9bc85bba Mon Sep 17 00:00:00 2001
+From: Kay Sievers <kay.sievers@vrfy.org>
+Date: Tue, 15 Feb 2011 17:27:29 +0100
+Subject: [PATCH 2/2] v4l_id: remove left-over variable
+
+---
+ extras/v4l_id/v4l_id.c |    1 -
+ 1 files changed, 0 insertions(+), 1 deletions(-)
+
+diff --git a/extras/v4l_id/v4l_id.c b/extras/v4l_id/v4l_id.c
+index f3fc648..21cb328 100644
+--- a/extras/v4l_id/v4l_id.c
++++ b/extras/v4l_id/v4l_id.c
+@@ -38,7 +38,6 @@ int main (int argc, char *argv[])
+ 	};
+ 	int fd;
+ 	char *device;
+-	struct video_capability v1cap;
+ 	struct v4l2_capability v2cap;
+ 
+ 	while (1) {
+-- 
+1.7.4.1
+

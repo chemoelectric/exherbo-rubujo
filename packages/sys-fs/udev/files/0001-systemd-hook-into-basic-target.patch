@@ -1,0 +1,31 @@
+From 0bd77e2acd0dc58c6eba16bb3c4c01865d090855 Mon Sep 17 00:00:00 2001
+From: Kay Sievers <kay.sievers@vrfy.org>
+Date: Wed, 29 Sep 2010 00:48:35 +0200
+Subject: [PATCH] systemd: hook into basic.target instead of sysinit.target
+
+---
+ Makefile.am |    8 ++++----
+ 1 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index f124396..39971be 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -129,10 +129,10 @@ systemdsystemunit_DATA = \
+ 	init/udev-retry.service
+ 
+ systemd-install-hook:
+-	mkdir -p $(DESTDIR)$(systemdsystemunitdir)/sysinit.target.wants
+-	ln -sf ../udev.service $(DESTDIR)$(systemdsystemunitdir)/sysinit.target.wants/udev.service
+-	ln -sf ../udev-settle.service $(DESTDIR)$(systemdsystemunitdir)/sysinit.target.wants/udev-settle.service
+-	ln -sf ../udev-retry.service $(DESTDIR)$(systemdsystemunitdir)/sysinit.target.wants/udev-retry.service
++	mkdir -p $(DESTDIR)$(systemdsystemunitdir)/basic.target.wants
++	ln -sf ../udev.service $(DESTDIR)$(systemdsystemunitdir)/basic.target.wants/udev.service
++	ln -sf ../udev-settle.service $(DESTDIR)$(systemdsystemunitdir)/basic.target.wants/udev-settle.service
++	ln -sf ../udev-retry.service $(DESTDIR)$(systemdsystemunitdir)/basic.target.wants/udev-retry.service
+ 
+ INSTALL_DATA_HOOKS += systemd-install-hook
+ endif
+-- 
+1.7.3
+

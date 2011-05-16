@@ -1,0 +1,171 @@
+From 8cd080ff9d418682aa550863fa624b329f653166 Mon Sep 17 00:00:00 2001
+From: Saleem Abdulrasool <compnerd@compnerd.org>
+Date: Sat, 7 Aug 2010 16:38:39 -0700
+Subject: [PATCH 2/2] allow building only the sound rules
+
+---
+ Makefile.am  |   43 ++++++++++++++++++++--------------
+ configure.ac |   73 ++++++++++++++++++++++++++++++++++++++++++----------------
+ 2 files changed, 78 insertions(+), 38 deletions(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index 8d5842e..a24487c 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -412,14 +412,37 @@ endif # ENABLE_INTROSPECTION
+ 
+ endif # ENABLE_GUDEV
+ 
++if ENABLE_USB_DB
++# ------------------------------------------------------------------------------
++# usb-db - read USB vendor/device string database
++# ------------------------------------------------------------------------------
++extras_usb_db_usb_db_SOURCES = extras/usb-db/usb-db.c
++extras_usb_db_usb_db_CPPFLAGS = $(AM_CPPFLAGS) -DUSB_DATABASE=\"$(USB_DATABASE)\" -DBUILD_FOR_USB
++extras_usb_db_usb_db_LDADD = libudev/libudev-private.la
++libexec_PROGRAMS += extras/usb-db/usb-db
++endif # ENABLE_USB_DB
++
++if ENABLE_PCI_DB
++# ------------------------------------------------------------------------------
++# pci-db - read PCI vendor/device string database
++# ------------------------------------------------------------------------------
++extras_usb_db_pci_db_SOURCES = extras/usb-db/usb-db.c
++extras_usb_db_pci_db_CPPFLAGS = $(AM_CPPFLAGS) -DPCI_DATABASE=\"$(PCI_DATABASE)\" -DBUILD_FOR_PCI
++extras_usb_db_pci_db_LDADD = libudev/libudev-private.la
++libexec_PROGRAMS += extras/usb-db/pci-db
++endif # ENABLE_PCI_DB
++
++if ENABLE_SOUND_RULES
++dist_udevrules_DATA += rules/rules.d/78-sound-card.rules
++endif # ENABLE_SOUND_RULES
++
+ if ENABLE_EXTRAS
+ # ------------------------------------------------------------------------------
+ # conditional extras (need glib, libusb, libacl, ...)
+ # ------------------------------------------------------------------------------
+ dist_udevrules_DATA += \
+ 	rules/rules.d/75-net-description.rules \
+-	rules/rules.d/75-tty-description.rules \
+-	rules/rules.d/78-sound-card.rules
++	rules/rules.d/75-tty-description.rules
+ 
+ # ------------------------------------------------------------------------------
+ # Bluetooth HID devices with special magic to switch the device
+@@ -446,22 +469,6 @@ udevacl-install-hook:
+ INSTALL_EXEC_HOOKS += udevacl-install-hook
+ 
+ # ------------------------------------------------------------------------------
+-# usb-db - read USB vendor/device string database
+-# ------------------------------------------------------------------------------
+-extras_usb_db_usb_db_SOURCES = extras/usb-db/usb-db.c
+-extras_usb_db_usb_db_CPPFLAGS = $(AM_CPPFLAGS) -DUSB_DATABASE=\"$(USB_DATABASE)\" -DBUILD_FOR_USB
+-extras_usb_db_usb_db_LDADD = libudev/libudev-private.la
+-libexec_PROGRAMS += extras/usb-db/usb-db
+-
+-# ------------------------------------------------------------------------------
+-# pci-db - read PCI vendor/device string database
+-# ------------------------------------------------------------------------------
+-extras_usb_db_pci_db_SOURCES = extras/usb-db/usb-db.c
+-extras_usb_db_pci_db_CPPFLAGS = $(AM_CPPFLAGS) -DPCI_DATABASE=\"$(PCI_DATABASE)\" -DBUILD_FOR_PCI
+-extras_usb_db_pci_db_LDADD = libudev/libudev-private.la
+-libexec_PROGRAMS += extras/usb-db/pci-db
+-
+-# ------------------------------------------------------------------------------
+ # mobile-action-modeswitch - switch Mobile Action cables into serial mode
+ # ------------------------------------------------------------------------------
+ extras_mobile_action_modeswitch_mobile_action_modeswitch_SOURCES =\
+diff --git a/configure.ac b/configure.ac
+index a52526e..3bd6f12 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -58,6 +58,59 @@ fi
+ 
+ AM_CONDITIONAL([ENABLE_GUDEV], [test x"$enable_gudev" = x"yes"])
+ 
++AC_ARG_ENABLE([usb-db],
++              AS_HELP_STRING([--disable-usb-db], [disable USB device database]),,
++              enable_usb_db=yes)
++
++if test x"$enable_usb_db" = x"yes" ; then
++   PKG_CHECK_MODULES(USBUTILS, [usbutils >= 0.82])
++   AC_SUBST([USB_DATABASE], `$PKG_CONFIG --variable=usbids usbutils`)
++fi
++
++AM_CONDITIONAL([ENABLE_USB_DB], [test x"$enable_usb_db" = x"yes"])
++
++AC_ARG_ENABLE([pci-db],
++              AS_HELP_STRING([--disable-pci-db], [disable PCI device database]),,
++              enable_pci_db=yes)
++
++if test x"$enable_pci_db" = x"yes" ; then
++   if test x"$cross_compiling" = x"no" ; then
++      AC_CHECK_FILE([/usr/share/misc/pci.ids],
++                    [pciids=/usr/share/misc/pci.ids],
++                    [AC_CHECK_FILE([/usr/share/hwdata/pci.ids],
++                                   [pciids=/usr/share/hwdata/pci.ids],
++                                   [AC_CHECK_FILE([/usr/share/pci.ids],
++                                                  [pciids=/usr/share/pci.ids])])])
++   fi
++
++   AC_ARG_WITH(pci-ids-path,
++               AS_HELP_STRING([--with-pci-ids-path=FILE], [Path to pci.ids file]),,
++               [with_pci_ids_path="$pciids"])
++
++   if test -z "$with_pci_ids_path" ; then
++      AC_MSG_ERROR([pci.ids not found, try --with-pci-ids-path=])
++   fi
++
++   AC_MSG_CHECKING([for PCI database location])
++   AC_MSG_RESULT([$with_pci_ids_path])
++
++   AC_SUBST(PCI_DATABASE, "$with_pci_ids_path")
++fi
++
++AM_CONDITIONAL([ENABLE_PCI_DB], [test x"$enable_pci_db" = x"yes"])
++
++AC_ARG_ENABLE([sound-rules],
++              AS_HELP_STRING([--disable-sound-rules], [disable sound rules]),,
++              enable_sound_rules=yes)
++
++if test x"$enable_sound_rules" = x"yes" ; then
++   if test x"enable_usb_db" = x"no" || test x"$enable_pci_db" = x"no" ; then
++      AC_MSG_ERROR([sound rules require usb-db and pci-db to be built])
++   fi
++fi
++
++AM_CONDITIONAL([ENABLE_SOUND_RULES], [test x"$enable_sound_rules" = x"yes"])
++
+ AC_ARG_WITH(firmware-path,
+ 	AS_HELP_STRING([--with-firmware-path=DIR[[[:DIR[...]]]]],
+ 	   [Firmware search path (default=/lib/firmware/updates:/lib/firmware)]),
+@@ -97,26 +150,6 @@ if test "x$enable_extras" = xyes; then
+ 	AC_SUBST(LIBUSB_CFLAGS)
+ 	AC_SUBST(LIBUSB_LIBS)
+ 
+-	PKG_CHECK_MODULES(USBUTILS, usbutils >= 0.82)
+-	AC_SUBST([USB_DATABASE], [$($PKG_CONFIG --variable=usbids usbutils)])
+-
+-	if test "x$cross_compiling" = "xno" ; then
+-		AC_CHECK_FILES([/usr/share/pci.ids], [pciids=/usr/share/pci.ids])
+-		AC_CHECK_FILES([/usr/share/hwdata/pci.ids], [pciids=/usr/share/hwdata/pci.ids])
+-		AC_CHECK_FILES([/usr/share/misc/pci.ids], [pciids=/usr/share/misc/pci.ids])
+-	fi
+-	AC_ARG_WITH(pci-ids-path,
+-		[AS_HELP_STRING([--with-pci-ids-path=DIR], [Path to pci.ids file])],
+-		[PCI_DATABASE=${withval}],
+-		[if test -n "$pciids" ; then
+-			PCI_DATABASE="$pciids"
+-		else
+-			AC_MSG_ERROR([pci.ids not found, try --with-pci-ids-path=])
+-		fi])
+-	AC_MSG_CHECKING([for PCI database location])
+-	AC_MSG_RESULT([$PCI_DATABASE])
+-	AC_SUBST(PCI_DATABASE)
+-
+ 	AC_CHECK_HEADER([linux/input.h], [:], AC_MSG_ERROR([kernel headers not found]))
+ 	AC_SUBST([INCLUDE_PREFIX], [$(echo '#include <linux/input.h>' | eval $ac_cpp -E - | sed -n '/linux\/input.h/ {s:.*"\(.*\)/linux/input.h".*:\1:; p; q}')])
+ fi
+-- 
+1.7.1
+

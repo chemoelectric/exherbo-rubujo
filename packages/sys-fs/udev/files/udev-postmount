@@ -1,0 +1,40 @@
+#!/sbin/runscript
+# Copyright © 2010 Saleem Abdulrasool <compnerd@compnerd.org>
+# Distributed under the terms of the GNU General Public License v2
+# Based in part upon udev-postmount which is:
+#     Copyright 1999-2007 Gentoo Foundation
+
+depend()
+{
+    need localmount
+    after dbus
+}
+
+start()
+{
+    local file dest type
+
+    [[ -d /dev/.udev ]] || return 0
+
+    # rerun any failed events
+    udevadm trigger '--type=failed'
+
+    [[ -w /etc/udev/rules.d ]] || return 0
+
+    for file in /dev/.udev/tmp-rules--* ; do
+        dest=${file##*tmp-rules--}
+
+        [[ "${dest}" == "*" ]] && break
+
+        type=${dest##70-persistent-}
+        type=${type%%.rules}
+
+        cat "${file}" >> "/etc/udev/rules.d/${dest}" && rm -f "${file}"
+    done
+}
+
+stop()
+{
+    :
+}
+

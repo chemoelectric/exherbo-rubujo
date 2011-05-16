@@ -1,0 +1,14 @@
+# Copyright 2010-2011 Wulf C. Krueger <philanthrop@exherbo.org>
+# Copyright 2008 Saleem Abdulrasool <compnerd@compnerd.org>
+# Distributed under the terms of the GNU General Public License v2
+
+require udev
+
+PLATFORMS="~amd64 ~arm ~ia64 ~ppc64 ~x86"
+
+DEFAULT_SRC_PREPARE_PATCHES=(
+    "${FILES}/0001-allow-building-of-only-gudev.patch"
+    "${FILES}/0002-allow-building-only-the-sound-rules.patch"
+    "${FILES}/0001-systemd-hook-into-basic-target.patch"
+)
+
