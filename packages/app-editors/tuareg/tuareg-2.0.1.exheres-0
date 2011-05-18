@@ -3,7 +3,7 @@
 
 SUMMARY="Tuareg, an Emacs major mode for Objective Caml"
 HOMEPAGE="https://forge.ocamlcore.org/projects/${PN}/"
-DOWNLOADS="https://forge.ocamlcore.org/frs/download.php/410/${PNV}.tgz"
+DOWNLOADS="http://forge.ocamlcore.org/frs/download.php/410/${PNV}.tgz"
 
 LICENCES="GPL-2"
 SLOT="0"
