@@ -9,7 +9,7 @@ else
     DOWNLOADS="mirror://kernel/linux/utils/kernel/hotplug/${PNV}.tar.bz2"
 fi
 
-require autotools [ supported_autoconf=[ 2.5 ] supported_automake=[ 1.11 ] ]
+require autotools [ supported_autoconf=[ 2.5 ] supported_automake=[ 1.11 ] ] easy-multibuild
 
 export_exlib_phases pkg_pretend src_prepare src_install pkg_postinst
 
@@ -31,6 +31,7 @@ MYOPTIONS="
     gobject-introspection [[ requires = [ glib ] ]]
     sound [[ description = [ install extra rules for sound cards ] ]]
     systemd [[ description = [ install systemd service files ] ]]
+    multibuild_c: 32 64
     platform: ia64
 " # ppc s390
 
@@ -40,9 +41,9 @@ DEPENDENCIES="
         app-doc/gtk-doc-autotools[>=1.15-r1]
     build+run:
         extras? (
-            dev-libs/libusb:0.1[>=0.1.12]
+            dev-libs/libusb:0.1[>=0.1.12][multibuild_c:*(?)?]
             dev-util/gperf[>=3.0.4]
-            sys-apps/acl[>=2.2.49]
+            sys-apps/acl[>=2.2.49][multibuild_c:*(?)?]
             sys-apps/usbutils[>=0.82]
         )
         glib? ( dev-libs/glib:2[>=2.22.0] )
@@ -56,25 +57,6 @@ DEPENDENCIES="
     suggestion:
         glib? ( sys-auth/ConsoleKit[>=0.4.1] )
 "
-
-DEFAULT_SRC_CONFIGURE_PARAMS=(
-    --libexecdir=/${LIBDIR}/udev
-    --sbindir=/sbin
-    --enable-static
-    --with-rootlibdir=/${LIBDIR}
-    --without-selinux
-)
-
-DEFAULT_SRC_CONFIGURE_OPTION_ENABLES=(
-    extras
-    "glib gudev"
-    "gobject-introspection introspection"
-    "sound pci-db"
-    "sound sound-rules"
-    "sound usb-db"
-)
-
-DEFAULT_SRC_CONFIGURE_OPTION_WITHS=( "systemd systemdsystemunitdir /${LIBDIR}/systemd/system" )
 
 AT_M4DIR=( m4 )
 
@@ -99,10 +81,31 @@ udev_src_prepare() {
     autotools_src_prepare
 }
 
-udev_src_install() {
-    default
+configure_one_multibuild() {
+    econf \
+        --sbindir=/sbin \
+        --enable-static \
+        --with-rootlibdir=/${LIBDIR} \
+        --libexecdir=/${LIBDIR}/udev \
+        --without-selinux \
+        $(option_enable extras) \
+        $(option_enable glib gudev) \
+        $(option_enable gobject-introspection introspection) \
+        $(option_enable sound pci-db) \
+        $(option_enable sound sound-rules) \
+        $(option_enable sound usb-db) \
+        $(option_with systemd systemdsystemunitdir /${LIBDIR}/systemd/system)
+}
 
-    keepdir /etc/udev/rules.d /${LIBDIR}/udev/{devices,state}
+install_one_multibuild() {
+    default
+    keepdir /${LIBDIR}/udev/{devices,state}
+}
+
+udev_src_install() {
+    easy-multibuild_src_install
+
+    keepdir /etc/udev/rules.d
 
     # platform rules {{{
     insinto /${LIBDIR}/udev/rules.d
@@ -141,8 +144,8 @@ EOT
         doins "${FILES}"/udev-start.sh
         doins "${FILES}"/udev-stop.sh
 
-        edo sed -e "s,@@libdir@@,${LIBDIR},g"                           \
-                -i "${IMAGE}"/${LIBDIR}/rcscripts/addons/udev-start.sh  \
+        edo sed -e "s,@@libdir@@,${LIBDIR},g"                          \
+                -i "${IMAGE}"/${LIBDIR}/rcscripts/addons/udev-start.sh \
                 -i "${IMAGE}"/${LIBDIR}/rcscripts/addons/udev-stop.sh
     fi
     # }}}
