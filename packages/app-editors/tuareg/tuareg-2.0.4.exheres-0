@@ -1,0 +1,34 @@
+# Copyright (c) 2010 Barry Schwartz
+# Distributed under the terms of the GNU General Public License v2
+
+SUMMARY="Tuareg, an Emacs major mode for Objective Caml"
+HOMEPAGE="https://forge.ocamlcore.org/projects/${PN}/"
+DOWNLOADS="http://forge.ocamlcore.org/frs/download.php/514/${PNV}.tgz"
+
+LICENCES="GPL-2"
+SLOT="0"
+PLATFORMS="~amd64"
+MYOPTIONS=""
+
+DEPENDENCIES="
+    build+run:
+        app-editors/emacs
+"
+
+src_install()
+{
+    local site_lisp=/usr/share/emacs/site-lisp
+
+    dodir "${site_lisp}/${PN}"
+    emake install DEST="${IMAGE}${site_lisp}/${PN}" MAKE_VERSION_FILE=/bin/true
+    emagicdocs
+}
+
+pkg_postinst()
+{
+    elog
+    elog "To autoload Tuareg mode, put"
+    elog "(load-library \"append-tuareg\")"
+    elog "in your .emacs file."
+    elog
+}
